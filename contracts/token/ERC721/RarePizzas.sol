@@ -38,12 +38,6 @@ contract RarePizzas is Context, ERC165, IERC721, IERC721Metadata {
     mapping (address => mapping (address => bool)) private _operatorApprovals;
 
     /**
-     * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
-     */
-    constructor () {
-    }
-
-    /**
      * @dev See {IERC165-supportsInterface}.
      */
     function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
