@@ -29,7 +29,7 @@ npx hardhat compile
 npx hardhat node
 ```
 
-- deploy contracts
+- deploy contracts (in a different terminal)
 
 ```
 npx hardhat run --network localhost scripts/deploy.js
