@@ -15,7 +15,7 @@ import "../../utils/Strings.sol";
  * the Metadata extension, but not including the Enumerable extension, which is available separately as
  * {ERC721Enumerable}.
  */
-contract RarePizzas is Context, ERC165, IERC721, IERC721Metadata {
+contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
     using Address for address;
     using Strings for uint256;
 
@@ -23,7 +23,7 @@ contract RarePizzas is Context, ERC165, IERC721, IERC721Metadata {
     string private _name = "Rare Pizzas";
 
     // Token symbol
-    string private _symbol "RAREPIZZA";
+    string private _symbol = "RAREPIZZA";
 
     // Mapping from token ID to owner address
     mapping (uint256 => address) private _owners;
