@@ -6,6 +6,11 @@ For Laszlo!
 
 # Instructions
 
+- Clone Repository
+
+```
+git clone https://github.com/snackman/RarePizzas.git
+```
 - Install Hardhat
 
 ```
