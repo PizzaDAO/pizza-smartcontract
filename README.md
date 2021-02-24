@@ -1,9 +1,6 @@
 # RarePizzas
 For Laszlo!
 
-
-
-
 # Instructions
 
 - Clone Repository
@@ -11,10 +8,10 @@ For Laszlo!
 ```
 git clone https://github.com/snackman/RarePizzas.git && cd RarePizzas
 ```
-- Install Hardhat
+- Install dependencies
 
 ```
-npm install --save-dev hardhat
+npm install
 ```
 
 - compile contracts
