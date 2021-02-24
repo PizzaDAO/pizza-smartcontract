@@ -9,7 +9,7 @@ For Laszlo!
 - Clone Repository
 
 ```
-git clone https://github.com/snackman/RarePizzas.git
+git clone https://github.com/snackman/RarePizzas.git && cd RarePizzas
 ```
 - Install Hardhat
 
