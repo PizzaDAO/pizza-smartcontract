@@ -1,11 +1,25 @@
 {
-  "name": "hardhat-project",
+  "name": "@pizzadao/rarepizzas",
+  "description": "Rare Pizza - 10.000 pizzas for Bitcoin Pizza Day 2021",
+  "homepage": "https://",
+  "license": "SEE LICENSE IN <LICENSE> FILE",
+  "keywords": [
+    "ethereum",
+    "hardhat",
+    "react",
+    "web3",
+    "npm",
+    "eth",
+    "evm",
+    "smartcontract",
+    "erc721"
+  ],
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.1",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "chai": "^4.3.0",
     "ethereum-waffle": "^3.2.2",
     "ethers": "^5.0.31",
-    "hardhat": "^2.0.10"
+    "hardhat": "^2.0.11"
   }
 }
