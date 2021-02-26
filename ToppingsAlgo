@@ -1,4 +1,4 @@
-## Simulated list of 4 adjacency matrices of nodes in multiples of 8.
+## Simulated list of 4 adjacency matrices of nodes in multiples of 8 available on PizzaDAO Discord
 library(igraph)
 library(ggplot2)
 library(psych)     
