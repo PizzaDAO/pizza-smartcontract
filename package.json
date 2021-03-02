@@ -26,5 +26,24 @@
     "hardhat": "^2.0.11",
     "prettier": "^2.2.1",
     "typescript": "^4.2.2"
+  },
+  "version": "1.0.0",
+  "main": "hardhat.config.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no tests installed\" && exit 1",
+    "build": "tsc",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PizzaDAO/RarePizzas.git"
+  },
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/PizzaDAO/RarePizzas/issues"
   }
 }
