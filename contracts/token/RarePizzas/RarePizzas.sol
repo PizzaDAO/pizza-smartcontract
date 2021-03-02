@@ -25,13 +25,13 @@ contract RarePizzas is Context, ERC165, IERC721, IERC721Metadata {
 
     mapping(uint=>string) internal _tokenURIs;
 
-    uint public RarePizzaSupply;
+    uint public totalSupply;
 
     // Token name
-    string private _name = "Rare Pizzas";
+    string private _name = "Rare Test";
 
     // Token symbol
-    string private _symbol = "RAREPIZZA";
+    string private _symbol = "TEST";
 
     // Mapping from token ID to owner address
     mapping (uint256 => address) private _owners;
@@ -95,7 +95,7 @@ contract RarePizzas is Context, ERC165, IERC721, IERC721Metadata {
 
     function mint(string memory RarePizzaURI, string[8] memory sliceURIs, address _to) public {
       require(msg.sender==minter);
-      uint pizzaId = RarePizzaSupply*9;
+      uint pizzaId = totalSupply*9;
       _mint(_to,pizzaId);
       _tokenURIs[pizzaId] = RarePizzaURI;
 
@@ -103,7 +103,7 @@ contract RarePizzas is Context, ERC165, IERC721, IERC721Metadata {
         _tokenURIs[pizzaId+i+1] = sliceURIs[i];
       }
 
-      RarePizzaSupply++;
+      totalSupply++;
     }
 
     function slice(uint pizzaId) public{
@@ -129,10 +129,16 @@ contract RarePizzas is Context, ERC165, IERC721, IERC721Metadata {
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
         require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
 
-        string memory baseURI = _baseURI();
-        return bytes(baseURI).length > 0
-            ? string(abi.encodePacked(baseURI, tokenId.toString()))
-            : '';
+        return string(abi.encodePacked(_uri, _tokenURIs[tokenId]));
+    }
+
+    /**
+     * @dev See {IERC721Metadata-tokenURI}.
+     */
+    function uri(uint256 tokenId) public view virtual returns (string memory) {
+        require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
+
+        return string(abi.encodePacked(_uri, _tokenURIs[tokenId]));
     }
 
     /**
