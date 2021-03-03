@@ -33,11 +33,6 @@
     "test": "test"
   },
   "dependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no tests installed\" && exit 1",
-    "build": "tsc",
-    "start": "node server.js"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/PizzaDAO/RarePizzas.git"
