@@ -17,6 +17,7 @@
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.1",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@types/jest": "^26.0.20",
     "@typescript-eslint/eslint-plugin": "^4.16.1",
     "@typescript-eslint/parser": "^4.16.1",
     "chai": "^4.3.0",
@@ -26,6 +27,7 @@
     "hardhat": "^2.0.11",
     "jest": "^26.6.3",
     "prettier": "^2.2.1",
+    "ts-jest": "^26.5.2",
     "typescript": "^4.2.2"
   },
   "version": "1.0.0",
