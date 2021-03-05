@@ -1,7 +1,7 @@
 pragma solidity ^0.8.0;
-import './RarePizzas.sol';
+import './Boxes.sol';
 import './IERC721.sol';
-contract bondingCurve is RarePizzas{
+contract bondingCurve is Boxes{
     IERC721 token;
     uint one=10**18;         
   // Approximate .001x^2+.000 000 000 000 000 000 000 000 0000999x^{8}
@@ -16,9 +16,10 @@ contract bondingCurve is RarePizzas{
         return curve(totalSupply);
     }
     function purchase() public payable{
+        require(totalSupply<10000,"maximum supply of 10000");
         totalSupply+=1;
         uint price=curve(totalSupply);
-        require(price==msg.value,"price must be on the curve")
-        _mint(_to,totalSupply);
+        require(price==msg.value,"price must be on the curve");
+        _mint(msg.sender,totalSupply);
     }
 }

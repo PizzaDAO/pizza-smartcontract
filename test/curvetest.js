@@ -21,5 +21,7 @@ const { expect } = require("chai");
      r=await curve.curve(10000)
     
      console.log(r.toString()/10**18)
+     let p=await curve.curve(1)
+    
    });
  });
