@@ -38,7 +38,6 @@
   "directories": {
     "test": "test"
   },
-  "dependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/PizzaDAO/RarePizzas.git"
