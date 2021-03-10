@@ -8,6 +8,7 @@ contract BondingCurve {
 
     // Approximate .001x^2+.000 000 000 000 000 000 000 000 0000999x^{8}
     function curve(uint256 n) public view returns (uint256) {
+        require(n > 0, "BondingCurve: starting position cannot be zero");
         uint256 term1 = ((n * one) / 10**4);
         uint256 term2 = ((one * n**8 * MAX_CURVE) / 10**32);
         return term1 + term2;
