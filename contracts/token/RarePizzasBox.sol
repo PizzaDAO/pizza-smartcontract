@@ -71,8 +71,8 @@ contract RarePizzasBox is
 
         uint256 price = getPrice();
         require(price == msg.value, "RAREPIZZA: price must be on the curve");
-        _safeMint(msg.sender, _getNextPizzaTokenId());
         _whole_pizza_count.increment();
+        _safeMint(msg.sender, _getNextPizzaTokenId());
     }
 
     // IERC721 Overrides
@@ -116,9 +116,9 @@ contract RarePizzasBox is
             _minted_pizza_count.current().add(1) <= MAX_MINTABLE_SUPPLY,
             "RAREPIZZA: mint would exceed MAX_MINTABLE_SUPPLY"
         );
-        _safeMint(to, _getNextPizzaTokenId());
         _minted_pizza_count.increment();
         _whole_pizza_count.increment();
+        _safeMint(to, _getNextPizzaTokenId());
     }
 
     function _getNextPizzaTokenId() private returns (uint256) {
