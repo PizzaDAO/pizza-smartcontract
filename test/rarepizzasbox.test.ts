@@ -24,7 +24,6 @@ describe("test Rare Pizzas Box", function () {
         console.log(r.toString() / 10 ** 18)
         r = await instance.curve(100)
         console.log(r.toString() / 10 ** 18)
-        console.log(r.toString() / 10 ** 18)
         r = await instance.curve(10000)
         console.log(r.toString() / 10 ** 18)
         r = await instance.curve(5000)
@@ -35,6 +34,8 @@ describe("test Rare Pizzas Box", function () {
         console.log(r.toString() / 10 ** 18)
         r = await instance.curve(10000)
         console.log(r.toString() / 10 ** 18)
+
+        // TODO: expect
     });
 
     it("Should allow payments to the payable contract", async () => {
