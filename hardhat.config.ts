@@ -1,9 +1,10 @@
-require("@nomiclabs/hardhat-waffle");
+import { task } from "hardhat/config";
+import "@nomiclabs/hardhat-waffle";
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
-task("accounts", "Prints the list of accounts", async () => {
-  const accounts = await ethers.getSigners();
+task("accounts", "Prints the list of accounts", async (args, hre) => {
+  const accounts = await hre.ethers.getSigners();
 
   for (const account of accounts) {
     console.log(account.address);
@@ -15,16 +16,17 @@ task("accounts", "Prints the list of accounts", async () => {
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
+ *  rinkeby: {
+      url:  "http://127.0.0.1:8555", //specify ethereum node endpoint
+      accounts: ["0xc87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3"] //specify privateKey of account
+    }
  */
 module.exports = {
-  defaultNetwork: "rinkeby",
+  defaultNetwork: "hardhat",
   networks: {
     hardhat: {
     },
-    rinkeby: {
-      url: "", //specify ethereum node endpoint
-      accounts: [""] //specify privateKey of account
-    }
+
   },
   solidity: {
     version: "0.8.0",
