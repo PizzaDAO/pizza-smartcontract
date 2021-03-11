@@ -29,8 +29,13 @@ contract RarePizzasBox is
     using CountersUpgradeable for CountersUpgradeable.Counter;
     using SafeMathUpgradeable for uint256;
 
+    // Public Variables
+
+    // 2021-03-14:15h::9m::26s
+    uint256 internal _public_sale_start_timestamp = 1615734566;
+
     uint256 private constant MAX_TOKEN_SUPPLY = 10000;
-    uint256 private constant MAX_MINTABLE_SUPPLY = 1250; // TODO: verify
+    uint256 private constant MAX_MINTABLE_SUPPLY = 1250;
 
     CountersUpgradeable.Counter private _minted_pizza_count;
     CountersUpgradeable.Counter private _whole_pizza_count;
@@ -59,6 +64,10 @@ contract RarePizzasBox is
     }
 
     function purchase() public payable override {
+        require(
+            block.timestamp >= _saleStartTimestamp(),
+            "RAREPIZZA: The sale hasn't started yet"
+        );
         require(
             totalSupply() <= maxSupply(),
             "RAREPIZZA: Call exceeds maximum supply"
@@ -123,6 +132,10 @@ contract RarePizzasBox is
 
     function _getNextPizzaTokenId() private view returns (uint256) {
         return totalSupply();
+    }
+
+    function _saleStartTimestamp() private view returns (uint256) {
+        return _public_sale_start_timestamp;
     }
 
     /**
