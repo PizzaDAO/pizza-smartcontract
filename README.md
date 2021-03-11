@@ -6,7 +6,7 @@ For Laszlo!
 - Clone Repository
 
 ```
-git clone https://github.com/snackman/RarePizzas.git && cd RarePizzas
+git clone git@github.com:PizzaDAO/pizza-smartcontract.git && cd pizza-smartcontract
 ```
 - Install dependencies
 
@@ -29,5 +29,5 @@ npx hardhat node
 - deploy contracts (in a different terminal)
 
 ```
-npx hardhat run --network localhost scripts/deploy.js
+npx hardhat run --network localhost scripts/deploy-box.ts
 ```
