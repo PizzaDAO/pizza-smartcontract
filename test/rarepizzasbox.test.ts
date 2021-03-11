@@ -1,60 +1,73 @@
-import { expect, use } from "chai";
-import { BigNumber, Contract } from 'ethers';
-import { MockProvider, solidity } from 'ethereum-waffle';
+import { expect } from 'chai'
+import { BigNumber, Contract, utils } from 'ethers'
+import { ethers } from 'hardhat'
 
-const { ethers, upgrades } = require("hardhat");
+type TestContext = {
+  box: Contract
+}
 
-use(solidity);
+let testContext: TestContext
 
-describe("test Rare Pizzas Box", function () {
-    let instance: Contract;
-    let wei = 10 ** 18;
+describe('Rare Pizzas Box', function () {
+  beforeEach(async () => {
+    const Box = await ethers.getContractFactory('RarePizzasBox')
+    const box = await Box.deploy()
 
-    const [wallet, otherWallet] = new MockProvider().getWallets();
+    testContext = {
+      box,
+    }
+  })
 
-    beforeEach(async () => {
-        const Box = await ethers.getContractFactory("RarePizzasBox");
-        instance = await Box.deploy();
-    });
+  it('Should return prices for the bonding curve', async () => {
+    const { box } = testContext
 
-    it("Should return prices for the bonding curve", async () => {
+    let r = await box.curve(1)
+    console.log(utils.formatEther(r))
 
-        let r = await instance.curve(1)
-        console.log(r.toString() / wei)
-        r = await instance.curve(10)
-        console.log(r.toString() / wei)
-        r = await instance.curve(100)
-        console.log(r.toString() / wei)
-        r = await instance.curve(10000)
-        console.log(r.toString() / wei)
-        r = await instance.curve(5000)
-        console.log(r.toString() / wei)
-        r = await instance.curve(6000)
-        console.log(r.toString() / wei)
-        r = await instance.curve(7000)
-        console.log(r.toString() / wei)
-        r = await instance.curve(10000)
-        console.log(r.toString() / wei)
+    r = await box.curve(10)
+    console.log(utils.formatEther(r))
 
-        expect(r / wei).to.equal(10000);
-    });
+    r = await box.curve(100)
+    console.log(utils.formatEther(r))
 
-    it("Should allow payments to the payable contract", async () => {
+    r = await box.curve(10000)
+    console.log(utils.formatEther(r))
 
-        let price: BigNumber = await instance.getPrice();
-        expect(price.toNumber() / wei).to.equal(0.0001);
+    r = await box.curve(5000)
+    console.log(utils.formatEther(r))
 
-        await instance.purchase({ value: price.toNumber() });
+    r = await box.curve(6000)
+    console.log(utils.formatEther(r))
 
-        expect((await instance.totalSupply()).toNumber()).to.equal(1);
-    });
+    r = await box.curve(7000)
+    console.log(utils.formatEther(r))
 
-    it("Should reject payments to the payable contract", async () => {
-        await expect(instance.purchase({ value: 0 })).to.be.reverted;
-    });
+    r = await box.curve(10000)
+    console.log(utils.formatEther(r))
 
-    it("Should reject withdrawal", async () => {
-        await expect(instance.withdraw()).to.be.reverted;
+    expect(r).to.equal(utils.parseEther('10000'))
+  })
 
-    });
-});
+  it('Should allow payments to the payable contract', async () => {
+    const { box } = testContext
+    const price: BigNumber = await box.getPrice()
+
+    expect(price).to.equal(utils.parseEther('0.0001'))
+
+    await box.purchase({ value: price })
+
+    expect((await box.totalSupply()).toNumber()).to.equal(1)
+  })
+
+  it('Should reject payments to the payable contract', async () => {
+    const { box } = testContext
+
+    await expect(box.purchase({ value: 0 })).to.be.reverted
+  })
+
+  it('Should reject withdrawal', async () => {
+    const { box } = testContext
+
+    await expect(box.withdraw()).to.be.reverted
+  })
+})
