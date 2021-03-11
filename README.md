@@ -31,3 +31,13 @@ npx hardhat node
 ```
 npx hardhat run --network localhost scripts/deploy-box.ts
 ```
+
+## run unit tests
+- run jest
+```
+npx hardhat test:jest
+```
+- or to run in watch mode
+```
+npx hardhat test:jest --watch
+```

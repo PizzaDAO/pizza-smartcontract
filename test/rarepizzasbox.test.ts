@@ -1,22 +1,18 @@
-import { expect, use } from "chai";
-import { BigNumber, Contract } from 'ethers';
-import { MockProvider, solidity } from 'ethereum-waffle';
+import { BigNumber, Contract } from 'ethers'
+import { MockProvider } from 'ethereum-waffle'
+import { ethers } from 'hardhat'
 
-const { ethers, upgrades } = require("hardhat");
+describe('test Rare Pizzas Box', function () {
+    let instance: Contract
 
-use(solidity);
-
-describe("test Rare Pizzas Box", function () {
-    let instance: Contract;
-
-    const [wallet] = new MockProvider().getWallets();
+    const [wallet] = new MockProvider().getWallets()
 
     beforeEach(async () => {
-        const Box = await ethers.getContractFactory("RarePizzasBox");
-        instance = await Box.deploy();
-    });
+        const Box = await ethers.getContractFactory('RarePizzasBox')
+        instance = await Box.deploy()
+    })
 
-    it("Should return prices for the bonding curve", async () => {
+    it('Should return prices for the bonding curve', async () => {
 
         let r = await instance.curve(1)
         console.log(r.toString() / 10 ** 18)
@@ -36,15 +32,15 @@ describe("test Rare Pizzas Box", function () {
         console.log(r.toString() / 10 ** 18)
 
         // TODO: expect
-    });
+    })
 
-    it("Should allow payments to the payable contract", async () => {
+    it('Should allow payments to the payable contract', async () => {
 
-        let price: BigNumber = await instance.getPrice();
-        expect(price.toNumber()).to.equal(0);
+        const price: BigNumber = await instance.getPrice()
+        expect(price.toNumber()).toBe(0)
 
-        await wallet.sendTransaction({ to: instance.address, value: price.toNumber() });
+        await wallet.sendTransaction({ to: instance.address, value: price.toNumber() })
 
         // TODO: expect
-    });
-});
+    })
+})
