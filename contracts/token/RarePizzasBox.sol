@@ -44,7 +44,7 @@ contract RarePizzasBox is
     }
 
     // IOpenSeaCompatible
-    function contractURI() public view override returns (string memory) {
+    function contractURI() public pure override returns (string memory) {
         // TODO: opensea metadata
         return "https://something.to/github";
     }
@@ -121,7 +121,7 @@ contract RarePizzasBox is
         _safeMint(to, _getNextPizzaTokenId());
     }
 
-    function _getNextPizzaTokenId() private returns (uint256) {
+    function _getNextPizzaTokenId() private view returns (uint256) {
         return totalSupply();
     }
 

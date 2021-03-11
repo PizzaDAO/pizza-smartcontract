@@ -1,6 +1,11 @@
-import { expect } from 'chai'
+import { expect, use } from 'chai'
 import { BigNumber, Contract, utils } from 'ethers'
+import { solidity } from 'ethereum-waffle'
 import { ethers } from 'hardhat'
+
+import { bondingCurve as bc } from './helpers'
+
+use(solidity)
 
 type TestContext = {
   box: Contract
@@ -18,34 +23,22 @@ describe('Rare Pizzas Box', function () {
     }
   })
 
-  it('Should return prices for the bonding curve', async () => {
-    const { box } = testContext
+  // describe('Deploying the contract', () => {})
 
-    let r = await box.curve(1)
-    console.log(utils.formatEther(r))
+  describe('Check methods', () => {
+    it('Should get price for next Box', async () => {
+      const { box } = testContext
+      const price: BigNumber = await box.getPrice()
+      const soldTokens = await box.totalSupply()
 
-    r = await box.curve(10)
-    console.log(utils.formatEther(r))
+      expect(price).to.equal(bc.bondingCurve(soldTokens + 1))
+    })
 
-    r = await box.curve(100)
-    console.log(utils.formatEther(r))
+    it('Should return max supply', async () => {
+      const { box } = testContext
 
-    r = await box.curve(10000)
-    console.log(utils.formatEther(r))
-
-    r = await box.curve(5000)
-    console.log(utils.formatEther(r))
-
-    r = await box.curve(6000)
-    console.log(utils.formatEther(r))
-
-    r = await box.curve(7000)
-    console.log(utils.formatEther(r))
-
-    r = await box.curve(10000)
-    console.log(utils.formatEther(r))
-
-    expect(r).to.equal(utils.parseEther('10000'))
+      expect(await box.maxSupply()).to.equal(bc.MAX_CURVE_VALUE)
+    })
   })
 
   it('Should allow payments to the payable contract', async () => {
