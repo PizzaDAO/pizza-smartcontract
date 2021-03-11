@@ -51,7 +51,7 @@ contract RarePizzasBox is
 
     // IRarePizzasBox
     function getPrice() public view override returns (uint256) {
-        return super.curve(super.totalSupply());
+        return super.curve(super.totalSupply() + 1);
     }
 
     function maxSupply() public view virtual override returns (uint256) {
