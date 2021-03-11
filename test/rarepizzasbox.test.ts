@@ -1,5 +1,5 @@
 import { expect, use } from "chai";
-import { BigNumber, Contract, utils } from 'ethers';
+import { BigNumber, Contract } from 'ethers';
 import { MockProvider, solidity } from 'ethereum-waffle';
 
 const { ethers, upgrades } = require("hardhat");
