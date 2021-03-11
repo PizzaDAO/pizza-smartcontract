@@ -1,8 +1,7 @@
-import { HardhatUserConfig } from "hardhat/config"
-import { task } from 'hardhat/config'
 import '@nomiclabs/hardhat-waffle'
 import '@openzeppelin/hardhat-upgrades'
 import 'hardhat-jest-plugin'
+import { task, HardhatUserConfig } from 'hardhat/config'
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
