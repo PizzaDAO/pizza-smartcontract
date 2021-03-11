@@ -20,12 +20,15 @@ describe('Rare Pizzas Box', function () {
     }
   })
 
-  it.each([1, 10, 100, 1000, 5000, 6000, 7000, 10000])('Should return prices for the bonding curve', async tokenId => {
-    const { box } = testContext
-    const r: BigNumber = await box.curve(tokenId)
+  it.each([1, 10, 100, 1000, 5000, 6000, 7000, 10000])(
+    'Should return prices for the bonding curve',
+    async (tokenId) => {
+      const { box } = testContext
+      const r: BigNumber = await box.curve(tokenId)
 
-    console.log(utils.formatEther(r))
-  })
+      console.log(utils.formatEther(r))
+    },
+  )
 
   it('Should allow payments to the payable contract', async () => {
     const { box } = testContext
