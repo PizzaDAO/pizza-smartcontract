@@ -39,23 +39,23 @@ const ROPSTEN_PRIVATE_KEY = "YOUR ROPSTEN PRIVATE KEY";
 const config: HardhatUserConfig = {
   defaultNetwork: 'hardhat',
   networks: {
-    goerli: {
-      url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
-      accounts: [`0x${GOERLI_PRIVATE_KEY}`]
-    },
+    // goerli: {
+    //   url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
+    //   accounts: [`0x${GOERLI_PRIVATE_KEY}`]
+    // },
     hardhat: {},
     // mainnet: {
     //   url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
     //   accounts: [`0xNOPE!`]
     // },
-    rinkeby: {
-      url: `https://eth-rinkeby.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
-      accounts: [`0x${RINKEBY_PRIVATE_KEY}`]
-    },
-    ropsten: {
-      url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
-      accounts: [`0x${ROPSTEN_PRIVATE_KEY}`]
-    }
+    // rinkeby: {
+    //   url: `https://eth-rinkeby.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
+    //   accounts: [`0x${RINKEBY_PRIVATE_KEY}`]
+    // },
+    // ropsten: {
+    //   url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
+    //   accounts: [`0x${ROPSTEN_PRIVATE_KEY}`]
+    // }
   },
   solidity: {
     version: '0.8.0',
