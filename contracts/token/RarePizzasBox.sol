@@ -58,7 +58,7 @@ contract RarePizzasBox is
     // IOpenSeaCompatible
     function contractURI() public view virtual override returns (string memory) {
         // TODO: opensea metadata
-        return 'https://something.to/github';
+        return 'https://raw.githubusercontent.com/PizzaDAO/pizza-smartcontract/master/data/opensea_metadata.json';
     }
 
     // IRarePizzasBox
