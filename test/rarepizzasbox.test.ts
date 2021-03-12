@@ -11,6 +11,7 @@ type TestContext = {
   box: Contract
 }
 
+const MAX_NUMBER_OF_BOXES = 10 * 1000
 let testContext: TestContext
 
 describe('Rare Pizzas Box', function () {
@@ -39,28 +40,47 @@ describe('Rare Pizzas Box', function () {
 
       expect(await box.maxSupply()).to.equal(bc.MAX_CURVE_VALUE)
     })
-  })
 
-  it('Should allow payments to the payable contract', async () => {
-    const { box } = testContext
-    const price: BigNumber = await box.getPrice()
+    describe('Purchase a box', () => {
+      describe('Happy flow', () => {
+        it('Should allow purchase of box', async () => {
+          const { box } = testContext
+          const boxBuyers = new Array(10)
 
-    expect(price).to.equal(utils.parseEther('0.0001'))
+          for (let i = 0; i < boxBuyers.length; i++) {
+            const price: BigNumber = await box.getPrice()
+            await box.purchase({ value: price })
 
-    await box.purchase({ value: price })
+            expect((await box.totalSupply()).toNumber()).to.equal(i + 1)
+          }
+        })
+      })
 
-    expect((await box.totalSupply()).toNumber()).to.equal(1)
-  })
+      describe('Revert', () => {
+        it('Should reject purchase of box for free', async () => {
+          const { box } = testContext
 
-  it('Should reject payments to the payable contract', async () => {
-    const { box } = testContext
+          await expect(box.purchase({ value: 0 })).to.be.reverted
+        })
 
-    await expect(box.purchase({ value: 0 })).to.be.reverted
-  })
+        // TODO: Implement this with mock contract functions
+        // it('Should reject purchase of box over MAX_NUMBER_OF_BOXES', async (done) => {})
+      })
+    })
 
-  it('Should reject withdrawal', async () => {
-    const { box } = testContext
+    describe('Withdraw funds', () => {
+      describe('Happy flow', () => {
+        // TODO: Implement withdrawal by owner
+        // it('Should withdraw funds', async () => {})
+      })
 
-    await expect(box.withdraw()).to.be.reverted
+      describe('Revert', () => {
+        it('Should reject withdrawal when 0 funds', async () => {
+          const { box } = testContext
+
+          await expect(box.withdraw()).to.be.reverted
+        })
+      })
+    })
   })
 })
