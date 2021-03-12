@@ -2,17 +2,17 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
+import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol';
 
-import "../math/BondingCurve.sol";
-import "../interfaces/IOpenSeaCompatible.sol";
-import "../interfaces/IRarePizzasBox.sol";
+import '../math/BondingCurve.sol';
+import '../interfaces/IOpenSeaCompatible.sol';
+import '../interfaces/IRarePizzasBox.sol';
 
 /**
  * @dev Rare Pizzas Box mints pizza box token for callers who call the purchase function.
@@ -31,15 +31,13 @@ contract RarePizzasBox is
 
     // V1 Variables (do not modify this section when upgrading)
 
-    // 2021-03-14:15h::9m::26s
-    uint256 public _public_sale_start_timestamp = 1615734566;
-
     uint256 public constant MAX_TOKEN_SUPPLY = 10000;
     uint256 public constant MAX_MINTABLE_SUPPLY = 1250;
     uint256 public constant MAX_PURCHASABLE_SUPPLY = 8750;
 
-    string public _boxMetadataUri =
-        "https://ipfs.io/ipfs/some/path/to/box/metadata";
+    uint256 public _public_sale_start_timestamp;
+
+    string public constant _boxMetadataUri = 'https://ipfs.io/ipfs/some/path/to/box/metadata';
 
     CountersUpgradeable.Counter public _minted_pizza_count;
     CountersUpgradeable.Counter public _purchased_pizza_count;
@@ -48,21 +46,23 @@ contract RarePizzasBox is
 
     function initialize(address mintTo, uint8 count) public initializer {
         __Ownable_init();
-        __ERC721_init("Rare Pizza Box", "RAREPIZZASBOX");
+        __ERC721_init('Rare Pizza Box', 'RAREPIZZASBOX');
 
+        // 2021-03-14:15h::9m::26s
+        _public_sale_start_timestamp = 1615734566;
         if (count > 0) {
             mint(mintTo, count);
         }
     }
 
     // IOpenSeaCompatible
-    function contractURI() public pure override returns (string memory) {
+    function contractURI() public view virtual override returns (string memory) {
         // TODO: opensea metadata
-        return "https://something.to/github";
+        return 'https://something.to/github';
     }
 
     // IRarePizzasBox
-    function getPrice() public view override returns (uint256) {
+    function getPrice() public view virtual override returns (uint256) {
         return super.curve(super.totalSupply() + 1);
     }
 
@@ -100,16 +100,13 @@ contract RarePizzasBox is
     /**
      * allows the contract owner to mint up to a specific number of boxes
      */
-    function mint(address to, uint8 count) public onlyOwner {
-        require(count > 0, "RAREPIZZA: must provide a count");
+    function mint(address to, uint8 count) public virtual onlyOwner {
+        require(count > 0, 'RAREPIZZA: must provide a count');
 
-        require(
-            totalSupply().add(count) <= maxSupply(),
-            "RAREPIZZA: mint would exceed maxSupply"
-        );
+        require(totalSupply().add(count) <= maxSupply(), 'RAREPIZZA: mint would exceed maxSupply');
         require(
             _minted_pizza_count.current().add(count) <= MAX_MINTABLE_SUPPLY,
-            "RAREPIZZA: mint would exceed MAX_MINTABLE_SUPPLY"
+            'RAREPIZZA: mint would exceed MAX_MINTABLE_SUPPLY'
         );
 
         for (uint256 i = 0; i < count; i++) {
@@ -125,7 +122,7 @@ contract RarePizzasBox is
     /**
      * @dev Withdraw ether from this contract (Callable by owner)
      */
-    function withdraw() public onlyOwner {
+    function withdraw() public virtual onlyOwner {
         uint256 balance = address(this).balance;
         payable(msg.sender).transfer(balance);
     }
