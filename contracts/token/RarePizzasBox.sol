@@ -70,23 +70,12 @@ contract RarePizzasBox is
         return MAX_TOKEN_SUPPLY;
     }
 
-    function purchase() public payable override {
-        require(
-            block.timestamp >= _public_sale_start_timestamp,
-            "RAREPIZZA: The sale hasn't started yet"
-        );
-        require(
-            totalSupply() <= MAX_TOKEN_SUPPLY,
-            "RAREPIZZA: Call exceeds maximum supply"
-        );
-
-        require(
-            totalSupply().add(1) <= MAX_TOKEN_SUPPLY,
-            "RAREPIZZA: purchase would exceed maxSupply"
-        );
+    function purchase() public payable virtual override {
+        require(block.timestamp >= _public_sale_start_timestamp, "RAREPIZZA: The sale hasn't started yet");
+        require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY, 'RAREPIZZA: purchase would exceed maxSupply');
 
         uint256 price = getPrice();
-        require(price == msg.value, "RAREPIZZA: price must be on the curve");
+        require(price == msg.value, 'RAREPIZZA: price must be on the curve');
         _purchased_pizza_count.increment();
         _safeMint(msg.sender, _getNextPizzaTokenId());
     }
