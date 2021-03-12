@@ -8,7 +8,7 @@ type TestContext = {
 
 let testContext: TestContext
 
-describe('Rare Pizzas Box Timestamp Mock Tests', function () {
+describe('Box Timestamp Mock Tests', function () {
     beforeEach(async () => {
         const Box = await ethers.getContractFactory('FakeRarePizzasBox');
         const box = await Box.deploy();
