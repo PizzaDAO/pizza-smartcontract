@@ -27,6 +27,14 @@ describe('Rare Pizzas Box', function () {
   // describe('Deploying the contract', () => {})
 
   describe('Check methods', () => {
+    it('Should get price for first Box', async () =>{
+      const { box } = testContext
+      const price: BigNumber = await box.getPrice()
+
+      expect(price).to.equal(bc.bondingCurve(1))
+    })
+
+
     it('Should get price for next Box', async () => {
       const { box } = testContext
       const price: BigNumber = await box.getPrice()
