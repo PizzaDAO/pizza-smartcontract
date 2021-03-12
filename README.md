@@ -29,7 +29,7 @@ npx hardhat node
 - deploy contracts (in a different terminal)
 
 ```
-npx hardhat run --network localhost scripts/deploy-box.ts
+npx hardhat run --network localhost scripts/deploy-box.proxy.ts
 ```
 
 ## Run unit tests
