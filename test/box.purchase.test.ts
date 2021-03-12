@@ -1,5 +1,5 @@
 import { expect, use } from 'chai'
-import { BigNumber, Contract, utils } from 'ethers'
+import { BigNumber, Contract } from 'ethers'
 import { solidity } from 'ethereum-waffle'
 import { ethers } from 'hardhat'
 
