@@ -30,7 +30,7 @@ describe('Box Metadata Tests', function () {
 
     // scale this up to test the distribution below
     let scaling = 50 // 8750 will fill the whole set (if you have enough eth in your wallet)
-    let mint_block = 1 // 50 will fill the whole set
+    let mint_block = 5 // 50 will fill the whole set
 
     it('Should return a valid token uri', async () => {
         const { box, wallet, anotherWallet } = testContext

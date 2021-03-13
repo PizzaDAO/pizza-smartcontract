@@ -3,6 +3,7 @@ import { NetworksUserConfig } from 'hardhat/types'
 import '@nomiclabs/hardhat-etherscan'
 import '@nomiclabs/hardhat-waffle'
 import '@openzeppelin/hardhat-upgrades'
+import "hardhat-gas-reporter"
 
 import config, { NetworkConfig } from './config'
 
@@ -68,6 +69,10 @@ const hardhatConfig: HardhatUserConfig = {
       },
     },
   },
+  gasReporter: {
+    currency: 'USD',
+    gasPrice: 150
+  }
 }
 
 export default hardhatConfig

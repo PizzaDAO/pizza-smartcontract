@@ -92,6 +92,17 @@ describe('Rare Pizzas Box', function () {
         expect(await box.balanceOf(userWallet.address)).to.equal(1)
       })
 
+      it('Should allow owner to mint different quantities', async () => {
+        const { box, userWallet } = testContext
+
+        await box.mint(userWallet.address, 5)
+        await box.mint(userWallet.address, 10)
+        // can go up to 255
+
+        expect(await box.totalSupply()).to.equal(15)
+        expect(await box.balanceOf(userWallet.address)).to.equal(15)
+      })
+
       it('Should allow owner purchase to address', async () => {
         const { box, wallet } = testContext
         const price: BigNumber = await box.getPrice()

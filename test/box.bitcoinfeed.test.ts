@@ -3,8 +3,8 @@ import { BigNumber, Contract, Wallet, utils, ContractFactory } from 'ethers'
 import { ethers, upgrades } from 'hardhat'
 import { MockProvider, deployMockContract, MockContract } from 'ethereum-waffle';
 
-const aggregatorV3 = require('../artifacts/@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol/AggregatorV3Interface.json')
-const boxContract = require('../artifacts/contracts/token/RarePizzasBox.sol/RarePizzasBox.json')
+import aggregatorV3 from '../artifacts/@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol/AggregatorV3Interface.json';
+import boxContract from '../artifacts/contracts/token/RarePizzasBox.sol/RarePizzasBox.json';
 
 
 type TestContext = {
