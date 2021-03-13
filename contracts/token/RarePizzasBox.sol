@@ -13,6 +13,7 @@ import '@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol';
 import '../math/BondingCurve.sol';
 import '../interfaces/IOpenSeaCompatible.sol';
 import '../interfaces/IRarePizzasBox.sol';
+import '../data/AllowList.sol';
 
 /**
  * @dev Rare Pizzas Box mints pizza box token for callers who call the purchase function.
@@ -71,7 +72,10 @@ contract RarePizzasBox is
     }
 
     function purchase() public payable virtual override {
-        require(block.timestamp >= _public_sale_start_timestamp, "RAREPIZZA: The sale hasn't started yet");
+        require(
+            block.timestamp >= _public_sale_start_timestamp || AllowList.allowed(msg.sender),
+            "RAREPIZZA: The sale hasn't started yet"
+        );
         require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY, 'RAREPIZZA: purchase would exceed maxSupply');
 
         uint256 price = getPrice();
@@ -113,6 +117,19 @@ contract RarePizzasBox is
             _minted_pizza_count.increment();
             _safeMint(to, _getNextPizzaTokenId());
         }
+    }
+
+    /**
+     * allows owner to purchase to a specific address
+     */
+    function purchaseTo(address to) public payable virtual onlyOwner {
+        require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY, 'RAREPIZZA: purchase would exceed maxSupply');
+        require(to != msg.sender, 'RAREPIZZA: Thats how capos get whacked');
+
+        uint256 price = getPrice();
+        require(price == msg.value, 'RAREPIZZA: price must be on the curve');
+        _purchased_pizza_count.increment();
+        _safeMint(to, _getNextPizzaTokenId());
     }
 
     function _getNextPizzaTokenId() private view returns (uint256) {
