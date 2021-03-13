@@ -3,40 +3,40 @@ import { BigNumber, Contract, utils } from 'ethers'
 import { ethers } from 'hardhat'
 
 type TestContext = {
-    box: Contract
+  box: Contract
 }
 
 let testContext: TestContext
 
 describe('Box Timestamp Mock Tests', function () {
-    beforeEach(async () => {
-        const Box = await ethers.getContractFactory('FakeRarePizzasBox');
-        const box = await Box.deploy();
-        // pick a date like jan 1, 2021
-        await box.setSaleStartTimestamp(1609459200);
+  beforeEach(async () => {
+    const Box = await ethers.getContractFactory('FakeRarePizzasBox')
+    const box = await Box.deploy()
 
-        testContext = {
-            box,
-        }
-    })
+    // Pick a date. 1609459200 = Friday, 1 January 2021 00:00:00
+    await box.setSaleStartTimestamp(1609459200)
 
-    it('Should allow purchase with low timestamp', async () => {
-        const { box } = testContext;
-        const price: BigNumber = await box.getPrice();
+    testContext = {
+      box,
+    }
+  })
 
-        await box.purchase({ value: price });
+  it('Should allow purchase with low timestamp', async () => {
+    const { box } = testContext
+    const price: BigNumber = await box.getPrice()
 
-        expect((await box.totalSupply()).toNumber()).to.equal(1);
+    await box.purchase({ value: price })
 
-    })
+    expect(await box.totalSupply()).to.equal(1)
+  })
 
-    it('Should not allow purchase with high timestamp', async () => {
-        const { box } = testContext;
-        await box.setSaleStartTimestamp(32472144000);
-        const price: BigNumber = await box.getPrice();
+  it('Should not allow purchase with high timestamp', async () => {
+    const { box } = testContext
+    await box.setSaleStartTimestamp(32472144000)
+    const price: BigNumber = await box.getPrice()
 
-        await expect(box.purchase({ value: price })).to.be.reverted
+    await expect(box.purchase({ value: price })).to.be.reverted
 
-        expect((await box.totalSupply()).toNumber()).to.equal(0);
-    })
+    expect(await box.totalSupply()).to.equal(0)
+  })
 })
