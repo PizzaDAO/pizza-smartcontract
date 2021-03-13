@@ -45,15 +45,12 @@ contract RarePizzasBox is
 
     // END V1 Variables
 
-    function initialize(address mintTo, uint8 count) public initializer {
+    function initialize() public initializer {
         __Ownable_init();
         __ERC721_init('Rare Pizza Box', 'RAREPIZZASBOX');
 
         // 2021-03-14:15h::9m::26s
         _public_sale_start_timestamp = 1615734566;
-        if (count > 0) {
-            mint(mintTo, count);
-        }
     }
 
     // IOpenSeaCompatible
