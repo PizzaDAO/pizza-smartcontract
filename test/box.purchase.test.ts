@@ -4,6 +4,7 @@ import { MockProvider, solidity } from 'ethereum-waffle'
 import { ethers } from 'hardhat'
 
 import { bondingCurve as bc } from './helpers'
+import { getAddress } from '@ethersproject/address'
 
 use(solidity)
 
@@ -23,7 +24,7 @@ describe('Rare Pizzas Box', function () {
     const box = await Box.deploy()
 
     // initialize to set owner, since not deployed via proxy
-    await box.initialize()
+    await box.initialize(utils.getAddress('0x0000000000000000000000000000000000000000'))
 
     // pick a date like jan 1, 2021
     await box.setSaleStartTimestamp(1609459200);

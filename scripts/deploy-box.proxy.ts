@@ -15,7 +15,8 @@ async function main() {
 
   // calls RarePizzasBox.initialize()
   // gnosis safe: 0xBA5E28a2D1C8cF67Ac9E0dfc850DC8b7b21A4DE2
-  const box = await upgrades.deployProxy(Box)
+  // TODO: define chainlink dep based on env
+  const box = await upgrades.deployProxy(Box, ['0x0000000000000000000000000000000000000000'])
   await box.deployed()
 
   console.log('RarePizzasBox deployed to:', box.address)

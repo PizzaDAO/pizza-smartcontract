@@ -10,6 +10,8 @@ import '@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol';
 
+import '@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol';
+
 import '../math/BondingCurve.sol';
 import '../interfaces/IOpenSeaCompatible.sol';
 import '../interfaces/IRarePizzasBox.sol';
@@ -39,9 +41,12 @@ contract RarePizzasBox is
     uint256 public constant MAX_MINTABLE_SUPPLY = 1250;
     uint256 public constant MAX_PURCHASABLE_SUPPLY = 8750;
 
-    uint256 public _public_sale_start_timestamp;
+    uint256 public publicSaleStart_timestampInS;
+    int256 public bitcoinPriceInUSD;
 
     string public constant _uriBase = 'https://ipfs.io/ipfs/';
+
+    address internal _chainlinkBtcUSDFeed;
 
     CountersUpgradeable.Counter public _minted_pizza_count;
     CountersUpgradeable.Counter public _purchased_pizza_count;
@@ -50,12 +55,17 @@ contract RarePizzasBox is
 
     // END V1 Variables
 
-    function initialize() public initializer {
+    function initialize(address chainlinkBtcUSDFeed) public initializer {
         __Ownable_init();
         __ERC721_init('Rare Pizza Box', 'RAREPIZZASBOX');
 
         // 2021-03-14:15h::9m::26s
-        _public_sale_start_timestamp = 1615734566;
+        publicSaleStart_timestampInS = 1615734566;
+        bitcoinPriceInUSD = 50000;
+
+        if (chainlinkBtcUSDFeed != address(0)) {
+            _chainlinkBtcUSDFeed = chainlinkBtcUSDFeed;
+        }
     }
 
     // IOpenSeaCompatible
@@ -75,7 +85,7 @@ contract RarePizzasBox is
 
     function purchase() public payable virtual override {
         require(
-            block.timestamp >= _public_sale_start_timestamp || allowed(msg.sender),
+            block.timestamp >= publicSaleStart_timestampInS || allowed(msg.sender),
             "RAREPIZZA: The sale hasn't started yet"
         );
         require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY, 'RAREPIZZA: purchase would exceed maxSupply');
@@ -139,6 +149,34 @@ contract RarePizzasBox is
         uint256 id = _getNextPizzaTokenId();
         _safeMint(to, id);
         _assignBoxArtwork(id);
+    }
+
+    /**
+     * Update the cached bitcoin price
+     */
+    function updateBitcoinPriceInUSD(int256 fallbackValue) public virtual onlyOwner {
+        if (_chainlinkBtcUSDFeed != address(0)) {
+            try AggregatorV3Interface(_chainlinkBtcUSDFeed).latestRoundData() returns (
+                uint80 roundId,
+                int256 answer,
+                uint256 startedAt,
+                uint256 updatedAt,
+                uint80 answeredInRound
+            ) {
+                bitcoinPriceInUSD = answer;
+                return;
+            } catch (bytes memory reason) {
+                if (reason.length == 0) {
+                    // contract doesnt implement interface
+                } else {
+                    //we got an error and dont care, use the fallback value
+                }
+            }
+        }
+        if (fallbackValue > 0) {
+            bitcoinPriceInUSD = fallbackValue;
+        }
+        // nothing got updated.  The miners thank you for your contribution.
     }
 
     /**

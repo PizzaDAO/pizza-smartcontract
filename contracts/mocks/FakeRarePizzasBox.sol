@@ -9,11 +9,15 @@ import '../token/RarePizzasBox.sol';
  */
 contract FakeRarePizzasBox is RarePizzasBox {
     function setSaleStartTimestamp(uint256 epochSeconds) public {
-        _public_sale_start_timestamp = epochSeconds;
+        publicSaleStart_timestampInS = epochSeconds;
     }
 
     function getBoxArtworkUri(uint256 tokenId) public view returns (uint256) {
         require(_exists(tokenId), 'RAREPIZZA: URI query for nonexistant token');
         return _tokenBoxArtworkURIs[tokenId];
+    }
+
+    function getBitcoinPriceInUSD() public view returns (int256) {
+        return bitcoinPriceInUSD;
     }
 }

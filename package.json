@@ -49,5 +49,8 @@
   },
   "directories": {
     "test": "test"
+  },
+  "dependencies": {
+    "@chainlink/contracts": "^0.1.6"
   }
 }
