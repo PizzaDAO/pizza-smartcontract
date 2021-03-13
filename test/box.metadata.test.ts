@@ -30,6 +30,7 @@ describe('Box Metadata Tests', function () {
 
     // scale this up to test the distribution below
     let scaling = 50
+    let mint_block = 50
 
     it('Should return a valid token uri', async () => {
         const { box, wallet, anotherWallet } = testContext
@@ -48,7 +49,7 @@ describe('Box Metadata Tests', function () {
         // seed the entire collection
         console.log("minting")
         for (let i = 0; i < 25; i++) {
-            await box.mint(signer, 50)
+            await box.mint(signer, mint_block)
         }
         console.log("purchasing")
         for (let i = 0; i < scaling; i++) {

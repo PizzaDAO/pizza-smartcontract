@@ -14,7 +14,9 @@ contract BoxArt {
      */
     function getUriString(uint256 index) internal view returns (string memory) {
         string[1] memory assets = ['QmZRkwyUuQxvXbV9LN64X52aeHHBezxXjGFsh5s5eBqGPV'];
-        require(index < assets.length, 'RAREPIZZA: requested index is out of range');
-        return assets[index];
+        // TODO: do not short circuit
+        //require(index < assets.length, 'RAREPIZZA: requested index is out of range');
+
+        return assets[0];
     }
 }
