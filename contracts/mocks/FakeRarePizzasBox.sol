@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "../token/RarePizzasBox.sol";
+import '../token/RarePizzasBox.sol';
 
 /**
  * @dev a FakeRarePizzasBox is a wrapper exposing modifying contract variables for testing
@@ -10,5 +10,10 @@ import "../token/RarePizzasBox.sol";
 contract FakeRarePizzasBox is RarePizzasBox {
     function setSaleStartTimestamp(uint256 epochSeconds) public {
         _public_sale_start_timestamp = epochSeconds;
+    }
+
+    function getBoxArtworkUri(uint256 tokenId) public view returns (uint256) {
+        require(_exists(tokenId), 'RAREPIZZA: URI query for nonexistant token');
+        return _tokenBoxArtworkURIs[tokenId];
     }
 }

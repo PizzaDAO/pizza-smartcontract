@@ -1,0 +1,12 @@
+{
+  "name": "Rare Pizza Box",
+  "description": "What's in the box you ask?  Something delicious, amore.",
+  "image": "https://ipfs.io/ipfs/QmTCEKipQX4gdGx5jAZiFtyQjPeiWcXRbb9CBk8AFhdcPy",
+  "attributes": [
+    {
+      "condition": "greasy",
+      "temperature": "piping hot",
+      "eminating smell": "delizioso"
+    }
+  ]
+}

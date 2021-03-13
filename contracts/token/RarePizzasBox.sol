@@ -14,6 +14,7 @@ import '../math/BondingCurve.sol';
 import '../interfaces/IOpenSeaCompatible.sol';
 import '../interfaces/IRarePizzasBox.sol';
 import '../data/AllowList.sol';
+import '../data/BoxArt.sol';
 
 /**
  * @dev Rare Pizzas Box mints pizza box token for callers who call the purchase function.
@@ -21,7 +22,9 @@ import '../data/AllowList.sol';
 contract RarePizzasBox is
     OwnableUpgradeable,
     ERC721EnumerableUpgradeable,
+    AllowList,
     BondingCurve,
+    BoxArt,
     IRarePizzasBox,
     IOpenSeaCompatible
 {
@@ -38,10 +41,12 @@ contract RarePizzasBox is
 
     uint256 public _public_sale_start_timestamp;
 
-    string public constant _boxMetadataUri = 'https://ipfs.io/ipfs/some/path/to/box/metadata';
+    string public constant _uriBase = 'https://ipfs.io/ipfs/';
 
     CountersUpgradeable.Counter public _minted_pizza_count;
     CountersUpgradeable.Counter public _purchased_pizza_count;
+
+    mapping(uint256 => uint256) internal _tokenBoxArtworkURIs;
 
     // END V1 Variables
 
@@ -70,7 +75,7 @@ contract RarePizzasBox is
 
     function purchase() public payable virtual override {
         require(
-            block.timestamp >= _public_sale_start_timestamp || AllowList.allowed(msg.sender),
+            block.timestamp >= _public_sale_start_timestamp || allowed(msg.sender),
             "RAREPIZZA: The sale hasn't started yet"
         );
         require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY, 'RAREPIZZA: purchase would exceed maxSupply');
@@ -78,7 +83,9 @@ contract RarePizzasBox is
         uint256 price = getPrice();
         require(price == msg.value, 'RAREPIZZA: price must be on the curve');
         _purchased_pizza_count.increment();
-        _safeMint(msg.sender, _getNextPizzaTokenId());
+        uint256 id = _getNextPizzaTokenId();
+        _safeMint(msg.sender, id);
+        _assignBoxArtwork(id);
     }
 
     // IERC721 Overrides
@@ -93,7 +100,8 @@ contract RarePizzasBox is
         override(ERC721Upgradeable, IERC721MetadataUpgradeable)
         returns (string memory)
     {
-        return string(abi.encodePacked(_boxMetadataUri));
+        require(_exists(tokenId), 'RAREPIZZA: URI query for nonexistant token');
+        return string(abi.encodePacked(_uriBase, getUriString(_tokenBoxArtworkURIs[tokenId])));
     }
 
     // Member Functions
@@ -112,7 +120,9 @@ contract RarePizzasBox is
 
         for (uint256 i = 0; i < count; i++) {
             _minted_pizza_count.increment();
-            _safeMint(to, _getNextPizzaTokenId());
+            uint256 id = _getNextPizzaTokenId();
+            _safeMint(to, id);
+            _assignBoxArtwork(id);
         }
     }
 
@@ -126,7 +136,18 @@ contract RarePizzasBox is
         uint256 price = getPrice();
         require(price == msg.value, 'RAREPIZZA: price must be on the curve');
         _purchased_pizza_count.increment();
-        _safeMint(to, _getNextPizzaTokenId());
+        uint256 id = _getNextPizzaTokenId();
+        _safeMint(to, id);
+        _assignBoxArtwork(id);
+    }
+
+    /**
+     * assign artwork index
+     */
+    function _assignBoxArtwork(uint256 tokenId) internal {
+        uint256 pseudoRandom =
+            uint256(keccak256(abi.encodePacked(blockhash(block.number - 1), tokenId, msg.sender))) % MAX_BOX_INDEX;
+        _tokenBoxArtworkURIs[tokenId] = pseudoRandom;
     }
 
     function _getNextPizzaTokenId() private view returns (uint256) {
