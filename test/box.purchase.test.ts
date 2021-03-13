@@ -22,7 +22,8 @@ describe('Rare Pizzas Box', function () {
     const Box = await ethers.getContractFactory('FakeRarePizzasBox')
     const box = await Box.deploy()
 
-    await box.initialize(wallet.address, 0)
+    // initialize to set owner, since not deployed via proxy
+    await box.initialize()
 
     // pick a date like jan 1, 2021
     await box.setSaleStartTimestamp(1609459200);
