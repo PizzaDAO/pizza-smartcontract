@@ -1,5 +1,6 @@
 import { HardhatUserConfig } from 'hardhat/config'
 import { task } from 'hardhat/config'
+import "@nomiclabs/hardhat-etherscan"
 import '@nomiclabs/hardhat-waffle'
 import '@openzeppelin/hardhat-upgrades'
 
@@ -15,7 +16,12 @@ task('accounts', 'Prints the list of accounts', async (args, hre) => {
 
 // Go to https://www.alchemyapi.io, sign up, create
 // a new App in its dashboard, and replace "KEY" with its key
-const ALCHEMY_API_KEY = "KEY";
+const ALCHEMY_API_KEY = "YOUR_API_KEY";
+const ALCHEMY_GOERLI_KEY = "YOUR_API_KEY";
+
+// Your API key for Etherscan
+// Obtain one at https://etherscan.io/
+const ETHERSCAN_API_KEY = "YOUR_API_KEY"
 
 // Replace these private keys with your testnet account private keys
 // To export your private key from Metamask, open Metamask and
@@ -40,7 +46,7 @@ const config: HardhatUserConfig = {
   defaultNetwork: 'hardhat',
   networks: {
     // goerli: {
-    //   url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
+    //   url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_GOERLI_KEY}`,
     //   accounts: [`0x${GOERLI_PRIVATE_KEY}`]
     // },
     hardhat: {},
@@ -56,6 +62,10 @@ const config: HardhatUserConfig = {
     //   url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
     //   accounts: [`0x${ROPSTEN_PRIVATE_KEY}`]
     // }
+  },
+  etherscan: {
+
+    apiKey: "YOUR_API_KEY"
   },
   solidity: {
     version: '0.8.0',
