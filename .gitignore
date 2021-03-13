@@ -1,3 +1,6 @@
+# Dotenv
+.env
+
 # Hardhat compile folders
 artifacts
 cache
