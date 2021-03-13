@@ -18,7 +18,7 @@ let testContext: TestContext
 
 describe('Rare Pizzas Box', function () {
   beforeEach(async () => {
-    const [wallet, userWallet] = new MockProvider().getWallets();
+    const [wallet, userWallet] = new MockProvider().getWallets()
     const Box = await ethers.getContractFactory('FakeRarePizzasBox')
     const box = await Box.deploy()
 
@@ -26,12 +26,12 @@ describe('Rare Pizzas Box', function () {
     await box.initialize()
 
     // pick a date like jan 1, 2021
-    await box.setSaleStartTimestamp(1609459200);
-
-
+    await box.setSaleStartTimestamp(1609459200)
 
     testContext = {
-      box, wallet, userWallet
+      box,
+      wallet,
+      userWallet,
     }
   })
 
@@ -57,13 +57,13 @@ describe('Rare Pizzas Box', function () {
     describe('Happy flow', () => {
       it('Should allow purchase of box', async () => {
         const { box } = testContext
-        const boxBuyers = new Array(10)
+        const boxBuyers = 10
 
-        for (let i = 0; i < boxBuyers.length; i++) {
+        for (let i = 0; i < boxBuyers; i++) {
           const price: BigNumber = await box.getPrice()
           await box.purchase({ value: price })
 
-          expect((await box.totalSupply()).toNumber()).to.equal(i + 1)
+          expect(await box.totalSupply()).to.equal(i + 1)
         }
       })
 
@@ -85,21 +85,20 @@ describe('Rare Pizzas Box', function () {
       it('Should allow owner mint to address', async () => {
         const { box, userWallet } = testContext
 
-        const price: BigNumber = await box.getPrice()
         await box.mint(userWallet.address, 1)
 
-        expect((await box.totalSupply()).toNumber()).to.equal(1)
-        expect((await box.balanceOf(userWallet.address)).toNumber()).to.equal(1);
+        expect(await box.totalSupply()).to.equal(1)
+        expect(await box.balanceOf(userWallet.address)).to.equal(1)
       })
 
       it('Should allow owner purchase to address', async () => {
         const { box, wallet } = testContext
-
         const price: BigNumber = await box.getPrice()
+
         await box.purchaseTo(wallet.address, { value: price })
 
-        expect((await box.totalSupply()).toNumber()).to.equal(1)
-        expect((await box.balanceOf(wallet.address)).toNumber()).to.equal(1);
+        expect(await box.totalSupply()).to.equal(1)
+        expect(await box.balanceOf(wallet.address)).to.equal(1)
       })
     })
 
@@ -117,7 +116,6 @@ describe('Rare Pizzas Box', function () {
 
   describe('Withdraw funds', () => {
     describe('Happy flow', () => {
-
       it('Should withdraw from owner', async () => {
         const { box } = testContext
 
@@ -128,14 +126,22 @@ describe('Rare Pizzas Box', function () {
     describe('Revert', () => {
       it('Should not allow purchase for non-presale address', async () => {
         const { box, wallet } = testContext
-        // pick a day in the future
-        await box.setSaleStartTimestamp(3609459200);
+        const twentyFourHoursMilliseconds = 24 * 60 * 60 * 1000
+
+        // Make sure balance is 0 before
+        expect(await box.balanceOf(wallet.address)).to.equal(0)
+
+        // Pick a day in the future
+        await box.setSaleStartTimestamp(Date.now() + twentyFourHoursMilliseconds)
 
         const price: BigNumber = await box.getPrice()
+
         await expect(box.purchase({ value: price })).to.be.reverted
 
-        expect((await box.balanceOf(wallet.address)).toNumber()).to.equal(0);
+        // Check that balance is still 0
+        expect(await box.balanceOf(wallet.address)).to.equal(0)
       })
+
       it('Should reject withdrawal when 0 funds', async () => {
         const { box, wallet } = testContext
 
