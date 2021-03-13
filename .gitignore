@@ -1,3 +1,6 @@
+# Dotenv
+.env
+
 # Hardhat compile folders
 artifacts
 cache
@@ -18,3 +21,6 @@ node_modules
 # Logs
 *.log
 npm-debug.log*
+
+# Openzeppelin
+.openzeppelin
