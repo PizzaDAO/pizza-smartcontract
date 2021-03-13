@@ -4,9 +4,33 @@
   "image": "https://ipfs.io/ipfs/QmTCEKipQX4gdGx5jAZiFtyQjPeiWcXRbb9CBk8AFhdcPy",
   "attributes": [
     {
-      "condition": "greasy",
-      "temperature": "piping hot",
-      "eminating smell": "delizioso"
+      "trait_type": "Temperature",
+      "value": "Piping Hot"
+    },
+    {
+      "trait_type": "Aroma",
+      "value": "delizioso"
+    },
+    {
+      "trait_type": "Driver",
+      "value": "Stoned"
+    },
+    {
+      "trait_type": "Delivery Time",
+      "value": "30 minutes or less"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Order Number",
+      "value": 1
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Pi Day",
+      "value": 1615734566
+    },
+    {
+      "value": "Mutant Turtle Approved"
     }
   ]
 }

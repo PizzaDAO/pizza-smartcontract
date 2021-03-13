@@ -9,7 +9,7 @@ import '../token/RarePizzasBox.sol';
  */
 contract FakeRarePizzasBox is RarePizzasBox {
     function setSaleStartTimestamp(uint256 epochSeconds) public {
-        _public_sale_start_timestamp = epochSeconds;
+        publicSaleStart_timestampInS = epochSeconds;
     }
 
     function getBoxArtworkUri(uint256 tokenId) public view returns (uint256) {
