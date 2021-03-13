@@ -4,6 +4,7 @@ import { MockProvider, solidity } from 'ethereum-waffle'
 import { ethers } from 'hardhat'
 
 import { bondingCurve as bc } from './helpers'
+import { getAddress } from '@ethersproject/address'
 
 use(solidity)
 
@@ -23,7 +24,7 @@ describe('Rare Pizzas Box', function () {
     const box = await Box.deploy()
 
     // initialize to set owner, since not deployed via proxy
-    await box.initialize()
+    await box.initialize(utils.getAddress('0x0000000000000000000000000000000000000000'))
 
     // pick a date like jan 1, 2021
     await box.setSaleStartTimestamp(1609459200)
@@ -89,6 +90,17 @@ describe('Rare Pizzas Box', function () {
 
         expect(await box.totalSupply()).to.equal(1)
         expect(await box.balanceOf(userWallet.address)).to.equal(1)
+      })
+
+      it('Should allow owner to mint different quantities', async () => {
+        const { box, userWallet } = testContext
+
+        await box.mint(userWallet.address, 5)
+        await box.mint(userWallet.address, 10)
+        // can go up to 255
+
+        expect(await box.totalSupply()).to.equal(15)
+        expect(await box.balanceOf(userWallet.address)).to.equal(15)
       })
 
       it('Should allow owner purchase to address', async () => {
