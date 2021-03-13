@@ -1,5 +1,15 @@
 import { ethers, upgrades } from 'hardhat'
 
+import config, { NetworkConfig } from '../config'
+
+const getChainlinkOracle = (config: NetworkConfig) => {
+  const networkName = config.NETWORK.toLowerCase()
+  switch (networkName) {
+    case 'rinkeby':
+      return config.CHAINLINK_RINKEBY_PRICE_FEED
+  }
+}
+
 async function main() {
   const [deployer] = await ethers.getSigners()
 
@@ -12,7 +22,7 @@ async function main() {
   // calls RarePizzasBox.initialize()
   // gnosis safe: 0xBA5E28a2D1C8cF67Ac9E0dfc850DC8b7b21A4DE2
   // TODO: define chainlink dep based on env
-  const box = await upgrades.deployProxy(Box, ['0x0000000000000000000000000000000000000000'])
+  const box = await upgrades.deployProxy(Box, [getChainlinkOracle(config)])
   await box.deployed()
 
   console.log('RarePizzasBox deployed to:', box.address)

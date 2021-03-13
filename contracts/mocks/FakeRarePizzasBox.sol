@@ -16,8 +16,4 @@ contract FakeRarePizzasBox is RarePizzasBox {
         require(_exists(tokenId), 'RAREPIZZA: URI query for nonexistant token');
         return _tokenBoxArtworkURIs[tokenId];
     }
-
-    function getBitcoinPriceInUSD() public view returns (int256) {
-        return bitcoinPriceInUSD;
-    }
 }

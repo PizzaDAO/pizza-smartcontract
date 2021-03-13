@@ -37,16 +37,18 @@ contract RarePizzasBox is
 
     // V1 Variables (do not modify this section when upgrading)
 
+    event BTCETHPriceUpdated(int256 old, int256 current);
+
     uint256 public constant MAX_TOKEN_SUPPLY = 10000;
     uint256 public constant MAX_MINTABLE_SUPPLY = 1250;
     uint256 public constant MAX_PURCHASABLE_SUPPLY = 8750;
 
     uint256 public publicSaleStart_timestampInS;
-    int256 public bitcoinPriceInUSD;
+    int256 public bitcoinPriceInWei;
 
     string public constant _uriBase = 'https://ipfs.io/ipfs/';
 
-    address internal _chainlinkBtcUSDFeed;
+    address internal _chainlinkBTCETHFeed;
 
     CountersUpgradeable.Counter public _minted_pizza_count;
     CountersUpgradeable.Counter public _purchased_pizza_count;
@@ -55,16 +57,17 @@ contract RarePizzasBox is
 
     // END V1 Variables
 
-    function initialize(address chainlinkBtcUSDFeed) public initializer {
+    function initialize(address chainlinkBTCETHFeed) public initializer {
         __Ownable_init();
         __ERC721_init('Rare Pizza Box', 'RAREPIZZASBOX');
 
         // 2021-03-14:15h::9m::26s
         publicSaleStart_timestampInS = 1615734566;
-        bitcoinPriceInUSD = 50000;
+        // starting value:  30.00 ETH
+        bitcoinPriceInWei = 30000000000000000000;
 
-        if (chainlinkBtcUSDFeed != address(0)) {
-            _chainlinkBtcUSDFeed = chainlinkBtcUSDFeed;
+        if (chainlinkBTCETHFeed != address(0)) {
+            _chainlinkBTCETHFeed = chainlinkBTCETHFeed;
         }
     }
 
@@ -117,6 +120,13 @@ contract RarePizzasBox is
     // Member Functions
 
     /**
+     * Get the current bitcoin price in wei
+     */
+    function getBitcoinPriceInWei() public view returns (int256) {
+        return bitcoinPriceInWei;
+    }
+
+    /**
      * allows the contract owner to mint up to a specific number of boxes
      */
     function mint(address to, uint8 count) public virtual onlyOwner {
@@ -152,29 +162,33 @@ contract RarePizzasBox is
     }
 
     /**
-     * Update the cached bitcoin price
+     * allows the owner to update the cached bitcoin price
      */
-    function updateBitcoinPriceInUSD(int256 fallbackValue) public virtual onlyOwner {
-        if (_chainlinkBtcUSDFeed != address(0)) {
-            try AggregatorV3Interface(_chainlinkBtcUSDFeed).latestRoundData() returns (
+    function updateBitcoinPriceInWei(int256 fallbackValue) public virtual onlyOwner {
+        if (_chainlinkBTCETHFeed != address(0)) {
+            try AggregatorV3Interface(_chainlinkBTCETHFeed).latestRoundData() returns (
                 uint80 roundId,
                 int256 answer,
                 uint256 startedAt,
                 uint256 updatedAt,
                 uint80 answeredInRound
             ) {
-                bitcoinPriceInUSD = answer;
+                int256 old = bitcoinPriceInWei;
+                bitcoinPriceInWei = answer;
+                emit BTCETHPriceUpdated(old, bitcoinPriceInWei);
                 return;
             } catch (bytes memory reason) {
                 if (reason.length == 0) {
-                    // contract doesnt implement interface
+                    // contract doesnt implement interface, use fallback
                 } else {
-                    //we got an error and dont care, use the fallback value
+                    //we got an error and dont care, use fallback
                 }
             }
         }
         if (fallbackValue > 0) {
-            bitcoinPriceInUSD = fallbackValue;
+            int256 old = bitcoinPriceInWei;
+            bitcoinPriceInWei = fallbackValue;
+            emit BTCETHPriceUpdated(old, bitcoinPriceInWei);
         }
         // nothing got updated.  The miners thank you for your contribution.
     }

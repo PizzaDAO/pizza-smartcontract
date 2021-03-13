@@ -4,7 +4,7 @@ import { ethers, upgrades } from 'hardhat'
 import { MockProvider, deployMockContract, MockContract } from 'ethereum-waffle';
 
 const aggregatorV3 = require('../artifacts/@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol/AggregatorV3Interface.json')
-const boxContract = require('../artifacts/contracts/mocks/FakeRarePizzasBox.sol/FakeRarePizzasBox.json')
+const boxContract = require('../artifacts/contracts/token/RarePizzasBox.sol/RarePizzasBox.json')
 
 
 type TestContext = {
@@ -35,21 +35,21 @@ describe('Bitcoin Feed Tests', function () {
 
         await box.initialize(utils.getAddress('0x0000000000000000000000000000000000000000'))
 
-        await box.updateBitcoinPriceInUSD(1)
+        await box.updateBitcoinPriceInWei(10)
 
-        expect(await box.getBitcoinPriceInUSD()).to.equal(1)
+        expect(await box.getBitcoinPriceInWei()).to.equal(10)
     })
 
-    it('Should not set fallback price when caller is drunk', async () => {
+    it('Should not set fallback price when caller uses 0', async () => {
         const { box } = testContext;
 
         await box.initialize(utils.getAddress('0x0000000000000000000000000000000000000000'))
 
-        await box.updateBitcoinPriceInUSD(0)
+        await box.updateBitcoinPriceInWei(0)
 
-        expect(await box.getBitcoinPriceInUSD()).to.equal(50000)
+        expect(await box.getBitcoinPriceInWei()).to.equal(BigNumber.from('30000000000000000000'))
     })
-    // todo
+    // TODO
     // it('Should set interface price when interface returns', async () => {
     //     const { box, priceFeed, signer } = testContext;
     //     await box.initialize(priceFeed.address)
@@ -57,17 +57,17 @@ describe('Bitcoin Feed Tests', function () {
     //     priceFeed.mock.latestRoundData.returns('123', `${hotmess}`, '123', '123', '12')
 
     //     const instance = box.connect(signer)
-    //     await instance.updateBitcoinPriceInUSD(1)
+    //     await instance.updateBitcoinPriceInWei(1)
 
-    //     // expect(await box.getBitcoinPriceInUSD()).to.equal(1000)
+    //     // expect(await box.getBitcoinPriceInWei()).to.equal(1000)
 
     // })
     it('Should set fallback price when interface fails', async () => {
         const { box, priceFeed } = testContext;
         await box.initialize(priceFeed.address)
 
-        await box.updateBitcoinPriceInUSD(1)
+        await box.updateBitcoinPriceInWei(1)
 
-        expect(await box.getBitcoinPriceInUSD()).to.equal(1)
+        expect(await box.getBitcoinPriceInWei()).to.equal(1)
     })
 })

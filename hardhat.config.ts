@@ -18,7 +18,7 @@ task('accounts', 'Prints the list of accounts', async (args, hre) => {
 
 const networks: NetworksUserConfig = {
   mainnet: {
-    url: `https://eth-mainnet.alchemyapi.io/v2/${config.ALCHEMY_API_KEY}`,
+    url: `https://eth-mainnet.alchemyapi.io/v2/${config.ALCHEMY_MAINNET_KEY}`,
     accounts: [`0xNOPE!`],
   },
   goerli: {
@@ -26,11 +26,11 @@ const networks: NetworksUserConfig = {
     accounts: [`0x${config.GOERLI_PRIVATE_KEY}`],
   },
   rinkeby: {
-    url: `https://eth-rinkeby.alchemyapi.io/v2/${config.ALCHEMY_API_KEY}`,
+    url: `https://eth-rinkeby.alchemyapi.io/v2/${config.ALCHEMY_RINKEBY_KEY}`,
     accounts: [`0x${config.RINKEBY_PRIVATE_KEY}`],
   },
   ropsten: {
-    url: `https://eth-ropsten.alchemyapi.io/v2/${config.ALCHEMY_API_KEY}`,
+    url: `https://eth-ropsten.alchemyapi.io/v2/${config.ALCHEMY_ROPSTEN_KEY}`,
     accounts: [`0x${config.ROPSTEN_PRIVATE_KEY}`],
   },
 }

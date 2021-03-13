@@ -32,9 +32,9 @@ npx hardhat node
 npx hardhat run --network localhost scripts/deploy-box.proxy.ts
 ```
 
-- deploy contracts to goerli
+- deploy contracts remotely
 
-edit hardhat.config.ts and include your keys
+copy .env.example to .env and fill in your keys
 
 ```
 $ npx hardhat run --network goerli scripts/deploy-box.proxy.ts
