@@ -59,7 +59,7 @@ contract RarePizzasBox is
 
     function initialize(address chainlinkBTCETHFeed) public initializer {
         __Ownable_init();
-        __ERC721_init('Rare Pizza Box', 'RAREPIZZASBOX');
+        __ERC721_init('Rare Pizza Box', 'ZABOX');
 
         // 2021-03-14:15h::9m::26s
         publicSaleStart_timestampInS = 1615734566;
@@ -95,6 +95,7 @@ contract RarePizzasBox is
 
         uint256 price = getPrice();
         require(price == msg.value, 'RAREPIZZA: price must be on the curve');
+
         _purchased_pizza_count.increment();
         uint256 id = _getNextPizzaTokenId();
         _safeMint(msg.sender, id);
