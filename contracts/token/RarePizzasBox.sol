@@ -133,6 +133,7 @@ contract RarePizzasBox is
 
     /**
      * allows the contract owner to mint up to a specific number of boxes
+     * owner can mit to themselves
      */
     function mint(address to, uint8 count) public virtual onlyOwner {
         require(count > 0, 'RAREPIZZA: need a number');
@@ -153,13 +154,14 @@ contract RarePizzasBox is
 
     /**
      * allows owner to purchase to a specific address
+     owner cannot purchase for themselves
      */
     function purchaseTo(address to) public payable virtual onlyOwner {
         require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY, 'RAREPIZZA: exceeds supply.');
         require(to != msg.sender, 'RAREPIZZA: Thats how capos get whacked');
 
         uint256 price = getPrice();
-        require(price == msg.value, 'RAREPIZZA: price too low');
+        require(msg.value >= price, 'RAREPIZZA: price too low');
         _purchased_pizza_count.increment();
         uint256 id = _getNextPizzaTokenId();
         _safeMint(to, id);

@@ -117,7 +117,7 @@ contract BoxArt {
                 'QmcBjENbnUD9AKWtDsYCvc7xWJhJk6ScEQiLmdJ5DSU6uv',
                 'QmShuDTh4EeWvpmoTpXWFw6osBKG1M58fBTU53gwHS5tfB'
             ];
-        require(index < assets.length, 'RAREPIZZA: requested index is out of range');
+        require(index < assets.length, 'RAREPIZZA: requested art index is out of range');
         return assets[index];
     }
 }

@@ -6,7 +6,7 @@ contract BondingCurve {
     uint256 constant oneEth = 10**18;
     uint256 constant oneGwei = 10**4;
     uint256 constant MAX_CURVE = 8750;
-    uint256 constant TIER0 = (oneEth / 10**4);
+    uint256 constant TIER0 = (oneEth / oneGwei);
     uint256 constant TIER1 = ((126 * oneEth) / oneGwei);
     uint256 constant TIER2 = ((376 * oneEth) / oneGwei);
     uint256 constant TIER3 = ((1626 * oneEth) / oneGwei);
