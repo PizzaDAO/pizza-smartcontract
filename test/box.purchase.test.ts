@@ -17,7 +17,7 @@ type TestContext = {
 const MAX_NUMBER_OF_BOXES = 10 * 1000
 let testContext: TestContext
 
-describe('Rare Pizzas Box', function () {
+describe('Box Purchase Tests', function () {
   beforeEach(async () => {
     const [wallet, userWallet] = new MockProvider().getWallets()
     const Box = await ethers.getContractFactory('FakeRarePizzasBox')

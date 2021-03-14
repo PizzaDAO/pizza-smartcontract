@@ -4,16 +4,32 @@ pragma solidity ^0.8.0;
 
 contract BondingCurve {
     uint256 constant oneEth = 10**18;
-    uint256 constant MAX_CURVE = 10 * 1000;
+    uint256 constant oneGwei = 10**4;
+    uint256 constant MAX_CURVE = 8750;
+    uint256 constant TIER0 = (oneEth / 10**4);
+    uint256 constant TIER1 = ((126 * oneEth) / oneGwei);
+    uint256 constant TIER2 = ((376 * oneEth) / oneGwei);
+    uint256 constant TIER3 = ((1626 * oneEth) / oneGwei);
+    uint256 constant TIER4 = ((2126 * oneEth) / oneGwei);
 
-    // Approximate .001x^2+.000 000 000 000 000 000 000 000 0000999x^{8}
     function curve(uint256 n) public pure returns (uint256) {
-        require(n > 0, "BondingCurve: starting position cannot be zero");
-        require(n <= MAX_CURVE, "BondingCurve: cannot go past MAX_CURVE value");
-
-        uint256 term1 = n * oneEth / 10**4;
-        uint256 term2 = oneEth * n**8 * (MAX_CURVE - 1) / 10**32;
-
-        return term1 + term2;
+        require(n > 0, 'BondingCurve: starting position cannot be zero');
+        require(n <= MAX_CURVE, 'BondingCurve: cannot go past MAX_CURVE value');
+        uint256 nInEth = (n * oneEth);
+        if (n <= 2500) {
+            return TIER0 + (nInEth / (2 * 10**5));
+        }
+        if (n > 2500 && n <= 5000) {
+            return TIER1 + (nInEth / (10**5));
+        }
+        if (n > 5000 && n <= 7500) {
+            return TIER2 + ((5 * nInEth) / (10**5));
+        }
+        if (n > 7500 && n <= 8000) {
+            return TIER3 + (nInEth / (10**4));
+        }
+        if (n > 8000) {
+            return TIER4 + ((2 * nInEth) / (10**4));
+        }
     }
 }
