@@ -16,7 +16,6 @@ import '../math/BondingCurve.sol';
 import '../interfaces/IOpenSeaCompatible.sol';
 import '../interfaces/IRarePizzasBox.sol';
 import '../interfaces/IRarePizzasBoxAdmin.sol';
-import '../data/AllowList.sol';
 import '../data/BoxArt.sol';
 
 /**
@@ -25,9 +24,8 @@ import '../data/BoxArt.sol';
 contract RarePizzasBox is
     OwnableUpgradeable,
     ERC721EnumerableUpgradeable,
-    AllowList,
-    BondingCurve,
     BoxArt,
+    BondingCurve,
     IRarePizzasBox,
     IRarePizzasBoxAdmin,
     IOpenSeaCompatible
@@ -44,6 +42,7 @@ contract RarePizzasBox is
     uint256 public constant MAX_TOKEN_SUPPLY = 10000;
     uint256 public constant MAX_MINTABLE_SUPPLY = 1250;
     uint256 public constant MAX_PURCHASABLE_SUPPLY = 8750;
+    uint32 public constant MAX_PRESALE_LIMIT = 10; // max can purchase in presale
 
     uint256 public publicSaleStart_timestampInS;
     uint256 public bitcoinPriceInWei;
@@ -56,6 +55,9 @@ contract RarePizzasBox is
     CountersUpgradeable.Counter public _purchased_pizza_count;
 
     mapping(uint256 => uint256) internal _tokenBoxArtworkURIs;
+
+    mapping(address => bool) internal _presaleAllowed;
+    mapping(address => uint32) internal _presalePurchaseCount;
 
     // END V1 Variables
 
@@ -99,7 +101,8 @@ contract RarePizzasBox is
 
     function purchase() public payable virtual override {
         require(
-            block.timestamp >= publicSaleStart_timestampInS || allowed(msg.sender),
+            block.timestamp >= publicSaleStart_timestampInS ||
+                (_presaleAllowed[msg.sender] && (_presalePurchaseCount[msg.sender] < MAX_PRESALE_LIMIT)),
             "RAREPIZZA: sale hasn't started yet"
         );
         require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY, 'RAREPIZZA: exceeds supply.');
@@ -107,6 +110,8 @@ contract RarePizzasBox is
         uint256 price = getPrice();
         require(msg.value >= price, 'RAREPIZZA: price too low');
 
+        // presale addresses can purchase up to 10 total
+        _presalePurchaseCount[msg.sender] += 1;
         _purchased_pizza_count.increment();
         _internalMintWithArtwork(msg.sender);
     }
@@ -129,7 +134,8 @@ contract RarePizzasBox is
 
     // IRarePizzasBoxAdmin
 
-    function mint(address to, uint8 count) public virtual override onlyOwner {
+    function mint(address toPizzaiolo, uint8 count) public virtual override onlyOwner {
+        require(toPizzaiolo != address(0), 'RAREPIZZA: dont be silly');
         require(count > 0, 'RAREPIZZA: need a number');
 
         require(totalSupply().add(count) <= maxSupply(), 'RAREPIZZA: exceeds supply.');
@@ -140,18 +146,24 @@ contract RarePizzasBox is
 
         for (uint256 i = 0; i < count; i++) {
             _minted_pizza_count.increment();
-            _internalMintWithArtwork(to);
+            _internalMintWithArtwork(toPizzaiolo);
         }
     }
 
-    function purchaseTo(address to) public payable virtual override onlyOwner {
+    function purchaseTo(address toPaisano) public payable virtual override onlyOwner {
+        require(toPaisano != address(0), 'RAREPIZZA: dont be silly');
         require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY, 'RAREPIZZA: exceeds supply.');
-        require(to != msg.sender, 'RAREPIZZA: Thats how capos get whacked');
+        require(toPaisano != msg.sender, 'RAREPIZZA: Thats how capos get whacked');
 
         uint256 price = getPrice();
         require(msg.value >= price, 'RAREPIZZA: price too low');
         _purchased_pizza_count.increment();
-        _internalMintWithArtwork(to);
+        _internalMintWithArtwork(toPaisano);
+    }
+
+    function setPresaleAllowed(address toPaisano, bool allowed) public virtual override onlyOwner {
+        require(toPaisano != address(0), 'RAREPIZZA: dont be silly');
+        _presaleAllowed[toPaisano] = allowed;
     }
 
     function setSaleStartTimestamp(uint256 epochSeconds) public virtual override onlyOwner {

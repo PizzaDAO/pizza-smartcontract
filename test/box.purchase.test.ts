@@ -20,7 +20,7 @@ let testContext: TestContext
 describe('Box Purchase Tests', function () {
   beforeEach(async () => {
     const [wallet, userWallet] = new MockProvider().getWallets()
-    const Box = await ethers.getContractFactory('FakeRarePizzasBox')
+    const Box = await ethers.getContractFactory('RarePizzasBox')
     const box = await Box.deploy()
 
     // initialize to set owner, since not deployed via proxy
@@ -36,9 +36,8 @@ describe('Box Purchase Tests', function () {
     }
   })
 
-  // describe('Deploying the contract', () => {})
-
   describe('Check methods', () => {
+    // skip becausew the bonding curve changed
     it.skip('Should get price for next Box', async () => {
       const { box } = testContext
       const price: BigNumber = await box.getPrice()
@@ -49,7 +48,6 @@ describe('Box Purchase Tests', function () {
 
     it('Should return max supply', async () => {
       const { box } = testContext
-
       expect(await box.maxSupply()).to.equal(bc.MAX_CURVE_VALUE)
     })
   })
@@ -68,20 +66,18 @@ describe('Box Purchase Tests', function () {
         }
       })
 
-      // it('Should allow purchase for presale address', async () => {
-      //   const { box, wallet } = testContext
-      //   // pick a day in the future
-      //   await box.setSaleStartTimestamp(3609459200);
+      it('Should allow purchase for presale address', async () => {
+        const { box, wallet } = testContext
+        // pick a day in the future
+        await box.setSaleStartTimestamp(3609459200)
+        await box.setPresaleAllowed(box.signer.getAddress(), true)
 
-      //   // TODO: in order for this to pass we need a public pravate keypair
-      //   // that is included in the allow list
-      //   const instance = box.connect('0xSomeId')
+        const price: BigNumber = await box.getPrice()
 
-      //   const price: BigNumber = await instance.getPrice()
-      //   await instance.purchase({ value: price })
+        await box.purchase({ value: price })
 
-      //   expect((await instance.balanceOf(wallet.address)).toNumber()).to.equal(1);
-      // })
+        expect((await box.balanceOf(box.signer.getAddress())).toNumber()).to.equal(1);
+      })
 
       it('Should allow owner mint to address', async () => {
         const { box, userWallet } = testContext
