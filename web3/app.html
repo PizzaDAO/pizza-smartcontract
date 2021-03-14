@@ -11,11 +11,14 @@ window.addEventListener('load', function () {
   const priceLabel = document.querySelector("#priceLabel")
   const pizzasLabel = document.querySelector("#pizzasLabel")
   const buyButton = document.querySelector("#buyButton")
+  const txLabel = document.querySelector("#txLabel")
+  const contractLabel = document.querySelector("#contractLabel")
 
   // Placeholders
-  balanceLabel.innerHTML = balance + " Ξ"
-  priceLabel.innerHTML = price + " ₿"
-  pizzasLabel.innerHTML = maxSupply
+  balanceLabel.innerHTML = "-- Ξ"
+  priceLabel.innerHTML = "-- Ξ"
+  pizzasLabel.innerHTML = "--"
+  contractLabel.innerHTML = "Contract Address: " + ERC721ADDRESS
 
   initWeb3()
 
@@ -51,7 +54,8 @@ function initWeb3() {
     startApp()
   } else {
     console.log("Non-ethereum browser detected")
-    window.alert('Non-Ethereum browser detected. Try Chrome and MetaMask!')
+    window.alert("Browser not compatible. Try Chrome and MetaMask!")
+    txLabel.innerHTML = "Try Chrome and MetaMask!"
   }
 }
 
@@ -65,21 +69,24 @@ function promptMetamask() {
 }
 
 async function triggerPurchase() {
+  txLabel.innerHTML = "Waiting for confirmation"
   Erc721Instance.methods.getPrice().call()
   .then(function(amount){
     console.log("priceWei: ", amount)
     Erc721Instance.methods.purchase().send({from: address, value: amount})
     .on('receipt', function(receipt){
       console.log("receipt: ", receipt)
-      window.alert('Transaction confirmed, enjoy your 🍕!')
+      txLabel.innerHTML = "Transaction confirmed, enjoy your 🍕!"
       updateValues()
     })
     .on('error', function(error, receipt) {
         console.log("Transaction failed: ", error, "br/", receipt)
+        txLabel.innerHTML = "Something went wrong, try again!"
     })
   })
   .catch(function(error){
     console.log("getPrice failed")
+    txLabel.innerHTML = "Something went wrong, try again!"
   })
 }
 
@@ -107,7 +114,7 @@ async function updateValues() {
   .then(function(amount){
     price = web3.utils.fromWei(amount)
     console.log("price: ", price)
-    priceLabel.innerHTML = price + " ₿"
+    priceLabel.innerHTML = price + " Ξ"
   })
   .catch(function(error){
     console.log("getPrice failed")
@@ -175,34 +182,18 @@ var addresses = 0
 var Erc721Instance = 0
 
 // Contract Info
-//const ERC721ADDRESS = '0x33bEDe4eBE2231873E7378855A946652Dfd6788c'; // proxy doesn't work properly
-//const ERC721ADDRESS = '0x0f03e846492c704321df4cedf6fb07475f4a728a'; // previous impl
-const ERC721ADDRESS = '0x70ace1a25455425e1fe770505120aa4e5e14fe83';
+const ERC721ADDRESS = '0x6683f68272c8B7d91ac3a7D5D90bbaF259dd72FD';
 const ERC721ABI = [
 {
-   "anonymous":false,
    "inputs":[
-      {
-         "indexed":true,
-         "internalType":"address",
-         "name":"from",
-         "type":"address"
-      },
-      {
-         "indexed":true,
-         "internalType":"address",
-         "name":"to",
-         "type":"address"
-      },
-      {
-         "indexed":true,
-         "internalType":"uint256",
-         "name":"tokenId",
-         "type":"uint256"
-      }
+
    ],
-   "name":"Transfer",
-   "type":"event"
+   "name":"purchase",
+   "outputs":[
+
+   ],
+   "stateMutability":"payable",
+   "type":"function"
 },
 {
    "inputs":[
@@ -235,15 +226,29 @@ const ERC721ABI = [
    "type":"function"
 },
 {
+   "anonymous":false,
    "inputs":[
-
+      {
+         "indexed":true,
+         "internalType":"address",
+         "name":"from",
+         "type":"address"
+      },
+      {
+         "indexed":true,
+         "internalType":"address",
+         "name":"to",
+         "type":"address"
+      },
+      {
+         "indexed":true,
+         "internalType":"uint256",
+         "name":"tokenId",
+         "type":"uint256"
+      }
    ],
-   "name":"purchase",
-   "outputs":[
-
-   ],
-   "stateMutability":"payable",
-   "type":"function"
+   "name":"Transfer",
+   "type":"event"
 },
 {
    "inputs":[
@@ -261,5 +266,4 @@ const ERC721ABI = [
    "type":"function"
 }
 ]
-
 </script>
