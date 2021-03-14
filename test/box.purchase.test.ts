@@ -95,9 +95,9 @@ describe('Box Purchase Tests', function () {
       it('Should allow owner to mint different quantities', async () => {
         const { box, userWallet } = testContext
 
+        // can go up to 255
         await box.mint(userWallet.address, 5)
         await box.mint(userWallet.address, 10)
-        // can go up to 255
 
         expect(await box.totalSupply()).to.equal(15)
         expect(await box.balanceOf(userWallet.address)).to.equal(15)
