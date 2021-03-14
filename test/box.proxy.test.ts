@@ -15,8 +15,8 @@ describe('Box Proxy Tests', function () {
   beforeEach(async () => {
     const [wallet, anotherWallet] = new MockProvider().getWallets()
 
-        const Box = await ethers.getContractFactory('FakeRarePizzasBox');
-        const box = await upgrades.deployProxy(Box, ['0x0000000000000000000000000000000000000000']);
+    const Box = await ethers.getContractFactory('FakeRarePizzasBox')
+    const box = await upgrades.deployProxy(Box, ['0x0000000000000000000000000000000000000000'])
 
     // pick a date like jan 1, 2021
     await box.setSaleStartTimestamp(1609459200)
