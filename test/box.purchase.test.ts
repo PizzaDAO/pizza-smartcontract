@@ -39,7 +39,7 @@ describe('Box Purchase Tests', function () {
   // describe('Deploying the contract', () => {})
 
   describe('Check methods', () => {
-    it('Should get price for next Box', async () => {
+    it.skip('Should get price for next Box', async () => {
       const { box } = testContext
       const price: BigNumber = await box.getPrice()
       const soldTokens = await box.totalSupply()
