@@ -21,7 +21,7 @@ let testContext: TestContext
 // so it is skipped when checked into source for now
 
 describe.skip('Bitcoin Rinkeby Feed Tests', function () {
-    it('should update price from chainlink oracle', async () => {
+    it.skip('should update price from chainlink oracle', async () => {
 
         const provider = new providers.AlchemyProvider("rinkeby", config.ALCHEMY_RINKEBY_KEY);
         const wallet = new Wallet(config.RINKEBY_PRIVATE_KEY, provider)
@@ -47,7 +47,7 @@ describe.skip('Bitcoin Rinkeby Feed Tests', function () {
 
     it('should read price from chainlink oracle in contract', async () => {
         // make sure there is a deployed contract at this address that matches the abi
-        const your_deployed_contract = '0x27332f62ee3726b102429130Ce58C050801B0760'
+        const your_deployed_contract = config.RAREPIZZAS_BOX_RINKEBY_PROXY_ADDRESS
         const provider = new providers.AlchemyProvider("rinkeby", config.ALCHEMY_RINKEBY_KEY);
         const wallet = new Wallet(config.RINKEBY_PRIVATE_KEY, provider)
 
