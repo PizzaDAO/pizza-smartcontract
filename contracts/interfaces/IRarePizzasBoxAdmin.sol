@@ -20,6 +20,11 @@ interface IRarePizzasBoxAdmin {
     function purchaseTo(address to) external payable;
 
     /**
+     * allows owner to add or remove addresses fro mthe presale list
+     */
+    function setPresaleAllowed(address toPaisano, bool allowed) external;
+
+    /**
      * Allows owner to set the sale start timestamp.
      * By modifying this value, the owner can pause the sale
      * by setting a timestamp arbitrarily in the future
