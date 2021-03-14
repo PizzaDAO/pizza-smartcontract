@@ -24,7 +24,13 @@ window.addEventListener('load', function () {
 
   walletButton.addEventListener('click', function () {
     console.log("Wallet button pressed")
-    promptMetamask()
+    if (metamaskInstalled) {
+      promptMetamask()
+    }
+    else {
+      window.open("https://www.metamask.io")
+    }
+
   })
 
   buyButton.addEventListener('click', function () {
@@ -56,6 +62,7 @@ function initWeb3() {
     console.log("Non-ethereum browser detected")
     window.alert("Browser not compatible. Try Chrome and MetaMask!")
     txLabel.innerHTML = "Try Chrome and MetaMask!"
+    metamaskInstalled = false
   }
 }
 
@@ -179,6 +186,7 @@ var price = 0.0001
 var balance = 0.0000
 var address = 0
 var addresses = 0
+var metamaskInstalled = true
 var Erc721Instance = 0
 
 // Contract Info
