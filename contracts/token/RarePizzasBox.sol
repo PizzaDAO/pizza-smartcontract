@@ -76,7 +76,8 @@ contract RarePizzasBox is
     // IOpenSeaCompatible
     function contractURI() public view virtual override returns (string memory) {
         // Metadata provided via github link so that it can be updated or modified
-        return 'https://raw.githubusercontent.com/PizzaDAO/pizza-smartcontract/master/data/opensea_metadata.json';
+        return
+            'https://raw.githubusercontent.com/PizzaDAO/pizza-smartcontract/master/data/opensea_metadata.mainnet.json';
     }
 
     // IRarePizzasBox
@@ -107,9 +108,7 @@ contract RarePizzasBox is
         require(msg.value >= price, 'RAREPIZZA: price too low');
 
         _purchased_pizza_count.increment();
-        uint256 id = _getNextPizzaTokenId();
-        _safeMint(msg.sender, id);
-        _assignBoxArtwork(id);
+        _internalMintWithArtwork(msg.sender);
     }
 
     // IERC721 Overrides
@@ -141,9 +140,7 @@ contract RarePizzasBox is
 
         for (uint256 i = 0; i < count; i++) {
             _minted_pizza_count.increment();
-            uint256 id = _getNextPizzaTokenId();
-            _safeMint(to, id);
-            _assignBoxArtwork(id);
+            _internalMintWithArtwork(to);
         }
     }
 
@@ -154,9 +151,7 @@ contract RarePizzasBox is
         uint256 price = getPrice();
         require(msg.value >= price, 'RAREPIZZA: price too low');
         _purchased_pizza_count.increment();
-        uint256 id = _getNextPizzaTokenId();
-        _safeMint(to, id);
-        _assignBoxArtwork(id);
+        _internalMintWithArtwork(to);
     }
 
     function setSaleStartTimestamp(uint256 epochSeconds) public virtual override onlyOwner {
@@ -184,6 +179,8 @@ contract RarePizzasBox is
                 }
             }
         }
+        // obviously if the link integration fails,
+        // the owner could set an arbitrary value here that is way out of range.
         if (fallbackValue > 0) {
             uint256 old = bitcoinPriceInWei;
             bitcoinPriceInWei = fallbackValue;
@@ -207,5 +204,11 @@ contract RarePizzasBox is
 
     function _getNextPizzaTokenId() internal view virtual returns (uint256) {
         return totalSupply();
+    }
+
+    function _internalMintWithArtwork(address to) internal view virtual returns (uint256) {
+        uint256 id = _getNextPizzaTokenId();
+        _safeMint(to, id);
+        _assignBoxArtwork(id);
     }
 }
