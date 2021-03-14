@@ -1,0 +1,277 @@
+<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+
+<script>
+console.log("Script started")
+
+window.addEventListener('load', function () {
+  console.log("Loading window")
+
+  const walletButton = document.querySelector("#walletButton")
+  const balanceLabel = document.querySelector("#balanceLabel")
+  const priceLabel = document.querySelector("#priceLabel")
+  const pizzasLabel = document.querySelector("#pizzasLabel")
+  const buyButton = document.querySelector("#buyButton")
+  const txLabel = document.querySelector("#txLabel")
+  const contractLabel = document.querySelector("#contractLabel")
+
+  // Placeholders
+  balanceLabel.innerHTML = "-- Ξ"
+  priceLabel.innerHTML = "-- Ξ"
+  pizzasLabel.innerHTML = "--"
+  contractLabel.innerHTML = "Contract Address: " + ERC721ADDRESS
+
+  initWeb3()
+
+  walletButton.addEventListener('click', function () {
+    console.log("Wallet button pressed")
+    if (metamaskInstalled) {
+      promptMetamask()
+    }
+    else {
+      window.open("https://www.metamask.io")
+    }
+
+  })
+
+  buyButton.addEventListener('click', function () {
+    handleUser()
+    if (addresses.length == 0) {
+      promptMetamask()
+    }
+    else {
+      triggerPurchase()
+    }
+  })
+
+})
+
+function initWeb3() {
+
+  if (window.ethereum) {
+    console.log("Window.ethereum exists")
+    window.web3 = new Web3(window.ethereum)
+    startApp()
+  } else if (window.web3) {
+    console.log("Window.web3 exists")
+    window.web3 = new Web3(window.web3.currentProvider)
+    startApp()
+  } else if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+    console.log("Mobile initiated")
+    startApp()
+  } else {
+    console.log("Non-ethereum browser detected")
+    window.alert("Browser not compatible. Try Chrome and MetaMask!")
+    txLabel.innerHTML = "Try Chrome and MetaMask!"
+    metamaskInstalled = false
+  }
+}
+
+function promptMetamask() {
+  window.ethereum.enable()
+    .then(() => {
+      updateBalance()
+    }).catch((err) => {
+    console.log(err);
+  })
+}
+
+async function triggerPurchase() {
+  txLabel.innerHTML = "Waiting for confirmation"
+  Erc721Instance.methods.getPrice().call()
+  .then(function(amount){
+    console.log("priceWei: ", amount)
+    Erc721Instance.methods.purchase().send({from: address, value: amount})
+    .on('receipt', function(receipt){
+      console.log("receipt: ", receipt)
+      txLabel.innerHTML = "Transaction confirmed, enjoy your 🍕!"
+      updateValues()
+    })
+    .on('error', function(error, receipt) {
+        console.log("Transaction failed: ", error, "br/", receipt)
+        txLabel.innerHTML = "Something went wrong, try again!"
+    })
+  })
+  .catch(function(error){
+    console.log("getPrice failed")
+    txLabel.innerHTML = "Something went wrong, try again!"
+  })
+}
+
+async function startApp() {
+  console.log("App started")
+  Erc721Instance = new web3.eth.Contract(ERC721ABI,ERC721ADDRESS)
+
+  Erc721Instance.events.Transfer(function(error, event){ console.log(event); })
+  .on('data', function(event){
+      console.log("event: ", event)
+      updateValues()
+      //console.log("eventTokenId: ", event["returnedValues"]["tokenId"]) // TO-DO: get pizza # from here
+  })
+  .on('changed', function(event){
+      console.log("changed")
+  })
+  .on('error', console.error);
+
+  updateValues()
+  handleUser()
+}
+
+async function updateValues() {
+  Erc721Instance.methods.getPrice().call()
+  .then(function(amount){
+    price = web3.utils.fromWei(amount)
+    console.log("price: ", price)
+    priceLabel.innerHTML = price + " Ξ"
+  })
+  .catch(function(error){
+    console.log("getPrice failed")
+  })
+
+  Erc721Instance.methods.maxSupply().call()
+  .then(function(amount){
+    maxSupply = amount
+    console.log("maxSupply: ", amount)
+    pizzasLabel.innerHTML = numberWithCommas(maxSupply - totalSupply)
+  })
+  .catch(function(error){
+    console.log("maxSupply failed")
+  })
+
+  Erc721Instance.methods.totalSupply().call()
+  .then(function(amount){
+    totalSupply = amount
+    console.log("totalSupply: ", amount)
+    pizzasLabel.innerHTML = numberWithCommas(maxSupply - totalSupply)
+  })
+  .catch(function(error){
+    console.log("totalSupply failed")
+  })
+}
+
+async function handleUser() {
+  web3.eth.getAccounts()
+  .then(accounts => {
+    addresses = accounts
+    console.log("accounts: ", accounts)
+    if (accounts.length == 0) {
+      console.log("User is logged out")
+    }
+    else {
+      console.log("User is logged in")
+      updateBalance()
+    }
+  }).catch((err) => {
+    console.log("Error fetching accounts: ", err)
+  })
+}
+
+async function updateBalance() {
+  address = (await web3.eth.getAccounts())[0]
+  console.log("Wallet address: ", address)
+  const balance = web3.utils.fromWei(await web3.eth.getBalance(address))
+  const balanceFloat = parseFloat(balance)
+  const roundedBalance = balanceFloat.toFixed(4)
+  balanceLabel.innerHTML = roundedBalance + " Ξ"
+  console.log("ETH balance: ", roundedBalance)
+}
+
+function numberWithCommas(x) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+// Placeholder values
+var maxSupply = 10000
+var totalSupply = 0
+var price = 0.0001
+var balance = 0.0000
+var address = 0
+var addresses = 0
+var metamaskInstalled = true
+var Erc721Instance = 0
+
+// Contract Info
+const ERC721ADDRESS = '0x6683f68272c8B7d91ac3a7D5D90bbaF259dd72FD';
+const ERC721ABI = [
+{
+   "inputs":[
+
+   ],
+   "name":"purchase",
+   "outputs":[
+
+   ],
+   "stateMutability":"payable",
+   "type":"function"
+},
+{
+   "inputs":[
+
+   ],
+   "name":"maxSupply",
+   "outputs":[
+      {
+         "internalType":"uint256",
+         "name":"",
+         "type":"uint256"
+      }
+   ],
+   "stateMutability":"view",
+   "type":"function"
+},
+{
+   "inputs":[
+
+   ],
+   "name":"totalSupply",
+   "outputs":[
+      {
+         "internalType":"uint256",
+         "name":"",
+         "type":"uint256"
+      }
+   ],
+   "stateMutability":"view",
+   "type":"function"
+},
+{
+   "anonymous":false,
+   "inputs":[
+      {
+         "indexed":true,
+         "internalType":"address",
+         "name":"from",
+         "type":"address"
+      },
+      {
+         "indexed":true,
+         "internalType":"address",
+         "name":"to",
+         "type":"address"
+      },
+      {
+         "indexed":true,
+         "internalType":"uint256",
+         "name":"tokenId",
+         "type":"uint256"
+      }
+   ],
+   "name":"Transfer",
+   "type":"event"
+},
+{
+   "inputs":[
+
+   ],
+   "name":"getPrice",
+   "outputs":[
+      {
+         "internalType":"uint256",
+         "name":"",
+         "type":"uint256"
+      }
+   ],
+   "stateMutability":"view",
+   "type":"function"
+}
+]
+</script>
