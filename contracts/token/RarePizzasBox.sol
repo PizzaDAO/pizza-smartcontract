@@ -206,7 +206,7 @@ contract RarePizzasBox is
         return totalSupply();
     }
 
-    function _internalMintWithArtwork(address to) internal view virtual returns (uint256) {
+    function _internalMintWithArtwork(address to) internal virtual {
         uint256 id = _getNextPizzaTokenId();
         _safeMint(to, id);
         _assignBoxArtwork(id);
