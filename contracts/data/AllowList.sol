@@ -5,15 +5,13 @@ pragma solidity ^0.8.0;
 /**
  * @dev a FakeRarePizzasBox is a wrapper exposing modifying contract variables for testing
  */
-contract AllowList {
-    function allowed(address buyer) internal pure returns (bool) {
-        address[1] memory addresses = [0x102d3B5ca9C8675C20B2F7E2171B3ecDcbe3Fc82];
+ contract AllowList {
 
-        for (uint256 i = 0; i < addresses.length; i++) {
-            if (addresses[i] == buyer) {
-                return true;
-            }
-        }
-        return false;
-    }
-}
+     mapping(address=>uint) public allowed;
+
+     function allow(address[] memory allowedAddresses) public {
+         for(uint i = 0;i<allowedAddresses.length;i++){
+             allowed[allowedAddresses[i]] = 10;
+         }
+     }
+ }
