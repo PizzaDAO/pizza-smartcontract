@@ -148,7 +148,7 @@ const publishBoxWeb3Abi = () => {
             boxContract.abi.find(i => i.name === 'maxSupply'),
             boxContract.abi.find(i => i.name === 'publicSaleStart_timestampInS'),
             boxContract.abi.find(i => i.name === 'purchase'),
-            boxContract.abi.filter(i => i.name === 'safeTransferFrom'),
+            ...boxContract.abi.filter(i => i.name === 'safeTransferFrom'),
             boxContract.abi.find(i => i.name === 'tokenURI'),
             boxContract.abi.find(i => i.name === 'totalSupply'),
         ]
