@@ -67,10 +67,13 @@ describe('Box Purchase Tests', function () {
       })
 
       it('Should allow purchase for presale address', async () => {
-        const { box, wallet } = testContext
+        const { box, wallet, userWallet } = testContext
         // pick a day in the future
         await box.setSaleStartTimestamp(3609459200)
-        await box.setPresaleAllowed(box.signer.getAddress(), true)
+        await box.setPresaleAllowed(10, [box.signer.getAddress()])
+
+        // executer again with more addresses
+        await box.setPresaleAllowed(10, [wallet.address, userWallet.address])
 
         const price: BigNumber = await box.getPrice()
 

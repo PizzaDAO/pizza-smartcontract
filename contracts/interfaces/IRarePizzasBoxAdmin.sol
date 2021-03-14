@@ -22,7 +22,7 @@ interface IRarePizzasBoxAdmin {
     /**
      * allows owner to add or remove addresses fro mthe presale list
      */
-    function setPresaleAllowed(address toPaisano, bool allowed) external;
+    function setPresaleAllowed(uint8 count, address[] memory toPaisanos) external;
 
     /**
      * Allows owner to set the sale start timestamp.
