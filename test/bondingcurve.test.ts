@@ -26,13 +26,36 @@ describe('Bonding Curve', () => {
   })
 
   describe('Happy flow', () => {
-    it('Should return value on bonding curve', async () => {
-      const { bondingCurve } = testContext
+    // it('Should return value on bonding curve', async () => {
+    //   const { bondingCurve } = testContext
 
-      for (const value of [1, 10, 100, 1000, 2 * 1000, 5 * 1000, 10 * 1000]) {
-        expect(await bondingCurve.curve(value)).to.equal(bc.bondingCurve(value))
+    //   for (const value of [1, 10, 100, 1000, 2 * 1000, 5 * 1000, 10 * 1000]) {
+    //     expect(await bondingCurve.curve(value)).to.equal(bc.bondingCurve(value))
+    //   }
+    // })
+
+    it("Should return prices for the bonding curve", async () => {
+      const { bondingCurve } = testContext
+      let sum = 0;
+      for (let i = 1; i < 8750; i++) {
+        const j = i
+        let r = await bondingCurve.curve(j)
+        let value = (r.toString() / 10 ** 18)
+        sum += value
+        if (i < 100 && i % 20 === 0) {
+
+          console.log(`index: ${j} btc: ${value.toFixed(4)} eth: ${(value / .03).toFixed(4)} usd: ${(value * 50000).toFixed(4)}`)
+        }
+        if (i % 100 === 0) {
+
+          console.log(`index: ${j} btc: ${value.toFixed(4)} eth: ${(value / .03).toFixed(4)} usd: ${(value * 50000).toFixed(4)}`)
+        }
       }
-    })
+
+      console.log(`total BTC: ${sum}`);
+
+    }).timeout(240000)
+
   })
 
   describe('Revert', () => {

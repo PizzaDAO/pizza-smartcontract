@@ -37,14 +37,14 @@ contract RarePizzasBox is
 
     // V1 Variables (do not modify this section when upgrading)
 
-    event BTCETHPriceUpdated(int256 old, int256 current);
+    event BTCETHPriceUpdated(uint256 old, uint256 current);
 
     uint256 public constant MAX_TOKEN_SUPPLY = 10000;
     uint256 public constant MAX_MINTABLE_SUPPLY = 1250;
     uint256 public constant MAX_PURCHASABLE_SUPPLY = 8750;
 
     uint256 public publicSaleStart_timestampInS;
-    int256 public bitcoinPriceInWei;
+    uint256 public bitcoinPriceInWei;
 
     string public constant _uriBase = 'https://ipfs.io/ipfs/';
 
@@ -59,7 +59,7 @@ contract RarePizzasBox is
 
     function initialize(address chainlinkBTCETHFeed) public initializer {
         __Ownable_init();
-        __ERC721_init('Rare Pizza Box', 'RAREPIZZASBOX');
+        __ERC721_init('Rare Pizza Box', 'ZABOX');
 
         // 2021-03-14:15h::9m::26s
         publicSaleStart_timestampInS = 1615734566;
@@ -79,7 +79,11 @@ contract RarePizzasBox is
 
     // IRarePizzasBox
     function getPrice() public view virtual override returns (uint256) {
-        return super.curve(super.totalSupply() + 1);
+        return getPriceInWei();
+    }
+
+    function getPriceInWei() public view virtual returns (uint256) {
+        return ((super.curve(_minted_pizza_count.current() + 1) * bitcoinPriceInWei) / oneEth);
     }
 
     function maxSupply() public view virtual override returns (uint256) {
@@ -89,12 +93,13 @@ contract RarePizzasBox is
     function purchase() public payable virtual override {
         require(
             block.timestamp >= publicSaleStart_timestampInS || allowed(msg.sender),
-            "RAREPIZZA: The sale hasn't started yet"
+            "RAREPIZZA: sale hasn't started yet"
         );
-        require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY, 'RAREPIZZA: purchase would exceed maxSupply');
+        require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY, 'RAREPIZZA: exceeds supply.');
 
         uint256 price = getPrice();
-        require(price == msg.value, 'RAREPIZZA: price must be on the curve');
+        require(msg.value >= price, 'RAREPIZZA: price too low');
+
         _purchased_pizza_count.increment();
         uint256 id = _getNextPizzaTokenId();
         _safeMint(msg.sender, id);
@@ -113,7 +118,7 @@ contract RarePizzasBox is
         override(ERC721Upgradeable, IERC721MetadataUpgradeable)
         returns (string memory)
     {
-        require(_exists(tokenId), 'RAREPIZZA: URI query for nonexistant token');
+        require(_exists(tokenId), 'RAREPIZZA: does not exist yet, paisano');
         return string(abi.encodePacked(_uriBase, getUriString(_tokenBoxArtworkURIs[tokenId])));
     }
 
@@ -122,7 +127,7 @@ contract RarePizzasBox is
     /**
      * Get the current bitcoin price in wei
      */
-    function getBitcoinPriceInWei() public view returns (int256) {
+    function getBitcoinPriceInWei() public view returns (uint256) {
         return bitcoinPriceInWei;
     }
 
@@ -130,9 +135,9 @@ contract RarePizzasBox is
      * allows the contract owner to mint up to a specific number of boxes
      */
     function mint(address to, uint8 count) public virtual onlyOwner {
-        require(count > 0, 'RAREPIZZA: must provide a count');
+        require(count > 0, 'RAREPIZZA: need a number');
 
-        require(totalSupply().add(count) <= maxSupply(), 'RAREPIZZA: mint would exceed maxSupply');
+        require(totalSupply().add(count) <= maxSupply(), 'RAREPIZZA: exceeds supply.');
         require(
             _minted_pizza_count.current().add(count) <= MAX_MINTABLE_SUPPLY,
             'RAREPIZZA: mint would exceed MAX_MINTABLE_SUPPLY'
@@ -150,11 +155,11 @@ contract RarePizzasBox is
      * allows owner to purchase to a specific address
      */
     function purchaseTo(address to) public payable virtual onlyOwner {
-        require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY, 'RAREPIZZA: purchase would exceed maxSupply');
+        require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY, 'RAREPIZZA: exceeds supply.');
         require(to != msg.sender, 'RAREPIZZA: Thats how capos get whacked');
 
         uint256 price = getPrice();
-        require(price == msg.value, 'RAREPIZZA: price must be on the curve');
+        require(price == msg.value, 'RAREPIZZA: price too low');
         _purchased_pizza_count.increment();
         uint256 id = _getNextPizzaTokenId();
         _safeMint(to, id);
@@ -164,7 +169,7 @@ contract RarePizzasBox is
     /**
      * allows the owner to update the cached bitcoin price
      */
-    function updateBitcoinPriceInWei(int256 fallbackValue) public virtual onlyOwner {
+    function updateBitcoinPriceInWei(uint256 fallbackValue) public virtual onlyOwner {
         if (_chainlinkBTCETHFeed != address(0)) {
             try AggregatorV3Interface(_chainlinkBTCETHFeed).latestRoundData() returns (
                 uint80 roundId,
@@ -173,8 +178,8 @@ contract RarePizzasBox is
                 uint256 updatedAt,
                 uint80 answeredInRound
             ) {
-                int256 old = bitcoinPriceInWei;
-                bitcoinPriceInWei = answer;
+                uint256 old = bitcoinPriceInWei;
+                bitcoinPriceInWei = uint256(answer);
                 emit BTCETHPriceUpdated(old, bitcoinPriceInWei);
                 return;
             } catch (bytes memory reason) {
@@ -186,7 +191,7 @@ contract RarePizzasBox is
             }
         }
         if (fallbackValue > 0) {
-            int256 old = bitcoinPriceInWei;
+            uint256 old = bitcoinPriceInWei;
             bitcoinPriceInWei = fallbackValue;
             emit BTCETHPriceUpdated(old, bitcoinPriceInWei);
         }

@@ -53,14 +53,13 @@ describe('Box Metadata Tests', function () {
         }
         console.log("purchasing")
         for (let i = 0; i < scaling; i++) {
-            const price: BigNumber = await box.getPrice()
+            const price = await box.getPrice()
             await box.purchase({ value: price })
-            if (i % 100 === 0) {
-                console.log(`purchased: ${i} block: ${(await ethers.provider.getBlockNumber())}`)
-            }
 
-            await wallet.sendTransaction({ to: signer, value: 1000000000 })
-            await anotherWallet.sendTransaction({ to: signer, value: 1000000000 })
+            if (i % 100 === 0) {
+                const purchasePrice = (price.toString() / 10 ** 18)
+                console.log(`purchased: ${i} BTC: ${purchasePrice / .03} ETH: ${purchasePrice} USD: ${purchasePrice * 2000} at block: ${(await ethers.provider.getBlockNumber())}`)
+            }
         }
 
         // build a result set so we can see the distribution
@@ -75,10 +74,13 @@ describe('Box Metadata Tests', function () {
             let art_index: BigNumber = await box.getBoxArtworkUri(i)
             let current = results_map.get(art_index.toNumber())
             results_map.set(art_index.toNumber(), current + 1)
+            if (i % 100 === 0) {
+                console.log(`parsed: ${i}`)
+            }
         }
 
         // print the results
-        console.log("---------- DATA DISTRO -----------")
+        console.log("---------- BOX DATA DISTRO -----------")
         for (let [key, value] of results_map.entries()) {
             if (value > 100) {
                 console.log(`art index: ${key} count: ${value} - EXCEEDED!`);

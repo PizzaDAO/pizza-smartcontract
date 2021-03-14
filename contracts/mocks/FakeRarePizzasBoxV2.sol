@@ -9,4 +9,8 @@ import '../token/RarePizzasBox.sol';
  */
 contract FakeRarePizzasBoxV2 is RarePizzasBox {
     uint256[16] private some_v2_storage;
+
+    function getSomeStorage() public view returns (uint256) {
+        return some_v2_storage[0];
+    }
 }
