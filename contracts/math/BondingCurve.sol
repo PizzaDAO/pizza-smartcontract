@@ -12,7 +12,7 @@ contract BondingCurve {
     uint256 constant TIER3 = ((1626 * oneEth) / oneGwei);
     uint256 constant TIER4 = ((2126 * oneEth) / oneGwei);
 
-    function curve(uint256 n) public pure returns (uint256) {
+    function curve(uint256 n) public pure returns (uint256 price) {
         require(n > 0, 'BondingCurve: starting position cannot be zero');
         require(n <= MAX_CURVE, 'BondingCurve: cannot go past MAX_CURVE value');
         uint256 nInEth = (n * oneEth);

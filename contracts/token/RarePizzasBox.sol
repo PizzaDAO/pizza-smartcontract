@@ -15,6 +15,7 @@ import '@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol';
 import '../math/BondingCurve.sol';
 import '../interfaces/IOpenSeaCompatible.sol';
 import '../interfaces/IRarePizzasBox.sol';
+import '../interfaces/IRarePizzasBoxAdmin.sol';
 import '../data/AllowList.sol';
 import '../data/BoxArt.sol';
 
@@ -28,6 +29,7 @@ contract RarePizzasBox is
     BondingCurve,
     BoxArt,
     IRarePizzasBox,
+    IRarePizzasBoxAdmin,
     IOpenSeaCompatible
 {
     using AddressUpgradeable for address;
@@ -73,16 +75,20 @@ contract RarePizzasBox is
 
     // IOpenSeaCompatible
     function contractURI() public view virtual override returns (string memory) {
-        // TODO: opensea metadata
+        // Metadata provided via github link so that it can be updated or modified
         return 'https://raw.githubusercontent.com/PizzaDAO/pizza-smartcontract/master/data/opensea_metadata.json';
     }
 
     // IRarePizzasBox
+    function getBitcoinPriceInWei() public view virtual override returns (uint256) {
+        return bitcoinPriceInWei;
+    }
+
     function getPrice() public view virtual override returns (uint256) {
         return getPriceInWei();
     }
 
-    function getPriceInWei() public view virtual returns (uint256) {
+    function getPriceInWei() public view virtual override returns (uint256) {
         return ((super.curve(_minted_pizza_count.current() + 1) * bitcoinPriceInWei) / oneEth);
     }
 
@@ -122,20 +128,9 @@ contract RarePizzasBox is
         return string(abi.encodePacked(_uriBase, getUriString(_tokenBoxArtworkURIs[tokenId])));
     }
 
-    // Member Functions
+    // IRarePizzasBoxAdmin
 
-    /**
-     * Get the current bitcoin price in wei
-     */
-    function getBitcoinPriceInWei() public view returns (uint256) {
-        return bitcoinPriceInWei;
-    }
-
-    /**
-     * allows the contract owner to mint up to a specific number of boxes
-     * owner can mit to themselves
-     */
-    function mint(address to, uint8 count) public virtual onlyOwner {
+    function mint(address to, uint8 count) public virtual override onlyOwner {
         require(count > 0, 'RAREPIZZA: need a number');
 
         require(totalSupply().add(count) <= maxSupply(), 'RAREPIZZA: exceeds supply.');
@@ -152,11 +147,7 @@ contract RarePizzasBox is
         }
     }
 
-    /**
-     * allows owner to purchase to a specific address
-     owner cannot purchase for themselves
-     */
-    function purchaseTo(address to) public payable virtual onlyOwner {
+    function purchaseTo(address to) public payable virtual override onlyOwner {
         require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY, 'RAREPIZZA: exceeds supply.');
         require(to != msg.sender, 'RAREPIZZA: Thats how capos get whacked');
 
@@ -168,17 +159,18 @@ contract RarePizzasBox is
         _assignBoxArtwork(id);
     }
 
-    /**
-     * allows the owner to update the cached bitcoin price
-     */
-    function updateBitcoinPriceInWei(uint256 fallbackValue) public virtual onlyOwner {
+    function setSaleStartTimestamp(uint256 epochSeconds) public virtual override onlyOwner {
+        publicSaleStart_timestampInS = epochSeconds;
+    }
+
+    function updateBitcoinPriceInWei(uint256 fallbackValue) public virtual override onlyOwner {
         if (_chainlinkBTCETHFeed != address(0)) {
             try AggregatorV3Interface(_chainlinkBTCETHFeed).latestRoundData() returns (
-                uint80 roundId,
+                uint80, // roundId,
                 int256 answer,
-                uint256 startedAt,
-                uint256 updatedAt,
-                uint80 answeredInRound
+                uint256, // startedAt,
+                uint256, // updatedAt,
+                uint80 // answeredInRound
             ) {
                 uint256 old = bitcoinPriceInWei;
                 bitcoinPriceInWei = uint256(answer);
@@ -200,24 +192,20 @@ contract RarePizzasBox is
         // nothing got updated.  The miners thank you for your contribution.
     }
 
-    /**
-     * assign artwork index
-     */
-    function _assignBoxArtwork(uint256 tokenId) internal {
+    function withdraw() public virtual override onlyOwner {
+        uint256 balance = address(this).balance;
+        payable(msg.sender).transfer(balance);
+    }
+
+    // Internal Stuff
+
+    function _assignBoxArtwork(uint256 tokenId) internal virtual {
         uint256 pseudoRandom =
             uint256(keccak256(abi.encodePacked(blockhash(block.number - 1), tokenId, msg.sender))) % MAX_BOX_INDEX;
         _tokenBoxArtworkURIs[tokenId] = pseudoRandom;
     }
 
-    function _getNextPizzaTokenId() private view returns (uint256) {
+    function _getNextPizzaTokenId() internal view virtual returns (uint256) {
         return totalSupply();
-    }
-
-    /**
-     * @dev Withdraw ether from this contract (Callable by owner)
-     */
-    function withdraw() public virtual onlyOwner {
-        uint256 balance = address(this).balance;
-        payable(msg.sender).transfer(balance);
     }
 }
