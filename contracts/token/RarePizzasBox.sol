@@ -90,7 +90,7 @@ contract RarePizzasBox is
     }
 
     function getPriceInWei() public view virtual override returns (uint256) {
-        return ((super.curve(_minted_pizza_count.current() + 1) * bitcoinPriceInWei) / oneEth);
+        return ((super.curve(_purchased_pizza_count.current() + 1) * bitcoinPriceInWei) / oneEth);
     }
 
     function maxSupply() public view virtual override returns (uint256) {
