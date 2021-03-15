@@ -4,5 +4,5 @@
   "image": "https://ipfs.io/ipfs/QmTCEKipQX4gdGx5jAZiFtyQjPeiWcXRbb9CBk8AFhdcPy",
   "external_link": "https://rarepizzas.com",
   "seller_fee_basis_points": 500,
-  "fee_recipient": "<UPDATE CONTRACT ADDRESS HERE>"
+    "fee_recipient": "0x465cDAC68140B62c11a1E89eCD30e97aA5a18413"
 }
