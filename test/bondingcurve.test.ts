@@ -56,12 +56,16 @@ describe('Bonding Curve', () => {
         }
         if (i < 100 || i > 8724) {
           console.log(
-            `index: ${j} btc: ${value.toFixed(4)}  eth: ${(value / 0.03).toFixed(4)} usd: ${(value * 50000).toFixed(4)} running real sum: ${realSum.toString()}`,
+            `index: ${j} btc: ${value.toFixed(4)}  eth: ${(value / 0.03).toFixed(4)} usd: ${(value * 50000).toFixed(
+              4,
+            )} running real sum: ${realSum.toString()}`,
           )
         }
         if (i % 100 === 0) {
           console.log(
-            `index: ${j} btc: ${value.toFixed(4)} eth: ${(value / 0.03).toFixed(4)} usd: ${(value * 50000).toFixed(4)} running real sum: ${realSum.toString()}`,
+            `index: ${j} btc: ${value.toFixed(4)} eth: ${(value / 0.03).toFixed(4)} usd: ${(value * 50000).toFixed(
+              4,
+            )} running real sum: ${realSum.toString()}`,
           )
         }
       }
