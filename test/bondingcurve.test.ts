@@ -74,15 +74,15 @@ describe('Bonding Curve', () => {
     it('Should revert when called with 0', async () => {
       const { bondingCurve } = testContext
 
-      await expect(bondingCurve.curve(0)).to.be.revertedWith('BondingCurve: starting position cannot be zero')
+      await expect(bondingCurve.curve(0)).to.be.revertedWith('position cannot be zero')
     })
 
     it('Should revert when called with value over MAX_VALUE', async () => {
       const { bondingCurve } = testContext
 
-      await expect(bondingCurve.curve(MAX_VALUE + 1)).to.be.revertedWith('BondingCurve: cannot go past MAX_CURVE value')
+      await expect(bondingCurve.curve(MAX_VALUE + 1)).to.be.revertedWith('cannot pass MAX_CURVE')
       await expect(bondingCurve.curve(MAX_VALUE + 1000)).to.be.revertedWith(
-        'BondingCurve: cannot go past MAX_CURVE value',
+        'cannot pass MAX_CURVE',
       )
     })
   })
