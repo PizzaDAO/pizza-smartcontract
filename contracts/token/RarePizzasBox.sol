@@ -115,7 +115,7 @@ contract RarePizzasBox is
         _purchased_pizza_count.increment();
         _internalMintWithArtwork(msg.sender);
 
-        // BUY SECOND LAST PIZZA GET LAST ONE FOR FREE!
+        // BUY ONE GET ONE FREE!
         if (_purchased_pizza_count.current().add(1) == MAX_PURCHASABLE_SUPPLY) {
             _presalePurchaseCount[msg.sender] += 1;
             _purchased_pizza_count.increment();
