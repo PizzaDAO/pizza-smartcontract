@@ -1,5 +1,5 @@
 import { Contract } from 'ethers'
-import { writeFileSync } from 'fs'
+import { readFileSync, writeFileSync } from 'fs'
 
 import config, { NetworkConfig } from '../config'
 
@@ -103,10 +103,17 @@ const publishDeploymentData = (name: string, contract: Contract) => {
   writeFileSync(`./dist/deployment-${Date.now()}.json`, json)
 }
 
+const parseBoxUris = () => {
+  var text = readFileSync("./data/box_resources", "utf-8");
+  var textByLine = text.split("\n")
+  console.log(JSON.stringify(textByLine));
+}
+
 const utils = {
   getChainlinkOracle: getChainlinkOracle,
   getProxyAddress: getProxyAddress,
   getProxyAdminAddress: getProxyAdminAddress,
+  parseBoxUris: parseBoxUris,
   publishBoxWeb3Abi: publishBoxWeb3Abi,
   publishBoxWeb3AdminAbi: publishBoxWeb3AdminAbi,
   publishDeploymentData: publishDeploymentData,
