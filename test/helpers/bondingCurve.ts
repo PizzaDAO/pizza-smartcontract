@@ -44,6 +44,35 @@ const TIER3 = TIER2.add(twoFiftyPow15)
 const TIER4 = TIER3.add(twoFiftyPow15)
 const TIER5 = TIER4.add(fiveHundredPow15)
 
+const approxvalues = [
+  366,
+  450,
+  650,
+  900,
+  1000,
+  1200,
+  1400,
+  1500,
+  1600,
+  1700,
+  1800,
+  1900,
+  2000,
+  2400,
+  3000,
+  4000,
+  4400,
+  6000,
+  12000,
+  24000,
+  50000,
+  100000,
+  240000,
+  333300,
+  1000000,
+  1000000,
+]
+
 export const bondingCurve = (value: number): BigNumber => {
   if (value < 0) throw new Error('Number cannot be less than 0')
   if (value > MAX_CURVE_VALUE) throw new Error('Number cannot be over 8750')
@@ -65,8 +94,12 @@ export const bondingCurve = (value: number): BigNumber => {
   if (valueBn.gt(8000) && valueBn.lte(8500)) {
     valueBn = valueBn.mul(tenToThePowerX(15)).add(TIER4)
   }
-  if (valueBn.gt(8500) && valueBn.lte(8750)) {
+  if (valueBn.gt(8500) && valueBn.lte(8724)) {
     valueBn = valueBn.mul(3).mul(tenToThePowerX(15)).add(TIER5)
+  }
+
+  if (valueBn.gt(8724) && valueBn.lte(8750)) {
+    valueBn = BigNumber.from(approxvalues[value - 8725]).mul(tenToThePowerX(16))
   }
 
   return valueBn
