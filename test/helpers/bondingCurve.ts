@@ -70,7 +70,6 @@ const approxvalues = [
   240000,
   333300,
   1000000,
-  1000000,
 ]
 
 export const bondingCurve = (value: number): BigNumber => {
@@ -97,9 +96,11 @@ export const bondingCurve = (value: number): BigNumber => {
   if (valueBn.gt(8500) && valueBn.lte(8724)) {
     valueBn = valueBn.mul(3).mul(tenToThePowerX(15)).add(TIER5)
   }
-
-  if (valueBn.gt(8724) && valueBn.lte(8750)) {
+  if (valueBn.gt(8724) && valueBn.lt(8750)) {
     valueBn = BigNumber.from(approxvalues[value - 8725]).mul(tenToThePowerX(16))
+  }
+  if (valueBn.eq(8750)) {
+    valueBn = BigNumber.from(0) // LAST ONE IS FREE!!
   }
 
   return valueBn
