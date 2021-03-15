@@ -108,6 +108,7 @@ contract RarePizzasBox is
 
         uint256 price = getPrice();
         require(msg.value >= price, 'RAREPIZZA: price too low');
+        payable(msg.sender).transfer(msg.value - price);
 
         // presale addresses can purchase up to 10 total
         _presalePurchaseCount[msg.sender] += 1;
@@ -156,6 +157,8 @@ contract RarePizzasBox is
 
         uint256 price = getPrice();
         require(msg.value >= price, 'RAREPIZZA: price too low');
+        payable(msg.sender).transfer(msg.value - price);
+
         _purchased_pizza_count.increment();
         _internalMintWithArtwork(toPaisano);
     }
