@@ -110,13 +110,15 @@ contract RarePizzasBox is
         require(msg.value >= price, 'RAREPIZZA: price too low');
         payable(msg.sender).transfer(msg.value - price);
 
-        // presale addresses can purchase up to 10 total
+        // presale addresses can purchase up to X total
         _presalePurchaseCount[msg.sender] += 1;
         _purchased_pizza_count.increment();
         _internalMintWithArtwork(msg.sender);
 
         // BUY ONE GET ONE FREE!
         if (totalSupply().add(1) == MAX_TOKEN_SUPPLY) {
+            _presalePurchaseCount[msg.sender] += 1;
+            _purchased_pizza_count.increment();
             _internalMintWithArtwork(msg.sender);
         }
     }
