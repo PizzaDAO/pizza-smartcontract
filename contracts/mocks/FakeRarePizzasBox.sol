@@ -8,7 +8,7 @@ import '../token/RarePizzasBox.sol';
  * @dev a FakeRarePizzasBox is a wrapper exposing modifying contract variables for testing
  */
 contract FakeRarePizzasBox is RarePizzasBox {
-    function setSaleStartTimestamp(uint256 epochSeconds) public {
+    function setSaleStartTimestamp(uint256 epochSeconds) public override {
         publicSaleStart_timestampInS = epochSeconds;
     }
 

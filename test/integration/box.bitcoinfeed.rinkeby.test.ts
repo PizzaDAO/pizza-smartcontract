@@ -5,8 +5,8 @@ import { MockProvider, deployMockContract, MockContract } from 'ethereum-waffle'
 
 import config, { NetworkConfig } from '../../config'
 
-const aggregatorV3 = require('../../artifacts/@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol/AggregatorV3Interface.json')
-const boxContract = require('../../artifacts/contracts/token/RarePizzasBox.sol/RarePizzasBox.json')
+import aggregatorV3 from '../../artifacts/@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol/AggregatorV3Interface.json';
+import boxContract from '../../artifacts/contracts/token/RarePizzasBox.sol/RarePizzasBox.json';
 
 
 type TestContext = {

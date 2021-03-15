@@ -6,6 +6,7 @@ import config, { NetworkConfig } from '../config'
 
 // run the migration from the current signer account
 async function main() {
+
   const [deployer] = await ethers.getSigners()
 
   console.log('Preparing upgreade contracts with the account:', deployer.address)
@@ -29,3 +30,4 @@ main()
     console.error(error)
     process.exit(1)
   })
+

@@ -2,6 +2,7 @@ import { Contract } from 'ethers'
 import { writeFileSync } from 'fs'
 
 import config, { NetworkConfig } from '../config'
+
 import boxContract from '../artifacts/contracts/token/RarePizzasBox.sol/RarePizzasBox.json'
 
 const getChainlinkOracle = (config: NetworkConfig) => {
@@ -55,10 +56,11 @@ const publishBoxWeb3Abi = () => {
       boxContract.abi.find((i) => i.name === 'BTCETHPriceUpdated'),
       boxContract.abi.find((i) => i.name === 'getBitcoinPriceInWei'),
       boxContract.abi.find((i) => i.name === 'getPrice'),
+      boxContract.abi.find((i) => i.name === 'getPriceInWei'),
       boxContract.abi.find((i) => i.name === 'maxSupply'),
       boxContract.abi.find((i) => i.name === 'publicSaleStart_timestampInS'),
       boxContract.abi.find((i) => i.name === 'purchase'),
-      ...boxContract.abi.filter((i) => i.name === 'safeTransferFrom'),
+      // TODO: later ...boxContract.abi.filter((i) => i.name === 'safeTransferFrom'),
       boxContract.abi.find((i) => i.name === 'tokenURI'),
       boxContract.abi.find((i) => i.name === 'totalSupply'),
     ],
@@ -67,6 +69,25 @@ const publishBoxWeb3Abi = () => {
   const json = JSON.stringify(boxWeb3interface)
   console.log(json)
   writeFileSync('./dist/boxWeb3Interface.json', json)
+}
+
+const publishBoxWeb3AdminAbi = () => {
+  const boxWeb3interface = {
+    contractName: boxContract.contractName,
+    sourceName: boxContract.sourceName,
+    abi: [
+      boxContract.abi.find((i) => i.name === 'mint'),
+      boxContract.abi.find((i) => i.name === 'purchaseTo'),
+      boxContract.abi.find((i) => i.name === 'setPresaleAllowed'),
+      boxContract.abi.find((i) => i.name === 'setSaleStartTimestamp'),
+      boxContract.abi.find((i) => i.name === 'updateBitcoinPriceInWei'),
+      boxContract.abi.find((i) => i.name === 'withdraw'),
+    ],
+  }
+
+  const json = JSON.stringify(boxWeb3interface)
+  console.log(json)
+  writeFileSync('./dist/boxWeb3AdminInterface.json', json)
 }
 
 const publishDeploymentData = (name: string, contract: Contract) => {
@@ -87,6 +108,7 @@ const utils = {
   getProxyAddress: getProxyAddress,
   getProxyAdminAddress: getProxyAdminAddress,
   publishBoxWeb3Abi: publishBoxWeb3Abi,
+  publishBoxWeb3AdminAbi: publishBoxWeb3AdminAbi,
   publishDeploymentData: publishDeploymentData,
 }
 export default utils

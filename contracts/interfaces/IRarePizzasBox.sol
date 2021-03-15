@@ -2,24 +2,36 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721EnumerableUpgradeable.sol";
+import '@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721EnumerableUpgradeable.sol';
 
 /**
  * Public interface for interacting with rare pizzas
  */
 interface IRarePizzasBox is IERC721EnumerableUpgradeable {
     /**
-     * Get the curent price on the bonding curve
+     * get the btc eth exchange rate as set by the contract admin or
+     * queried from an oracle
+     */
+    function getBitcoinPriceInWei() external view returns (uint256);
+
+    /**
+     * Get the curent price on the bonding curve * the btc/eth exchange rate
+     * may be an alias to getPriceInWei()
      */
     function getPrice() external view returns (uint256);
 
     /**
-     * Get the maximum supply of pizzas
+     * Get the curent price on the bonding curve * the btc/eth exchange rate
+     */
+    function getPriceInWei() external view returns (uint256);
+
+    /**
+     * Get the maximum supply of tokens
      */
     function maxSupply() external view returns (uint256);
 
     /**
-     * try to purchase one pizza
+     * try to purchase one token
      */
     function purchase() external payable;
 }
