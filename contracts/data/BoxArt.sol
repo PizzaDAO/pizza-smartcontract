@@ -117,7 +117,7 @@ contract BoxArt {
                 'QmdBCDyNFyDVchtFerrkNxDKPStdj8HHabasQxW8VVDjVA'
             ];
 
-        require(index < assets.length, 'RAREPIZZA: requested art index is out of range');
+        require(index < assets.length, 'requested index is out of range');
 
         return assets[index];
     }

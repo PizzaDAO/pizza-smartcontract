@@ -6,7 +6,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721Metad
 
 interface IOpenSeaCompatible is IERC721MetadataUpgradeable {
     /**
-    Get the contract metadata
+     * Get the contract metadata
      */
     function contractURI() external view returns (string memory);
 }

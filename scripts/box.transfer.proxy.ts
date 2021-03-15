@@ -13,7 +13,7 @@ async function main() {
   console.log('New Owner:', newOwner)
 
   // The owner of the ProxyAdmin can upgrade our contracts
-  await upgrades.admin.transferProxyAdminOwnership(newOwner);
+  await upgrades.admin.transferProxyAdminOwnership(newOwner)
   console.log('Successfully Transferred To', newOwner)
 }
 
