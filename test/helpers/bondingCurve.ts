@@ -35,18 +35,15 @@ export const MAX_CURVE_VALUE = 8750
 
 const tenToThePowerX = (x: number) => BigNumber.from(10).pow(x)
 
-const twoFiftyPow15 = BigNumber.from(250).mul(tenToThePowerX(15))
-const fiveHundredPow15 = BigNumber.from(500).mul(tenToThePowerX(15))
-
 const TIER1 = BigNumber.from(501).mul(tenToThePowerX(14))
-const TIER2 = TIER1.add(twoFiftyPow15)
-const TIER3 = TIER2.add(twoFiftyPow15)
-const TIER4 = TIER3.add(twoFiftyPow15)
-const TIER5 = TIER4.add(fiveHundredPow15)
+const TIER2 = BigNumber.from(100).mul(tenToThePowerX(15)).add(TIER1)
+const TIER3 = BigNumber.from(250).mul(tenToThePowerX(15)).add(TIER2)
+const TIER4 = BigNumber.from(250).mul(tenToThePowerX(15)).add(TIER3)
+const TIER5 = BigNumber.from(500).mul(tenToThePowerX(15)).add(TIER4)
 
 const approxvalues = [
-  366,
-  450,
+  100,
+  436,
   650,
   900,
   1000,
@@ -82,19 +79,19 @@ export const bondingCurve = (value: number): BigNumber => {
     valueBn = valueBn.mul(2).mul(tenToThePowerX(13)).add(tenToThePowerX(14))
   }
   if (valueBn.gt(2500) && valueBn.lte(5000)) {
-    valueBn = valueBn.mul(4).mul(tenToThePowerX(13)).add(TIER1)
+    valueBn = valueBn.sub(2500).mul(4).mul(tenToThePowerX(13)).add(TIER1)
   }
   if (valueBn.gt(5000) && valueBn.lte(7500)) {
-    valueBn = valueBn.mul(tenToThePowerX(14)).add(TIER2)
+    valueBn = valueBn.sub(5000).mul(tenToThePowerX(14)).add(TIER2)
   }
   if (valueBn.gt(7500) && valueBn.lte(8000)) {
-    valueBn = valueBn.mul(5).mul(tenToThePowerX(14)).add(TIER3)
+    valueBn = valueBn.sub(7500).mul(5).mul(tenToThePowerX(14)).add(TIER3)
   }
   if (valueBn.gt(8000) && valueBn.lte(8500)) {
-    valueBn = valueBn.mul(tenToThePowerX(15)).add(TIER4)
+    valueBn = valueBn.sub(8000).mul(tenToThePowerX(15)).add(TIER4)
   }
   if (valueBn.gt(8500) && valueBn.lte(8724)) {
-    valueBn = valueBn.mul(3).mul(tenToThePowerX(15)).add(TIER5)
+    valueBn = valueBn.sub(8500).mul(3).mul(tenToThePowerX(15)).add(TIER5)
   }
   if (valueBn.gt(8724) && valueBn.lt(8750)) {
     valueBn = BigNumber.from(approxvalues[value - 8725]).mul(tenToThePowerX(16))
