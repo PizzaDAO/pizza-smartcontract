@@ -8,19 +8,19 @@ pragma solidity ^0.8.0;
  */
 interface IRarePizzasBoxAdmin {
     /**
-     * allows the contract owner to mint up to a specific number of boxes
+     * Allows the contract owner to mint up to a specific number of boxes
      * owner can mit to themselves
      */
     function mint(address to, uint8 count) external;
 
     /**
-     * allows owner to purchase to a specific address
+     * Allows owner to purchase to a specific address
      * owner cannot purchase for themselves
      */
     function purchaseTo(address to) external payable;
 
     /**
-     * allows owner to add or remove addresses fro mthe presale list
+     * Allows owner to add or remove addresses fro mthe presale list
      */
     function setPresaleAllowed(uint8 count, address[] memory toPaisanos) external;
 
@@ -32,7 +32,7 @@ interface IRarePizzasBoxAdmin {
     function setSaleStartTimestamp(uint256 epochSeconds) external;
 
     /**
-     * allows the owner to update the cached bitcoin price
+     * Allows the owner to update the cached bitcoin price
      */
     function updateBitcoinPriceInWei(uint256 fallbackValue) external;
 
