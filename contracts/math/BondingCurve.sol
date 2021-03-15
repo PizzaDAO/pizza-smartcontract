@@ -43,11 +43,8 @@ contract BondingCurve {
         if (n > 8500 && n <= 8724) {
             return TIER5 + (3 * n * oneEth / 10**3);
         }
-
-        if (n > 8724 && n <= 8750) {
+        if (n > 8724 && n < 8750) {
           return approxvalues[n-8725] * 10**16;
         }
-
-        return approxvalues[approxvalues.length - 1] * 10**16;
     }
 }
