@@ -19,6 +19,7 @@ async function main() {
 
   utils.publishDeploymentData('RarePizzasBox', box)
   utils.publishBoxWeb3Abi()
+  utils.publishBoxWeb3AdminAbi()
 }
 
 main()

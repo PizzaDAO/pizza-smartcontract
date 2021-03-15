@@ -108,6 +108,7 @@ const utils = {
   getProxyAddress: getProxyAddress,
   getProxyAdminAddress: getProxyAdminAddress,
   publishBoxWeb3Abi: publishBoxWeb3Abi,
+  publishBoxWeb3AdminAbi: publishBoxWeb3AdminAbi,
   publishDeploymentData: publishDeploymentData,
 }
 export default utils
