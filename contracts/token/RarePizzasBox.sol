@@ -116,7 +116,7 @@ contract RarePizzasBox is
         _internalMintWithArtwork(msg.sender);
 
         // BUY ONE GET ONE FREE!
-        if (_purchased_pizza_count.add(1) == MAX_PURCHASABLE_SUPPLY) {
+        if (_purchased_pizza_count.current().add(1) == MAX_PURCHASABLE_SUPPLY) {
             _presalePurchaseCount[msg.sender] += 1;
             _purchased_pizza_count.increment();
             _internalMintWithArtwork(msg.sender);
