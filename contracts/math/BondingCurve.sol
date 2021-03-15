@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 pragma solidity ^0.8.0;
 
 contract BondingCurve {
@@ -9,39 +11,40 @@ contract BondingCurve {
     uint256 constant TIER4 = TIER3 + ((250 * oneEth) / 10**3);
     uint256 constant TIER5 = TIER4 + ((500 * oneEth) / 10**3);
 
-    uint256[] approxvalues = [
-        100,
-        436,
-        650,
-        900,
-        1000,
-        1200,
-        1400,
-        1500,
-        1600,
-        1700,
-        1800,
-        1900,
-        2000,
-        2400,
-        3000,
-        4000,
-        4400,
-        6000,
-        12000,
-        24000,
-        50000,
-        100000,
-        240000,
-        333300,
-        1000000
-    ];
-
     // Approximate .001x^2+.000 000 000 000 000 000 000 000 0000999x^{8}
 
     function curve(uint256 n) public view returns (uint256) {
         require(n > 0, 'BondingCurve: starting position cannot be zero');
         require(n <= MAX_CURVE, 'BondingCurve: cannot go past MAX_CURVE value');
+
+        uint256[25] memory approxvalues =
+            [
+                uint256(100),
+                436,
+                650,
+                900,
+                1000,
+                1200,
+                1400,
+                1500,
+                1600,
+                1700,
+                1800,
+                1900,
+                2000,
+                2400,
+                3000,
+                4000,
+                4400,
+                6000,
+                12000,
+                24000,
+                50000,
+                100000,
+                240000,
+                333300,
+                1000000
+            ];
 
         if (n <= 2500) {
             return ((2 * n * oneEth) / 10**5) + oneEth / 10**4;
