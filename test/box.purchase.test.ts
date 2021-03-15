@@ -37,18 +37,20 @@ describe('Box Purchase Tests', function () {
   })
 
   describe('Check methods', () => {
-    // skip becausew the bonding curve changed
-    it.skip('Should get price for next Box', async () => {
+    it('Should get price for next Box', async () => {
       const { box } = testContext
       const price: BigNumber = await box.getPrice()
       const soldTokens = await box.totalSupply()
+      const btcPriceInWei = await box.getBitcoinPriceInWei()
 
-      expect(price).to.equal(bc.bondingCurve(soldTokens + 1))
+      expect(utils.formatUnits(price, 'wei')).to.equal(
+        utils.formatEther(bc.bondingCurve(soldTokens + 1).mul(btcPriceInWei)),
+      )
     })
 
     it('Should return max supply', async () => {
       const { box } = testContext
-      expect(await box.maxSupply()).to.equal(bc.MAX_CURVE_VALUE)
+      expect(await box.maxSupply()).to.equal(10000)
     })
   })
 
@@ -79,7 +81,7 @@ describe('Box Purchase Tests', function () {
 
         await box.purchase({ value: price })
 
-        expect((await box.balanceOf(box.signer.getAddress())).toNumber()).to.equal(1);
+        expect((await box.balanceOf(box.signer.getAddress())).toNumber()).to.equal(1)
       })
 
       it('Should allow owner mint to address', async () => {
