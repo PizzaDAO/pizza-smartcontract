@@ -102,12 +102,12 @@ contract RarePizzasBox is
         require(
             block.timestamp >= publicSaleStart_timestampInS ||
                 (_presalePurchaseCount[msg.sender] < _presaleAllowed[msg.sender]),
-            "RAREPIZZA: sale hasn't started yet"
+            "sale hasn't started"
         );
-        require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY, 'RAREPIZZA: exceeds supply.');
+        require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY, 'exceeds supply.');
 
         uint256 price = getPrice();
-        require(msg.value >= price, 'RAREPIZZA: price too low');
+        require(msg.value >= price, 'price too low');
         payable(msg.sender).transfer(msg.value - price);
 
         // presale addresses can purchase up to X total
@@ -135,21 +135,18 @@ contract RarePizzasBox is
         override(ERC721Upgradeable, IERC721MetadataUpgradeable)
         returns (string memory)
     {
-        require(_exists(tokenId), 'RAREPIZZA: does not exist yet, paisano');
+        require(_exists(tokenId), 'does not exist, paisano');
         return string(abi.encodePacked(_uriBase, getUriString(_tokenBoxArtworkURIs[tokenId])));
     }
 
     // IRarePizzasBoxAdmin
 
     function mint(address toPizzaiolo, uint8 count) public virtual override onlyOwner {
-        require(toPizzaiolo != address(0), 'RAREPIZZA: dont be silly');
-        require(count > 0, 'RAREPIZZA: need a number');
+        require(toPizzaiolo != address(0), 'dont be silly');
+        require(count > 0, 'need a number');
 
-        require(totalSupply().add(count) <= maxSupply(), 'RAREPIZZA: exceeds supply.');
-        require(
-            _minted_pizza_count.current().add(count) <= MAX_MINTABLE_SUPPLY,
-            'RAREPIZZA: mint would exceed MAX_MINTABLE_SUPPLY'
-        );
+        require(totalSupply().add(count) <= maxSupply(), 'would exceed supply.');
+        require(_minted_pizza_count.current().add(count) <= MAX_MINTABLE_SUPPLY, 'would exceed mint');
 
         for (uint256 i = 0; i < count; i++) {
             _minted_pizza_count.increment();
@@ -158,12 +155,12 @@ contract RarePizzasBox is
     }
 
     function purchaseTo(address toPaisano) public payable virtual override onlyOwner {
-        require(toPaisano != address(0), 'RAREPIZZA: dont be silly');
-        require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY, 'RAREPIZZA: exceeds supply.');
-        require(toPaisano != msg.sender, 'RAREPIZZA: Thats how capos get whacked');
+        require(toPaisano != address(0), 'dont be silly');
+        require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY, 'would exceed supply.');
+        require(toPaisano != msg.sender, 'thats how capos get whacked');
 
         uint256 price = getPrice();
-        require(msg.value >= price, 'RAREPIZZA: price too low');
+        require(msg.value >= price, 'price too low');
         payable(msg.sender).transfer(msg.value - price);
 
         _purchased_pizza_count.increment();
@@ -172,7 +169,7 @@ contract RarePizzasBox is
 
     function setPresaleAllowed(uint8 count, address[] memory toPaisanos) public virtual override onlyOwner {
         for (uint256 i = 0; i < toPaisanos.length; i++) {
-            require(toPaisanos[i] != address(0), 'RAREPIZZA: dont be silly');
+            require(toPaisanos[i] != address(0), 'dont be silly');
             _presaleAllowed[toPaisanos[i]] = count;
         }
     }
