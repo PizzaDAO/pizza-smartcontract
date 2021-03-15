@@ -9,19 +9,19 @@ import '@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721Enume
  */
 interface IRarePizzasBox is IERC721EnumerableUpgradeable {
     /**
-     * get the btc eth exchange rate as set by the contract admin or
+     * Get the btc eth exchange rate as set by the contract admin or
      * queried from an oracle
      */
     function getBitcoinPriceInWei() external view returns (uint256);
 
     /**
-     * Get the curent price on the bonding curve * the btc/eth exchange rate
+     * Get the current price on the bonding curve * the btc/eth exchange rate
      * may be an alias to getPriceInWei()
      */
     function getPrice() external view returns (uint256);
 
     /**
-     * Get the curent price on the bonding curve * the btc/eth exchange rate
+     * Get the current price on the bonding curve * the btc/eth exchange rate
      */
     function getPriceInWei() external view returns (uint256);
 
@@ -31,7 +31,7 @@ interface IRarePizzasBox is IERC721EnumerableUpgradeable {
     function maxSupply() external view returns (uint256);
 
     /**
-     * try to purchase one token
+     * Try to purchase one token
      */
     function purchase() external payable;
 }
