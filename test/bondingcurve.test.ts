@@ -42,9 +42,13 @@ describe('Bonding Curve', () => {
       for (let i = 1; i <= 8750; i++) {
         const j = i
         let r = await bondingCurve.curve(j)
-        let value = r.toString() / 10 ** 18
+        let value = (r/ 10 ** 18)
         sum += value
-        if (i < 100 || (i > 8700 && i % 10 === 0)) {
+        if(i===8724){
+          console.log("FIRST LOG")
+          console.log(`total BTC: ${sum}`)
+        }
+        if (i < 100 || (i > 8724)) {
           console.log(
             `index: ${j} btc: ${value.toFixed(4)} eth: ${(value / 0.03).toFixed(4)} usd: ${(value * 50000).toFixed(4)}`,
           )

@@ -114,6 +114,9 @@ contract RarePizzasBox is
         _presalePurchaseCount[msg.sender] += 1;
         _purchased_pizza_count.increment();
         _internalMintWithArtwork(msg.sender);
+        if(totalSupply().add(1)==MAX_TOKEN_SUPPLY){
+            _internalMintWithArtwork(msg.sender);
+        }
     }
 
     // IERC721 Overrides
