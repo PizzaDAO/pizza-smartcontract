@@ -110,12 +110,12 @@ contract RarePizzasBox is
         require(msg.value >= price, 'price too low');
         payable(msg.sender).transfer(msg.value - price);
 
-        // presale addresses can purchase up to X total
+        // Presale addresses can purchase up to X total
         _presalePurchaseCount[msg.sender] += 1;
         _purchased_pizza_count.increment();
         _internalMintWithArtwork(msg.sender);
 
-        // BUY ONE GET ONE FREE!
+        // BUY SECOND LAST PIZZA GET LAST ONE FOR FREE!
         if (_purchased_pizza_count.current().add(1) == MAX_PURCHASABLE_SUPPLY) {
             _presalePurchaseCount[msg.sender] += 1;
             _purchased_pizza_count.increment();
@@ -144,7 +144,6 @@ contract RarePizzasBox is
     function mint(address toPizzaiolo, uint8 count) public virtual override onlyOwner {
         require(toPizzaiolo != address(0), 'dont be silly');
         require(count > 0, 'need a number');
-
         require(totalSupply().add(count) <= maxSupply(), 'would exceed supply.');
         require(_minted_pizza_count.current().add(count) <= MAX_MINTABLE_SUPPLY, 'would exceed mint');
 

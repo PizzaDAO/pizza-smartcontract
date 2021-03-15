@@ -16,7 +16,7 @@ type TestContext = {
 
 let testContext: TestContext
 
-// this test will connect to rinkeby
+// This test will connect to rinkeby
 // so it is skipped when checked into source for now
 
 describe.skip('Box Purchase Rinkeby Feed Tests', function () {

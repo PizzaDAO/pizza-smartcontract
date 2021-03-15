@@ -16,7 +16,7 @@ type TestContext = {
 
 let testContext: TestContext
 
-// this test will actually deploy a contract to rinkeby and test the chainlink integration
+// This test will actually deploy a contract to rinkeby and test the chainlink integration
 // so it is skipped when checked into source for now
 
 describe.skip('Bitcoin Rinkeby Feed Tests', function () {
@@ -43,7 +43,7 @@ describe.skip('Bitcoin Rinkeby Feed Tests', function () {
   })
 
   it('should read price from chainlink oracle in contract', async () => {
-    // make sure there is a deployed contract at this address that matches the abi
+    // Make sure there is a deployed contract at this address that matches the abi
     const your_deployed_contract = config.RAREPIZZAS_BOX_RINKEBY_PROXY_ADDRESS
     const provider = new providers.AlchemyProvider('rinkeby', config.ALCHEMY_RINKEBY_KEY)
     const wallet = new Wallet(config.RINKEBY_PRIVATE_KEY, provider)

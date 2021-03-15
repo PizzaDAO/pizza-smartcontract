@@ -26,7 +26,6 @@ describe('Bonding Curve', () => {
   })
 
   describe('Happy flow', () => {
-    // test fails because curve changed in solidity
     it('Should return value on bonding curve', async () => {
       const { bondingCurve } = testContext
 
@@ -35,16 +34,15 @@ describe('Bonding Curve', () => {
       }
     })
 
-    // just prints out the new curve
+    // Just prints out the new curve
     it('Should return prices for the bonding curve', async () => {
       const { bondingCurve } = testContext
       let sum = 0
       let realSum = BigInt(0)
       for (let i = 1; i <= 8750; i++) {
         const j = i
-        let r = await bondingCurve.curve(j)
-
-        let value = r / 10 ** 18
+        const r = await bondingCurve.curve(j)
+        const value = r / 10 ** 18
 
         sum += value
         realSum = realSum + BigInt(r)
