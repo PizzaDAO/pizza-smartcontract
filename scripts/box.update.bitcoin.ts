@@ -4,13 +4,13 @@ import config from '../config'
 
 import boxContract from '../artifacts/contracts/token/RarePizzasBox.sol/RarePizzasBox.json';
 
-// seed the contract with addresses
+// Update the bitcoin price
 async function main() {
     const [deployer] = await ethers.getSigners()
-    const provider = new ethers.providers.AlchemyProvider("rinkeby", config.ALCHEMY_RINKEBY_KEY);
-    const wallet = new ethers.Wallet(config.RINKEBY_PRIVATE_KEY, provider)
+    const provider = new ethers.providers.AlchemyProvider(config.NETWORK, utils.getAlchemyAPIKey(config));
+    const wallet = new ethers.Wallet(utils.getDeploymentKey(config), provider)
 
-    const instanceAddress = config.RAREPIZZAS_BOX_RINKEBY_PROXY_ADDRESS;
+    const instanceAddress = utils.getProxyAddress(config)
 
     console.log('Connecting to instance')
 
@@ -20,11 +20,12 @@ async function main() {
     //verify we can query something
     console.log(`current BTC-ETH Price: ${current.toString() / 10 ** 18}`)
 
-    console.log('seeding addresses')
+    console.log('updating BTC Price')
 
-    await contract.setPresaleAllowed(10, ['0xSOME_ADDRESSES'])
+    await contract.updateBitcoinPriceInWei('31000000000000000000')
 
-    console.log('addresses seeded')
+    console.log('updated')
+    console.log(`current BTC-ETH Price: ${current.toString() / 10 ** 18}`)
 }
 
 main()

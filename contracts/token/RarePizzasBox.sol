@@ -64,10 +64,10 @@ contract RarePizzasBox is
         __Ownable_init();
         __ERC721_init('Rare Pizza Box', 'ZABOX');
 
-        // 2021-03-14:15h::9m::26s
-        publicSaleStart_timestampInS = 1615734566;
-        // starting value:  30.00 ETH
-        bitcoinPriceInWei = 30000000000000000000;
+        // Date and time (GMT): Tuesday, March 16, 2021 15:14:15
+        publicSaleStart_timestampInS = 1615853023;
+        // starting value:  31.00 ETH
+        bitcoinPriceInWei = 31000000000000000000;
 
         if (chainlinkBTCETHFeed != address(0)) {
             _chainlinkBTCETHFeed = chainlinkBTCETHFeed;
