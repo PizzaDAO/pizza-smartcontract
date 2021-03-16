@@ -23,10 +23,10 @@ describe('Box Purchase Tests', function () {
     const Box = await ethers.getContractFactory('RarePizzasBox')
     const box = await Box.deploy()
 
-    // initialize to set owner, since not deployed via proxy
+    // Initialize to set owner, since not deployed via proxy
     await box.initialize(utils.getAddress('0x0000000000000000000000000000000000000000'))
 
-    // pick a date like jan 1, 2021
+    // Pick a date like jan 1, 2021
     await box.setSaleStartTimestamp(1609459200)
 
     testContext = {
@@ -50,7 +50,8 @@ describe('Box Purchase Tests', function () {
 
     it('Should return max supply', async () => {
       const { box } = testContext
-      expect(await box.maxSupply()).to.equal(10000)
+
+      expect(await box.maxSupply()).to.equal(MAX_NUMBER_OF_BOXES)
     })
   })
 
@@ -70,18 +71,18 @@ describe('Box Purchase Tests', function () {
 
       it('Should allow purchase for presale address', async () => {
         const { box, wallet, userWallet } = testContext
-        // pick a day in the future
+        // Pick a day in the future
         await box.setSaleStartTimestamp(3609459200)
         await box.setPresaleAllowed(10, [box.signer.getAddress()])
 
-        // executer again with more addresses
+        // Execute again with more addresses
         await box.setPresaleAllowed(10, [wallet.address, userWallet.address])
 
         const price: BigNumber = await box.getPrice()
 
         await box.purchase({ value: price })
 
-        expect((await box.balanceOf(box.signer.getAddress())).toNumber()).to.equal(1)
+        expect(await box.balanceOf(box.signer.getAddress())).to.equal(1)
       })
 
       it('Should allow owner mint to address', async () => {
@@ -96,7 +97,7 @@ describe('Box Purchase Tests', function () {
       it('Should allow owner to mint different quantities', async () => {
         const { box, userWallet } = testContext
 
-        // can go up to 255
+        // Can go up to 255
         await box.mint(userWallet.address, 5)
         await box.mint(userWallet.address, 10)
 
@@ -139,13 +140,12 @@ describe('Box Purchase Tests', function () {
     describe('Revert', () => {
       it('Should not allow purchase for non-presale address', async () => {
         const { box, wallet } = testContext
-        const twentyFourHoursMilliseconds = 24 * 60 * 60 * 1000
 
         // Make sure balance is 0 before
         expect(await box.balanceOf(wallet.address)).to.equal(0)
 
         // Pick a day in the future
-        await box.setSaleStartTimestamp(Date.now() + twentyFourHoursMilliseconds)
+        await box.setSaleStartTimestamp(Date.now() + 24 * 60 * 60 * 1000)
 
         const price: BigNumber = await box.getPrice()
 
