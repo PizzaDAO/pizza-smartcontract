@@ -3,6 +3,6 @@
   "description": "U hungy? Git gud! Grab a box and get in line",
   "image": "https://ipfs.io/ipfs/QmTCEKipQX4gdGx5jAZiFtyQjPeiWcXRbb9CBk8AFhdcPy",
   "external_link": "https://rarepizzas.com",
-  "seller_fee_basis_points": 500,
+  "seller_fee_basis_points": 1250,
   "fee_recipient": "<UPDATE CONTRACT ADDRESS HERE>"
 }
