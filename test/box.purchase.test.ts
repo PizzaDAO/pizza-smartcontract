@@ -17,10 +17,10 @@ type TestContext = {
 const MAX_NUMBER_OF_BOXES = 10 * 1000
 let testContext: TestContext
 
-describe('Rare Pizzas Box', function () {
+describe('Box Purchase Tests', function () {
   beforeEach(async () => {
     const [wallet, userWallet] = new MockProvider().getWallets()
-    const Box = await ethers.getContractFactory('FakeRarePizzasBox')
+    const Box = await ethers.getContractFactory('RarePizzasBox')
     const box = await Box.deploy()
 
     // initialize to set owner, since not deployed via proxy
@@ -36,21 +36,21 @@ describe('Rare Pizzas Box', function () {
     }
   })
 
-  // describe('Deploying the contract', () => {})
-
   describe('Check methods', () => {
     it('Should get price for next Box', async () => {
       const { box } = testContext
       const price: BigNumber = await box.getPrice()
       const soldTokens = await box.totalSupply()
+      const btcPriceInWei = await box.getBitcoinPriceInWei()
 
-      expect(price).to.equal(bc.bondingCurve(soldTokens + 1))
+      expect(utils.formatUnits(price, 'wei')).to.equal(
+        utils.formatEther(bc.bondingCurve(soldTokens + 1).mul(btcPriceInWei)),
+      )
     })
 
     it('Should return max supply', async () => {
       const { box } = testContext
-
-      expect(await box.maxSupply()).to.equal(bc.MAX_CURVE_VALUE)
+      expect(await box.maxSupply()).to.equal(10000)
     })
   })
 
@@ -68,20 +68,21 @@ describe('Rare Pizzas Box', function () {
         }
       })
 
-      // it('Should allow purchase for presale address', async () => {
-      //   const { box, wallet } = testContext
-      //   // pick a day in the future
-      //   await box.setSaleStartTimestamp(3609459200);
+      it('Should allow purchase for presale address', async () => {
+        const { box, wallet, userWallet } = testContext
+        // pick a day in the future
+        await box.setSaleStartTimestamp(3609459200)
+        await box.setPresaleAllowed(10, [box.signer.getAddress()])
 
-      //   // TODO: in order for this to pass we need a public pravate keypair
-      //   // that is included in the allow list
-      //   const instance = box.connect('0xSomeId')
+        // executer again with more addresses
+        await box.setPresaleAllowed(10, [wallet.address, userWallet.address])
 
-      //   const price: BigNumber = await instance.getPrice()
-      //   await instance.purchase({ value: price })
+        const price: BigNumber = await box.getPrice()
 
-      //   expect((await instance.balanceOf(wallet.address)).toNumber()).to.equal(1);
-      // })
+        await box.purchase({ value: price })
+
+        expect((await box.balanceOf(box.signer.getAddress())).toNumber()).to.equal(1)
+      })
 
       it('Should allow owner mint to address', async () => {
         const { box, userWallet } = testContext
@@ -95,9 +96,9 @@ describe('Rare Pizzas Box', function () {
       it('Should allow owner to mint different quantities', async () => {
         const { box, userWallet } = testContext
 
+        // can go up to 255
         await box.mint(userWallet.address, 5)
         await box.mint(userWallet.address, 10)
-        // can go up to 255
 
         expect(await box.totalSupply()).to.equal(15)
         expect(await box.balanceOf(userWallet.address)).to.equal(15)

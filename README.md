@@ -37,13 +37,13 @@ npx hardhat run --network localhost scripts/box.deploy.ts
 copy .env.example to .env and fill in your keys
 
 ```
-$ npx hardhat run --network rinkeby scripts/box.deploy.ts
+npx hardhat run --network rinkeby scripts/box.deploy.ts
 ```
 
 then go to etherscan and get the implementation address (under the contract source, theres a `more options` dropdown menu and select `is this a proxy?`)
 
 ```
-$ npx hardhat verify --contract contracts/token/RarePizzasBox.sol:RarePizzasBox --network goerli 0x_THE_IMPLEMENTATION_ADDRESS
+$ npx hardhat verify --contract contracts/token/RarePizzasBox.sol:RarePizzasBox --network rinkeby 0x_THE_IMPLEMENTATION_ADDRESS
 ```
 
 ## Run unit tests
