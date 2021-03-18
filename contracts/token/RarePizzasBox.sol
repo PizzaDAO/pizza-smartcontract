@@ -38,6 +38,8 @@ contract RarePizzasBox is
     // V1 Variables (do not modify this section when upgrading)
 
     event BTCETHPriceUpdated(uint256 old, uint256 current);
+    event PresaleAllowedUpdated();
+    event SaleStartTimestampUpdated(uint256 old, uint256 current);
 
     uint256 public constant MAX_TOKEN_SUPPLY = 10000;
     uint256 public constant MAX_MINTABLE_SUPPLY = 1250;
@@ -171,10 +173,15 @@ contract RarePizzasBox is
             require(toPaisanos[i] != address(0), 'dont be silly');
             _presaleAllowed[toPaisanos[i]] = count;
         }
+
+        emit PresaleAllowedUpdated();
     }
 
     function setSaleStartTimestamp(uint256 epochSeconds) public virtual override onlyOwner {
+        uint256 old = publicSaleStart_timestampInS;
         publicSaleStart_timestampInS = epochSeconds;
+
+        emit SaleStartTimestampUpdated(old, epochSeconds);
     }
 
     function updateBitcoinPriceInWei(uint256 fallbackValue) public virtual override onlyOwner {
