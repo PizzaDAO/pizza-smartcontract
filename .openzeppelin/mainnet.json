@@ -1,9 +1,9 @@
 {
   "manifestVersion": "3.1",
   "impls": {
-    "457b56303e816231a65fef197807970997192dac63b289c72f58e08b142d8450": {
-      "address": "0x2dfF908B82d3C3f213517c1BEE58196384Bc6bCa",
-      "txHash": "0x159b3dada0ba0e3740a07abf01a81146b3ad27a4d15ed7599757279f5fc28761",
+    "7eb34bdc67f1e21b1bf0b01cc8b96119c3fb7e308f777edd249ad70fee5b22b9": {
+      "address": "0xBFa6e1590c17765c0E3f77A1a554464cc7F3eDa9",
+      "txHash": "0x04cedd2d17cfb719ce3ad185c48f3aada26dded375d98033f3062cb3fba43350",
       "layout": {
         "storage": [
           {
@@ -123,7 +123,7 @@
           {
             "contract": "RarePizzasBox",
             "label": "bitcoinPriceInWei",
-            "type": "t_int256",
+            "type": "t_uint256",
             "src": "contracts/token/RarePizzasBox.sol:47"
           },
           {
@@ -149,14 +149,23 @@
             "label": "_tokenBoxArtworkURIs",
             "type": "t_mapping(t_uint256,t_uint256)",
             "src": "contracts/token/RarePizzasBox.sol:56"
+          },
+          {
+            "contract": "RarePizzasBox",
+            "label": "_presaleAllowed",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "contracts/token/RarePizzasBox.sol:58"
+          },
+          {
+            "contract": "RarePizzasBox",
+            "label": "_presalePurchaseCount",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "contracts/token/RarePizzasBox.sol:59"
           }
         ],
         "types": {
           "t_uint256": {
             "label": "uint256"
-          },
-          "t_int256": {
-            "label": "int256"
           },
           "t_address": {
             "label": "address"
@@ -173,6 +182,9 @@
           "t_mapping(t_uint256,t_uint256)": {
             "label": "mapping(uint256 => uint256)"
           },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
           "t_mapping(t_address,t_mapping(t_uint256,t_uint256))": {
             "label": "mapping(address => mapping(uint256 => uint256))"
           },
@@ -187,9 +199,6 @@
           },
           "t_mapping(t_uint256,t_address)": {
             "label": "mapping(uint256 => address)"
-          },
-          "t_mapping(t_address,t_uint256)": {
-            "label": "mapping(address => uint256)"
           },
           "t_mapping(t_address,t_mapping(t_address,t_bool))": {
             "label": "mapping(address => mapping(address => bool))"
@@ -214,7 +223,7 @@
     }
   },
   "admin": {
-    "address": "0x60B74fe78f46f9Fc0A27eaf75EaFa449ec238EA9",
-    "txHash": "0x1909e30e4b14d9fd0eddc35415448071f67f4fd23e4bcac884611139f80aa78e"
+    "address": "0x8287aF9ACF070C00c204aEb336Bf5221E808BC20",
+    "txHash": "0xb38c1644e89ff30f755b211e6c2197bf86efb0a54f0d9f37bfe821b6d4570ef6"
   }
 }

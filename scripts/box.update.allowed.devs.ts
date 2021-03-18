@@ -7,6 +7,7 @@ import boxContract from '../artifacts/contracts/token/RarePizzasBox.sol/RarePizz
 import presale_devs from './reservations.mainnet.devs.json';
 
 // seed the contract with addresses
+// note the actual list is not checked into source
 async function main() {
     const [deployer] = await ethers.getSigners()
     const provider = new ethers.providers.AlchemyProvider(config.NETWORK, utils.getAlchemyAPIKey(config));
@@ -23,9 +24,7 @@ async function main() {
     console.log(`current BTC-ETH Price: ${current.toString() / 10 ** 18}`)
 
     console.log('seeding addresses')
-
-    await contract.setPresaleAllowed(3, [...presale_devs])
-
+    await contract.setPresaleAllowed(0, [...presale_devs])
     console.log('addresses seeded')
 }
 

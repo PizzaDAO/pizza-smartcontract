@@ -4,9 +4,10 @@ import config from '../config'
 
 import boxContract from '../artifacts/contracts/token/RarePizzasBox.sol/RarePizzasBox.json';
 
-import presale_mainnet from './reservations.mainnet.whitelist.json';
+import presale_mainnet from './reservations.mainnet.allowed.json';
 
 // seed the contract with addresses
+// note the actual list of addresses is NOT checked into source
 async function main() {
     const [deployer] = await ethers.getSigners()
     const provider = new ethers.providers.AlchemyProvider(config.NETWORK, utils.getAlchemyAPIKey(config));
@@ -24,7 +25,7 @@ async function main() {
 
     console.log('seeding addresses')
 
-    await contract.setPresaleAllowed(3, [...presale_mainnet])
+    await contract.setPresaleAllowed(0, [...presale_mainnet])
 
     console.log('addresses seeded')
 }

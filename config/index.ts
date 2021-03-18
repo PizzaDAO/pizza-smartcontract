@@ -8,7 +8,7 @@ const config: NetworkConfig = {
   ALCHEMY_RINKEBY_KEY: process.env.ALCHEMY_RINKEBY_KEY || '',
   ALCHEMY_ROPSTEN_KEY: process.env.ALCHEMY_ROPSTEN_KEY || '',
   ETHERSCAN_API_KEY: process.env.ETHERSCAN_API_KEY || '',
-  MAINNET_PRIVATE_KEY: process.env.ETHERSCAN_API_KEY || '',
+  MAINNET_PRIVATE_KEY: process.env.MAINNET_PRIVATE_KEY || '',
   GOERLI_PRIVATE_KEY: process.env.GOERLI_PRIVATE_KEY || '',
   RINKEBY_PRIVATE_KEY: process.env.RINKEBY_PRIVATE_KEY || '',
   ROPSTEN_PRIVATE_KEY: process.env.ROPSTEN_PRIVATE_KEY || '',
