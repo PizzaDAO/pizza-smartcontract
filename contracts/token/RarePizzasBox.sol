@@ -38,6 +38,8 @@ contract RarePizzasBox is
     // V1 Variables (do not modify this section when upgrading)
 
     event BTCETHPriceUpdated(uint256 old, uint256 current);
+    event PresaleAllowedUpdated();
+    event SaleStartTimestampUpdated(uint256 old, uint256 current);
 
     uint256 public constant MAX_TOKEN_SUPPLY = 10000;
     uint256 public constant MAX_MINTABLE_SUPPLY = 1250;
@@ -64,10 +66,10 @@ contract RarePizzasBox is
         __Ownable_init();
         __ERC721_init('Rare Pizza Box', 'ZABOX');
 
-        // 2021-03-14:15h::9m::26s
-        publicSaleStart_timestampInS = 1615734566;
-        // starting value:  30.00 ETH
-        bitcoinPriceInWei = 30000000000000000000;
+        // Date and time (GMT): Set to PI
+        publicSaleStart_timestampInS = 3141592653;
+        // starting value:  31.00 ETH
+        bitcoinPriceInWei = 31000000000000000000;
 
         if (chainlinkBTCETHFeed != address(0)) {
             _chainlinkBTCETHFeed = chainlinkBTCETHFeed;
@@ -171,10 +173,15 @@ contract RarePizzasBox is
             require(toPaisanos[i] != address(0), 'dont be silly');
             _presaleAllowed[toPaisanos[i]] = count;
         }
+
+        emit PresaleAllowedUpdated();
     }
 
     function setSaleStartTimestamp(uint256 epochSeconds) public virtual override onlyOwner {
+        uint256 old = publicSaleStart_timestampInS;
         publicSaleStart_timestampInS = epochSeconds;
+
+        emit SaleStartTimestampUpdated(old, epochSeconds);
     }
 
     function updateBitcoinPriceInWei(uint256 fallbackValue) public virtual override onlyOwner {

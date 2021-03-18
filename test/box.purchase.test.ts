@@ -6,6 +6,8 @@ import { ethers } from 'hardhat'
 import { bondingCurve as bc } from './helpers'
 import { getAddress } from '@ethersproject/address'
 
+import presale from '../scripts/reservations.rinkeby.json';
+
 use(solidity)
 
 type TestContext = {
@@ -67,6 +69,19 @@ describe('Box Purchase Tests', function () {
 
           expect(await box.totalSupply()).to.equal(i + 1)
         }
+      })
+
+      it('Should add presale from list', async () => {
+        const { box, wallet, userWallet } = testContext
+
+        await box.setPresaleAllowed(10, [box.signer.getAddress()])
+
+        for (let presaleAddress of presale) {
+          await box.setPresaleAllowed(10, [presaleAddress])
+        }
+
+        // also set as array
+        await box.setPresaleAllowed(10, [...presale])
       })
 
       it('Should allow purchase for presale address', async () => {
