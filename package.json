@@ -52,5 +52,8 @@
   },
   "directories": {
     "test": "test"
+  },
+  "dependencies": {
+    "chainlink": "^0.8.2"
   }
 }
