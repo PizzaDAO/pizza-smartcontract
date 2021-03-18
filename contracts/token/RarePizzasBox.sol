@@ -38,7 +38,7 @@ contract RarePizzasBox is
     // V1 Variables (do not modify this section when upgrading)
 
     event BTCETHPriceUpdated(uint256 old, uint256 current);
-    event PresaleAllowedUpdated(string message);
+    event PresaleAllowedUpdated();
     event SaleStartTimestampUpdated(uint256 old, uint256 current);
 
     uint256 public constant MAX_TOKEN_SUPPLY = 10000;
@@ -174,7 +174,7 @@ contract RarePizzasBox is
             _presaleAllowed[toPaisanos[i]] = count;
         }
 
-        emit PresaleAllowedUpdated('setPresaleAllowed was called');
+        emit PresaleAllowedUpdated();
     }
 
     function setSaleStartTimestamp(uint256 epochSeconds) public virtual override onlyOwner {
