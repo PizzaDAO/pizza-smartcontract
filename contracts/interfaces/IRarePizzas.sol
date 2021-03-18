@@ -15,7 +15,7 @@ interface IRarePizzas is IERC721EnumerableUpgradeable {
     function maxSupply() external view returns (uint256);
 
     /**
-     * try to purchase one pizza
+     * Try to purchase one pizza
      */
     function redeem(IRarePizzasBox box) external payable;
 }

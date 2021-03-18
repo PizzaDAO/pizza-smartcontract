@@ -14,8 +14,8 @@ contract BondingCurve {
     // Approximate .001x^2+.000 000 000 000 000 000 000 000 0000999x^{8}
 
     function curve(uint256 n) public pure returns (uint256 price) {
-        require(n > 0, 'BondingCurve: starting position cannot be zero');
-        require(n <= MAX_CURVE, 'BondingCurve: cannot go past MAX_CURVE value');
+        require(n > 0, 'position cannot be zero');
+        require(n <= MAX_CURVE, 'cannot pass MAX_CURVE');
 
         uint256[25] memory approxvalues =
             [
