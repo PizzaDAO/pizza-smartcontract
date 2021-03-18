@@ -20,7 +20,8 @@ task('accounts', 'Prints the list of accounts', async (args, hre) => {
 const networks: NetworksUserConfig = {
   mainnet: {
     url: `https://eth-mainnet.alchemyapi.io/v2/${config.ALCHEMY_MAINNET_KEY}`,
-    accounts: [`0xNOPE!`],
+    accounts: [`0x${config.MAINNET_PRIVATE_KEY}`],
+    gasPrice: 250000000000
   },
   goerli: {
     url: `https://eth-goerli.alchemyapi.io/v2/${config.ALCHEMY_GOERLI_KEY}`,

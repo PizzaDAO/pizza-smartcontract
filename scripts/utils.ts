@@ -1,5 +1,5 @@
 import { Contract } from 'ethers'
-import { writeFileSync } from 'fs'
+import { readFileSync, writeFileSync } from 'fs'
 
 import config, { NetworkConfig } from '../config'
 
@@ -16,6 +16,19 @@ const getChainlinkOracle = (config: NetworkConfig) => {
       return config.CHAINLINK_RINKEBY_PRICE_FEED
     case 'ropsten':
       return config.CHAINLINK_ROPSTEN_PRICE_FEED
+  }
+  return 'VALUE NOT FOUND'
+}
+
+const getAlchemyAPIKey = (config: NetworkConfig) => {
+  const networkName = config.NETWORK.toLowerCase()
+  switch (networkName) {
+    case 'mainnet':
+      return config.ALCHEMY_MAINNET_KEY
+    case 'goerli':
+      return config.ALCHEMY_GOERLI_KEY
+    case 'rinkeby':
+      return config.ALCHEMY_RINKEBY_KEY
   }
   return 'VALUE NOT FOUND'
 }
@@ -40,6 +53,19 @@ const getProxyAdminAddress = (config: NetworkConfig) => {
       return config.RAREPIZZAS_BOX_MAINNET_PROXY_ADMIN_ADDRESS
     case 'rinkeby':
       return config.RAREPIZZAS_BOX_RINKEBY_PROXY_ADMIN_ADDRESS
+  }
+  return 'VALUE NOT FOUND'
+}
+
+const getDeploymentKey = (config: NetworkConfig) => {
+  const networkName = config.NETWORK.toLowerCase()
+  switch (networkName) {
+    case 'mainnet':
+      return config.MAINNET_PRIVATE_KEY
+    case 'goerli':
+      return config.GOERLI_PRIVATE_KEY
+    case 'rinkeby':
+      return config.RINKEBY_PRIVATE_KEY
   }
   return 'VALUE NOT FOUND'
 }
@@ -103,10 +129,19 @@ const publishDeploymentData = (name: string, contract: Contract) => {
   writeFileSync(`./dist/deployment-${Date.now()}.json`, json)
 }
 
+const parseBoxUris = () => {
+  var text = readFileSync("./data/box_resources", "utf-8");
+  var textByLine = text.split("\n")
+  console.log(JSON.stringify(textByLine));
+}
+
 const utils = {
+  getAlchemyAPIKey: getAlchemyAPIKey,
+  getDeploymentKey: getDeploymentKey,
   getChainlinkOracle: getChainlinkOracle,
   getProxyAddress: getProxyAddress,
   getProxyAdminAddress: getProxyAdminAddress,
+  parseBoxUris: parseBoxUris,
   publishBoxWeb3Abi: publishBoxWeb3Abi,
   publishBoxWeb3AdminAbi: publishBoxWeb3AdminAbi,
   publishDeploymentData: publishDeploymentData,

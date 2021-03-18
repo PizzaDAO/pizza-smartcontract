@@ -26,7 +26,6 @@ describe('Bonding Curve', () => {
   })
 
   describe('Happy flow', () => {
-    // test fails because curve changed in solidity
     it('Should return value on bonding curve', async () => {
       const { bondingCurve } = testContext
 
@@ -35,16 +34,15 @@ describe('Bonding Curve', () => {
       }
     })
 
-    // just prints out the new curve
+    // Just prints out the new curve
     it('Should return prices for the bonding curve', async () => {
       const { bondingCurve } = testContext
       let sum = 0
       let realSum = BigInt(0)
       for (let i = 1; i <= 8750; i++) {
         const j = i
-        let r = await bondingCurve.curve(j)
-
-        let value = r / 10 ** 18
+        const r = await bondingCurve.curve(j)
+        const value = r / 10 ** 18
 
         sum += value
         realSum = realSum + BigInt(r)
@@ -56,12 +54,16 @@ describe('Bonding Curve', () => {
         }
         if (i < 100 || i > 8724) {
           console.log(
-            `index: ${j} btc: ${value.toFixed(4)}  eth: ${(value / 0.03).toFixed(4)} usd: ${(value * 50000).toFixed(4)} running real sum: ${realSum.toString()}`,
+            `index: ${j} btc: ${value.toFixed(4)}  eth: ${(value / 0.03).toFixed(4)} usd: ${(value * 50000).toFixed(
+              4,
+            )} running real sum: ${realSum.toString()}`,
           )
         }
         if (i % 100 === 0) {
           console.log(
-            `index: ${j} btc: ${value.toFixed(4)} eth: ${(value / 0.03).toFixed(4)} usd: ${(value * 50000).toFixed(4)} running real sum: ${realSum.toString()}`,
+            `index: ${j} btc: ${value.toFixed(4)} eth: ${(value / 0.03).toFixed(4)} usd: ${(value * 50000).toFixed(
+              4,
+            )} running real sum: ${realSum.toString()}`,
           )
         }
       }
@@ -74,15 +76,15 @@ describe('Bonding Curve', () => {
     it('Should revert when called with 0', async () => {
       const { bondingCurve } = testContext
 
-      await expect(bondingCurve.curve(0)).to.be.revertedWith('BondingCurve: starting position cannot be zero')
+      await expect(bondingCurve.curve(0)).to.be.revertedWith('position cannot be zero')
     })
 
     it('Should revert when called with value over MAX_VALUE', async () => {
       const { bondingCurve } = testContext
 
-      await expect(bondingCurve.curve(MAX_VALUE + 1)).to.be.revertedWith('BondingCurve: cannot go past MAX_CURVE value')
+      await expect(bondingCurve.curve(MAX_VALUE + 1)).to.be.revertedWith('cannot pass MAX_CURVE')
       await expect(bondingCurve.curve(MAX_VALUE + 1000)).to.be.revertedWith(
-        'BondingCurve: cannot go past MAX_CURVE value',
+        'cannot pass MAX_CURVE',
       )
     })
   })

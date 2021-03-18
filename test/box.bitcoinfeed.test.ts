@@ -47,6 +47,7 @@ describe('Bitcoin Feed Tests', function () {
 
     expect(await box.getBitcoinPriceInWei()).to.equal(BigNumber.from('30000000000000000000'))
   })
+
   // TODO
   // it('Should set interface price when interface returns', async () => {
   //     const { box, priceFeed, signer } = testContext;
@@ -60,6 +61,7 @@ describe('Bitcoin Feed Tests', function () {
   //     // expect(await box.getBitcoinPriceInWei()).to.equal(1000)
 
   // })
+
   it('Should set fallback price when interface fails', async () => {
     const { box, priceFeed } = testContext
     await box.initialize(priceFeed.address)

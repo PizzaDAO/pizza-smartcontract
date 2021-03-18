@@ -52,5 +52,8 @@
   },
   "directories": {
     "test": "test"
+  },
+  "dependencies": {
+    "abi-decoder": "^2.4.0"
   }
 }

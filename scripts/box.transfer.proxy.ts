@@ -2,7 +2,7 @@ import { ethers, upgrades } from 'hardhat'
 import utils from './utils'
 import config from '../config'
 
-// transfer ownership from the signer to some owner
+// transfer ownership of the upgrade proxy from the signer to some owner
 async function main() {
   const [deployer] = await ethers.getSigners()
   const newOwner = utils.getProxyAdminAddress(config)
@@ -13,7 +13,7 @@ async function main() {
   console.log('New Owner:', newOwner)
 
   // The owner of the ProxyAdmin can upgrade our contracts
-  await upgrades.admin.transferProxyAdminOwnership(newOwner);
+  await upgrades.admin.transferProxyAdminOwnership(newOwner)
   console.log('Successfully Transferred To', newOwner)
 }
 
