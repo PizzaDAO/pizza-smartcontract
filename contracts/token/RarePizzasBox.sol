@@ -241,14 +241,14 @@ contract RarePizzasBox is
     }
     function _assignBoxArtwork(uint256 tokenId) internal virtual {
         uint256 pseudoRandom =
-            uint256(keccak256(abi.encodePacked(blockhash(block.number - 1), tokenId, msg.sender))) % MAX_BOX_INDEX;
+        uint256(keccak256(abi.encodePacked(blockhash(block.number - 1), tokenId, msg.sender))) % MAX_BOX_INDEX;
         _tokenBoxArtworkURIs[tokenId] = pseudoRandom;
     }
     function _getNextPizzaTokenId() internal view virtual returns (uint256) {
         return totalSupply();
     }
 
-    function MintWithArtwork(bytes32 request,uint random) public virtual {
+    function MintWithArtwork(bytes32 request,uint random) external virtual {
         require(msg.sender==randomOracle,"oracle must call MintWithArtwork");
         address to=_purchaseID[request];
         uint256 id = _getNextPizzaTokenId();
