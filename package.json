@@ -52,5 +52,8 @@
   },
   "directories": {
     "test": "test"
+  },
+  "dependencies": {
+    "hardhat-contract-sizer": "^2.0.3"
   }
 }
