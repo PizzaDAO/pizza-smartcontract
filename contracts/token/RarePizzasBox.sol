@@ -33,7 +33,7 @@ contract RarePizzasBox is
     IRarePizzasBox,
     IRarePizzasBoxAdmin,
     IOpenSeaCompatible
-    
+
 {
     using AddressUpgradeable for address;
     using StringsUpgradeable for uint256;
@@ -102,9 +102,9 @@ contract RarePizzasBox is
     function maxSupply() public view virtual override returns (uint256) {
         return MAX_TOKEN_SUPPLY;
     }
-     
-    
-    function _internalMintWithArtwork(address to) internal virtual {
+
+
+    function _mintWithArtWork(address to) internal virtual {
         uint256 id = _getNextPizzaTokenId();
         _safeMint(to, id);
         _assignBoxArtwork(id);
@@ -125,11 +125,11 @@ contract RarePizzasBox is
         // presale addresses can purchase up to 10 total
         _presalePurchaseCount[msg.sender] += 1;
         _purchased_pizza_count.increment();
-        bytes32 queryID=IRandomConsumer(randomOracle).getRandomNumber(); 
+        bytes32 queryID=IRandomConsumer(randomOracle).getRandomNumber();
         _purchaseID[queryID]=msg.sender;
-        /*_internalMintWithArtwork(msg.sender);
+        /*_mintWithArtWork(msg.sender);
         if(totalSupply().add(1)==MAX_TOKEN_SUPPLY){
-            _internalMintWithArtwork(msg.sender);
+            _mintWithArtWork(msg.sender);
         }
         */
     }
@@ -164,7 +164,7 @@ contract RarePizzasBox is
 
         for (uint256 i = 0; i < count; i++) {
             _minted_pizza_count.increment();
-            _internalMintWithArtwork(toPizzaiolo);
+            _mintWithArtWork(toPizzaiolo);
         }
     }
     function setRandomOracle(address a) public onlyOwner{
@@ -180,9 +180,9 @@ contract RarePizzasBox is
         payable(msg.sender).transfer(msg.value - price);
 
         _purchased_pizza_count.increment();
-         bytes32 queryID=IRandomConsumer(randomOracle).getRandomNumber(); 
+         bytes32 queryID=IRandomConsumer(randomOracle).getRandomNumber();
         _purchaseID[queryID]=toPaisano;
-       // _internalMintWithArtwork(toPaisano);
+       // _mintWithArtWork(toPaisano);
     }
 
     function setPresaleAllowed(uint8 count, address[] memory toPaisanos) public virtual override onlyOwner {
@@ -236,7 +236,7 @@ contract RarePizzasBox is
 
     function _assignBoxArtwork(uint256 tokenId,uint256 random) internal virtual {
         uint256 pseudoRandom = random % MAX_BOX_INDEX;
-           
+
         _tokenBoxArtworkURIs[tokenId] = pseudoRandom;
     }
     function _assignBoxArtwork(uint256 tokenId) internal virtual {
@@ -248,11 +248,9 @@ contract RarePizzasBox is
         return totalSupply();
     }
 
-    function MintWithArtwork(bytes32 request,uint random) external virtual {
+    function mintWithArtwork(bytes32 request,uint random) external virtual {
         require(msg.sender==randomOracle,"oracle must call MintWithArtwork");
         address to=_purchaseID[request];
-        uint256 id = _getNextPizzaTokenId();
-        _safeMint(to, id);
-        _assignBoxArtwork(id,random);
+        _mintWithArtWork(to);
     }
 }
