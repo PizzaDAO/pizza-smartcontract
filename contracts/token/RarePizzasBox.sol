@@ -22,9 +22,10 @@ import '../data/BoxArt.sol';
  * @dev Rare Pizzas Box mints pizza box token for callers who call the purchase function.
  */
 
- interface IRandomConsumer{
-     function getRandomNumber() external returns (bytes32 requestId);
- }
+interface IRandomConsumer{
+    function getRandomNumber() external returns (bytes32 requestId);
+}
+
 contract RarePizzasBox is
     OwnableUpgradeable,
     ERC721EnumerableUpgradeable,
