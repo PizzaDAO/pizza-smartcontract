@@ -21,6 +21,11 @@ import '../data/BoxArt.sol';
 /**
  * @dev Rare Pizzas Box mints pizza box token for callers who call the purchase function.
  */
+
+interface IRandomConsumer{
+    function getRandomNumber() external returns (bytes32 requestId);
+}
+
 contract RarePizzasBox is
     OwnableUpgradeable,
     ERC721EnumerableUpgradeable,
@@ -29,6 +34,7 @@ contract RarePizzasBox is
     IRarePizzasBox,
     IRarePizzasBoxAdmin,
     IOpenSeaCompatible
+
 {
     using AddressUpgradeable for address;
     using StringsUpgradeable for uint256;
@@ -51,12 +57,12 @@ contract RarePizzasBox is
     string public constant _uriBase = 'https://ipfs.io/ipfs/';
 
     address internal _chainlinkBTCETHFeed;
-
+    address public randomOracle;
     CountersUpgradeable.Counter public _minted_pizza_count;
     CountersUpgradeable.Counter public _purchased_pizza_count;
 
     mapping(uint256 => uint256) internal _tokenBoxArtworkURIs;
-
+    mapping(bytes32=>address) internal _purchaseID;
     mapping(address => uint256) internal _presaleAllowed;
     mapping(address => uint256) internal _presalePurchaseCount;
 
@@ -100,6 +106,13 @@ contract RarePizzasBox is
         return MAX_TOKEN_SUPPLY;
     }
 
+
+    function _mintWithArtWork(address to) internal virtual {
+        uint256 id = _getNextPizzaTokenId();
+        _safeMint(to, id);
+        _assignBoxArtwork(id);
+    }
+
     function purchase() public payable virtual override {
         require(
             block.timestamp >= publicSaleStart_timestampInS ||
@@ -122,7 +135,13 @@ contract RarePizzasBox is
             _presalePurchaseCount[msg.sender] += 1;
             _purchased_pizza_count.increment();
             _internalMintWithArtwork(msg.sender);
+        bytes32 queryID=IRandomConsumer(randomOracle).getRandomNumber();
+        _purchaseID[queryID]=msg.sender;
+        /*_mintWithArtWork(msg.sender);
+        if(totalSupply().add(1)==MAX_TOKEN_SUPPLY){
+            _mintWithArtWork(msg.sender);
         }
+        */
     }
 
     // IERC721 Overrides
@@ -151,10 +170,12 @@ contract RarePizzasBox is
 
         for (uint256 i = 0; i < count; i++) {
             _minted_pizza_count.increment();
-            _internalMintWithArtwork(toPizzaiolo);
+            _mintWithArtWork(toPizzaiolo);
         }
     }
-
+    function setRandomOracle(address a) public onlyOwner{
+         randomOracle=a;
+    }
     function purchaseTo(address toPaisano) public payable virtual override onlyOwner {
         require(toPaisano != address(0), 'dont be silly');
         require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY, 'would exceed supply.');
@@ -165,7 +186,9 @@ contract RarePizzasBox is
         payable(msg.sender).transfer(msg.value - price);
 
         _purchased_pizza_count.increment();
-        _internalMintWithArtwork(toPaisano);
+         bytes32 queryID=IRandomConsumer(randomOracle).getRandomNumber();
+        _purchaseID[queryID]=toPaisano;
+       // _mintWithArtWork(toPaisano);
     }
 
     function setPresaleAllowed(uint8 count, address[] memory toPaisanos) public virtual override onlyOwner {
@@ -222,19 +245,23 @@ contract RarePizzasBox is
 
     // Internal Stuff
 
-    function _assignBoxArtwork(uint256 tokenId) internal virtual {
-        uint256 pseudoRandom =
-            uint256(keccak256(abi.encodePacked(blockhash(block.number - 1), tokenId, msg.sender))) % MAX_BOX_INDEX;
+    function _assignBoxArtwork(uint256 tokenId,uint256 random) internal virtual {
+        uint256 pseudoRandom = random % MAX_BOX_INDEX;
+
         _tokenBoxArtworkURIs[tokenId] = pseudoRandom;
     }
-
+    function _assignBoxArtwork(uint256 tokenId) internal virtual {
+        uint256 pseudoRandom =
+        uint256(keccak256(abi.encodePacked(blockhash(block.number - 1), tokenId, msg.sender))) % MAX_BOX_INDEX;
+        _tokenBoxArtworkURIs[tokenId] = pseudoRandom;
+    }
     function _getNextPizzaTokenId() internal view virtual returns (uint256) {
         return totalSupply();
     }
 
-    function _internalMintWithArtwork(address to) internal virtual {
-        uint256 id = _getNextPizzaTokenId();
-        _safeMint(to, id);
-        _assignBoxArtwork(id);
+    function mintWithArtwork(bytes32 request,uint random) external virtual {
+        require(msg.sender==randomOracle,"oracle must call MintWithArtwork");
+        address to=_purchaseID[request];
+        _mintWithArtWork(to);
     }
 }
