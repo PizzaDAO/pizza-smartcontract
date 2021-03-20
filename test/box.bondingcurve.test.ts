@@ -25,7 +25,7 @@ describe('Bonding Curve', () => {
     }
   })
 
-  describe.skip('Happy flow', () => {
+  describe('Happy flow', () => {
     it('Should return value on bonding curve', async () => {
       const { bondingCurve } = testContext
 
