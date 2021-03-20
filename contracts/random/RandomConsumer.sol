@@ -1,44 +1,52 @@
-
 pragma solidity ^0.6.6;
 
-import "@chainlink/contracts/src/v0.6/VRFConsumerBase.sol";
+import '@chainlink/contracts/src/v0.6/VRFConsumerBase.sol';
+import '@openzeppelin/contracts/access/Ownable.sol';
 
+import '../interfaces/IChainlinkVRFCallbackv6.sol';
+import '../interfaces/IChainlinkVRFAdmin.sol';
 
-interface IPizza{
-    function MintWithArtwork(bytes32 id,uint random) external;
-}
-contract RandomConsumer is VRFConsumerBase {
+/**
+ * Random Consumer contract interacts with chainlink VRF.
+ * This contract is not upgradeable.
+ * If new implementations are needed
+ * Then a new instance should be deployed.
+ */
+contract RandomConsumer is VRFConsumerBase, Ownable, IChainlinkVRFAdmin {
+    event CallbackContractSet(address callback);
 
     bytes32 internal keyHash;
     uint256 internal fee;
-    address pizzas;
-    uint256 public randomResult;
 
-    /**
-     * Constructor inherits VRFConsumerBase
-     *
-     * Network: Kovan
-     * Chainlink VRF Coordinator address: 0xdD3782915140c8f3b190B5D67eAc6dc5760C46E9
-     * LINK token address:                0xa36085F69e2889c224210F603D836748e7dC0088
-     * Key Hash: 0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4
-     */
-    constructor(address p)
+    address private _callbackContract;
+
+    constructor(
+        address vrfCoordinator,
+        address linkToken,
+        bytes32 keyHash,
+        address callbackContract
+    )
+        public
         VRFConsumerBase(
-            0xdD3782915140c8f3b190B5D67eAc6dc5760C46E9, // VRF Coordinator
-            0xa36085F69e2889c224210F603D836748e7dC0088  // LINK Token
-        ) public
+            vrfCoordinator, // VRF Coordinator
+            linkToken // LINK Token
+        )
     {
-        keyHash = 0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4;
-        fee = 0.1 * 10 ** 18; // 0.1 LINK (varies by network)
-        pizzas=p;
+        keyHash = keyHash;
+        // TODO: pass in fee from config
+        fee = 0.1 * 10**18; // 0.1 LINK (varies by network)
+        _callbackContract = callbackContract;
     }
+
+    // VRFConsumerBase
 
     /**
      * Requests randomness from a user-provided seed
      */
     function getRandomNumber() public returns (bytes32 requestId) {
-        require(msg.sender==pizzas,"Sender must be the pizza box contract");
-        require(LINK.balanceOf(address(this)) >= fee, "Not enough LINK - fill contract with faucet");
+        require(_callbackContract != address(0), 'Callback must be set');
+        require(msg.sender == _callbackContract, 'Sender must be callback');
+        require(LINK.balanceOf(address(this)) >= fee, 'Not enough LINK');
         return requestRandomness(keyHash, fee, 0);
     }
 
@@ -46,7 +54,20 @@ contract RandomConsumer is VRFConsumerBase {
      * Callback function used by VRF Coordinator
      */
     function fulfillRandomness(bytes32 requestId, uint256 randomness) internal override {
+        IChainlinkVRFCallback(_callbackContract).fulfillRandomness(requestId, randomness);
+    }
 
-        IPizza(pizzas).mintWithArtwork(requestId,randomness);
+    // IChainlinkVRFAdmin
+
+    function setCallbackContract(address callback) public override onlyOwner {
+        _callbackContract = callback;
+        CallbackContractSet(callback);
+    }
+
+    // TODO: other functions
+
+    function withdraw() public override onlyOwner {
+        uint256 balance = address(this).balance;
+        payable(msg.sender).transfer(balance);
     }
 }
