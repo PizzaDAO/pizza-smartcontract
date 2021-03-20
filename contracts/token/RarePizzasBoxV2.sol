@@ -105,13 +105,20 @@ contract RarePizzasBoxV2 is RarePizzasBox, IChainlinkVRFCallback, IRarePizzasBox
 
     function _externalMintWithArtwork(address to) internal virtual {
         if (_chainlinkVRFConsumer != address(0)) {
-            // TODO: try/catch
-            bytes32 queryID = IChainlinkVRFRandomConsumer(_chainlinkVRFConsumer).getRandomNumber();
-            _purchaseID[queryID] = to;
-            // out for delivery
-        } else {
-            // fallback to the block-based implementation
-            _internalMintWithArtwork(to);
+            try IChainlinkVRFRandomConsumer(_chainlinkVRFConsumer).getRandomNumber() returns (bytes32 requestId) {
+                _purchaseID[requestId] = to;
+                // pizza box is out for delivery
+                return;
+            } catch (bytes memory reason) {
+                if (reason.length == 0) {
+                    // contract doesnt implement interface, use fallback
+                } else {
+                    //we got an error and dont care, use fallback
+                }
+            }
         }
+
+        // fallback to the block-based implementation
+        _internalMintWithArtwork(to);
     }
 }

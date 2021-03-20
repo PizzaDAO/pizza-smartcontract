@@ -104,6 +104,29 @@ describe('Box V2 Purchase Tests', function () {
                 }
             })
 
+            it('Should allow purchase of box when VRF is wrong', async () => {
+                const { box, random, testHash, wallet } = testContext
+                const boxBuyers = 10
+
+                // set up the consumer to an invalid contract address
+                await box.setVRFConsumer(box.address)
+
+                for (let i = 0; i < boxBuyers; i++) {
+                    const price: BigNumber = await box.getPrice()
+                    await box.purchase({ value: price })
+
+                    // fulfilling randomness should fail 
+                    // since the random contract is 
+                    // no longer the VRF consumer address
+                    // note in the actual implementation this doesnt get called
+                    // since the purchase function will have already
+                    // fallen through to the old implementation
+                    await expect(random.fulfillRandomnessWrapper(testHash, 31)).to.be.reverted;
+
+                    expect(await box.totalSupply()).to.equal(i + 1)
+                }
+            })
+
             it('Should still allow owner mint to address using old method', async () => {
                 const { box, userWallet } = testContext
 
