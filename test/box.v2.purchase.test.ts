@@ -121,7 +121,7 @@ describe('Box V2 Purchase Tests', function () {
                     // note in the actual implementation this doesnt get called
                     // since the purchase function will have already
                     // fallen through to the old implementation
-                    await expect(random.fulfillRandomnessWrapper(testHash, 31)).to.be.reverted;
+                    await expect(random.fulfillRandomnessWrapper(testHash, 31)).to.be.revertedWith('caller not VRF');
 
                     expect(await box.totalSupply()).to.equal(i + 1)
                 }

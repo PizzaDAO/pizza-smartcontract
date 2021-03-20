@@ -15,7 +15,7 @@ describe('Box Fake Upgrade Tests', function () {
   beforeEach(async () => {
     const [wallet, anotherWallet] = new MockProvider().getWallets()
 
-    const Box = await ethers.getContractFactory('FakeRarePizzasBox')
+    const Box = await ethers.getContractFactory('RarePizzasBox')
     const box = await upgrades.deployProxy(Box, ['0x0000000000000000000000000000000000000000'])
 
     // pick a date like jan 1, 2021
@@ -26,10 +26,6 @@ describe('Box Fake Upgrade Tests', function () {
       wallet,
       anotherWallet,
     }
-  })
-
-  it('Should set an admin', async () => {
-    // TODO
   })
 
   it('Should upgrade contract logic', async () => {
@@ -45,11 +41,13 @@ describe('Box Fake Upgrade Tests', function () {
     expect(await boxV2.totalSupply()).to.equal(1)
   })
 
-  it('Should emit upgraded event', async () => {
-    // TODO
-  })
+  // TODO: FIX-ME: interferes with other upgrade logic and needs to pull in the signers to fix it
+  // it('Should not upgrade contract logic when admin changed', async () => {
+  //   const { box, wallet } = testContext
 
-  it('Should allow changing ownership', async () => {
-    // TODO
-  })
+  //   await upgrades.admin.transferProxyAdminOwnership(wallet.address)
+
+  //   const BoxV2 = await ethers.getContractFactory('FakeRarePizzasBoxV2')
+  //   await expect(upgrades.upgradeProxy(box.address, BoxV2)).to.be.revertedWith('caller is not the owner')
+  // })
 })

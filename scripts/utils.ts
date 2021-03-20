@@ -116,17 +116,32 @@ const publishBoxWeb3AdminAbi = () => {
   writeFileSync('./dist/boxWeb3AdminInterface.json', json)
 }
 
-const publishDeploymentData = (name: string, contract: Contract) => {
+const publishDeploymentData = (name: string, proxy: Contract, implementation: Contract) => {
   const deploymentData = {
     network: config.NETWORK,
     name: name,
-    proxy: contract.address,
-    transaction: contract.deployTransaction,
+    proxy: proxy.address,
+    implementation: implementation.address,
+    transaction: proxy.deployTransaction,
   }
   const json = JSON.stringify(deploymentData)
   console.log(deploymentData)
   writeFileSync('./dist/deployment-latest.json', json)
   writeFileSync(`./dist/deployment-${Date.now()}.json`, json)
+}
+
+const publishUpgradeData = (name: string, proxy: Contract, implementation: Contract) => {
+  const deploymentData = {
+    network: config.NETWORK,
+    name: name,
+    proxy: proxy.address,
+    implementation: implementation.address,
+    transaction: implementation.deployTransaction,
+  }
+  const json = JSON.stringify(deploymentData)
+  console.log(deploymentData)
+  writeFileSync('./dist/deployment-upgrade-latest.json', json)
+  writeFileSync(`./dist/deployment-upgrade-${Date.now()}.json`, json)
 }
 
 const parseBoxUris = () => {
@@ -145,5 +160,6 @@ const utils = {
   publishBoxWeb3Abi: publishBoxWeb3Abi,
   publishBoxWeb3AdminAbi: publishBoxWeb3AdminAbi,
   publishDeploymentData: publishDeploymentData,
+  publishUpgradeData: publishUpgradeData
 }
 export default utils

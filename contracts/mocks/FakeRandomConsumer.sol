@@ -26,6 +26,8 @@ contract FakeRandomConsumer is RandomConsumer {
         return testHash;
     }
 
+    // Testing functtion
+
     function fulfillRandomnessWrapper(bytes32 requestId, uint256 randomness) public {
         super.fulfillRandomness(requestId, randomness);
     }
