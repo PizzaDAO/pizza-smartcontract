@@ -4,7 +4,7 @@ import '@nomiclabs/hardhat-etherscan'
 import '@nomiclabs/hardhat-waffle'
 import '@openzeppelin/hardhat-upgrades'
 import 'hardhat-gas-reporter'
-
+import 'hardhat-contract-sizer'
 import config, { NetworkConfig } from './config'
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -69,6 +69,11 @@ const hardhatConfig: HardhatUserConfig = {
         runs: 200,
       },
     },
+  },
+  contractSizer: {
+    alphaSort: true,
+    runOnCompile: true,
+    disambiguatePaths: false,
   },
   gasReporter: {
     currency: 'USD',
