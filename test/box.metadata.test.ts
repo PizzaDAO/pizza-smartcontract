@@ -28,7 +28,7 @@ describe('Box Metadata Tests', function () {
     }
   })
 
-  // scale this up to test the distribution below
+  // TESTING: scale this up to test the distribution below
   const scaling = 50 // 8750 will fill the whole set (if you have enough eth in your wallet)
   const mint_block = 5 // 50 will fill the whole set
 

@@ -1,5 +1,6 @@
 import { expect, use } from 'chai'
 import { BigNumber, Contract, Wallet, utils } from 'ethers'
+import { randomNumber } from '@ethersproject/testcases'
 import { MockProvider, solidity } from 'ethereum-waffle'
 import { ethers } from 'hardhat'
 
@@ -68,23 +69,6 @@ describe('Box V2 Purchase Tests', function () {
                 BigNumber.from('1000000000000000000')
             )
         })
-
-        it('Should get price for next Box', async () => {
-            const { box } = testContext
-            const price: BigNumber = await box.getPrice()
-            const soldTokens = await box.totalSupply()
-            const btcPriceInWei = await box.getBitcoinPriceInWei()
-
-            expect(utils.formatUnits(price, 'wei')).to.equal(
-                utils.formatEther(bc.bondingCurve(soldTokens + 1).mul(btcPriceInWei)),
-            )
-        })
-
-        it('Should return max supply', async () => {
-            const { box } = testContext
-
-            expect(await box.maxSupply()).to.equal(MAX_NUMBER_OF_BOXES)
-        })
     })
 
     describe('Purchase a box', () => {
@@ -96,7 +80,25 @@ describe('Box V2 Purchase Tests', function () {
                 for (let i = 0; i < boxBuyers; i++) {
                     const price: BigNumber = await box.getPrice()
                     await box.purchase({ value: price })
-                    await random.fulfillRandomnessWrapper(testHash, 31)
+                    await random.fulfillRandomnessWrapper(testHash, randomNumber('31' + i, 256, 512))
+
+                    expect(await box.totalSupply()).to.equal(i + 1)
+                }
+            })
+
+            it('Should allow purchase of box when VRF unset', async () => {
+                const { box, random, testHash } = testContext
+                const boxBuyers = 10
+
+                // set up the consumer to the 0 address
+                await box.setVRFConsumer('0x0000000000000000000000000000000000000000')
+
+                for (let i = 0; i < boxBuyers; i++) {
+                    const price: BigNumber = await box.getPrice()
+                    await box.purchase({ value: price })
+
+                    // since VRF is unset, should complete mint in the same tx
+                    // DISABLED: await random.fulfillRandomnessWrapper(testHash, 31)
 
                     expect(await box.totalSupply()).to.equal(i + 1)
                 }
