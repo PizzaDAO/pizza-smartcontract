@@ -15,7 +15,11 @@ async function main() {
   const Box = await ethers.getContractFactory('RarePizzasBox')
 
   const box = await upgrades.deployProxy(Box, [utils.getChainlinkOracle(config)])
-  await box.deployed()
+  
+  const RC = await ethers.getContractFactory('RandomConsumer')
+  const rc await RC.deploy() 
+   
+  await box.setRandomOracle(rc.address)
 
   utils.publishDeploymentData('RarePizzasBox', box)
   utils.publishBoxWeb3Abi()
