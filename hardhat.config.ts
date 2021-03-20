@@ -4,7 +4,7 @@ import '@nomiclabs/hardhat-etherscan'
 import '@nomiclabs/hardhat-waffle'
 import '@openzeppelin/hardhat-upgrades'
 import 'hardhat-gas-reporter'
-
+import 'hardhat-contract-sizer'
 import config, { NetworkConfig } from './config'
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -62,7 +62,26 @@ const hardhatConfig: HardhatUserConfig = {
     apiKey: config.ETHERSCAN_API_KEY,
   },
   solidity: {
-    compilers: [{ version: "0.8.0", settings: {} }, { version: "0.6.6", settings: {} }],
+    compilers: [{
+      version: "0.8.0", settings: {
+        optimizer: {
+          enabled: true,
+          runs: 200,
+        }
+      }
+    }, {
+      version: "0.6.6", settings: {
+        optimizer: {
+          enabled: true,
+          runs: 200,
+        }
+      }
+    }],
+  },
+  contractSizer: {
+    alphaSort: true,
+    runOnCompile: true,
+    disambiguatePaths: false,
   },
   gasReporter: {
     currency: 'USD',

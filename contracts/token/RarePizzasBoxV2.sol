@@ -8,9 +8,18 @@ import '@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol';
 
 import './RarePizzasBox.sol';
 
-import '../interfaces/IChainlinkVRFCallbackv8.sol';
 import '../interfaces/IChainlinkVRFRandomConsumer.sol';
 import '../interfaces/IRarePizzasBoxV2Admin.sol';
+
+/**
+ * Public interface for interacting with rare pizzas box V2
+ */
+interface IChainlinkVRFCallback {
+    /**
+     * Callback function called by the VRF consumer with random response
+     */
+    function fulfillRandomness(bytes32 request, uint256 random) external;
+}
 
 contract RarePizzasBoxV2 is RarePizzasBox, IChainlinkVRFCallback, IRarePizzasBoxV2Admin {
     using AddressUpgradeable for address;
@@ -29,6 +38,9 @@ contract RarePizzasBoxV2 is RarePizzasBox, IChainlinkVRFCallback, IRarePizzasBox
     function fulfillRandomness(bytes32 request, uint256 random) external override {
         require(msg.sender == _chainlinkVRFConsumer, 'caller not VRF');
         address to = _purchaseID[request];
+
+        require(to != address(0), 'purchase must exist');
+
         uint256 id = _getNextPizzaTokenId();
         _safeMint(to, id);
         _assignBoxArtwork(id, random);
@@ -57,7 +69,7 @@ contract RarePizzasBoxV2 is RarePizzasBox, IChainlinkVRFCallback, IRarePizzasBox
         if (_purchased_pizza_count.current().add(1) == MAX_PURCHASABLE_SUPPLY) {
             _presalePurchaseCount[msg.sender] += 1;
             _purchased_pizza_count.increment();
-            _externalMintWithArtwork(msg.sender);
+            _externalMintWithArtwork(msg.sender); // V2: mint using external randomness
         }
     }
 
@@ -88,6 +100,7 @@ contract RarePizzasBoxV2 is RarePizzasBox, IChainlinkVRFCallback, IRarePizzasBox
             // TODO: try/catch
             bytes32 queryID = IChainlinkVRFRandomConsumer(_chainlinkVRFConsumer).getRandomNumber();
             _purchaseID[queryID] = to;
+            // out for delivery
         } else {
             // fallback to the block-based implementation
             _internalMintWithArtwork(to);

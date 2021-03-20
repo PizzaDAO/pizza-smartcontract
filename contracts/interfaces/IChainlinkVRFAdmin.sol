@@ -12,10 +12,19 @@ interface IChainlinkVRFAdmin {
      */
     function setCallbackContract(address callback) external;
 
-    // TODO:
-    // function setFee(uint256 fee) external;
+    /**
+     * Owner can set the fee in link
+     * _fee = 0.1 * 10**18; // 0.1 LINK (varies by network)
+     */
+    function setFee(uint256 fee) external;
 
-    // function withdrawLink() external;
+    /**
+     * Owner can withdraw link from the contract
+     */
+    function withdrawLink() external;
 
+    /**
+     * Owner can withdraw ETH from the contract
+     */
     function withdraw() external;
 }
