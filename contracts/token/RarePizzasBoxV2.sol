@@ -28,6 +28,9 @@ contract RarePizzasBoxV2 is RarePizzasBox, IChainlinkVRFCallback, IRarePizzasBox
 
     // V2 Variables (do not modify this section when upgrading)
 
+    event VRFConsumerUpdated(address oldConsumer, address newConsumer);
+    event InternalArtworkAssigned(uint256 tokenId, uint256 artworkURI);
+
     address internal _chainlinkVRFConsumer;
     mapping(bytes32 => address) internal _purchaseID;
 
@@ -76,7 +79,9 @@ contract RarePizzasBoxV2 is RarePizzasBox, IChainlinkVRFCallback, IRarePizzasBox
     // IRarePizzasBoxV2Admin
 
     function setVRFConsumer(address consumer) public virtual override onlyOwner {
+        address old = _chainlinkVRFConsumer;
         _chainlinkVRFConsumer = consumer;
+        emit VRFConsumerUpdated(old, _chainlinkVRFConsumer);
     }
 
     // Internal Stuff
@@ -93,6 +98,9 @@ contract RarePizzasBoxV2 is RarePizzasBox, IChainlinkVRFCallback, IRarePizzasBox
         uint256 pseudoRandom =
             uint256(keccak256(abi.encodePacked(blockhash(block.difficulty - 1), tokenId, msg.sender))) % MAX_BOX_INDEX;
         _tokenBoxArtworkURIs[tokenId] = pseudoRandom;
+        // this function should only be called from owner or as a fallback
+        // so emit an event whenever it is called
+        emit InternalArtworkAssigned(tokenId, pseudoRandom);
     }
 
     function _externalMintWithArtwork(address to) internal virtual {

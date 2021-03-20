@@ -23,7 +23,10 @@ interface IChainlinkVRFCallback {
  * Then a new instance should be deployed.
  */
 contract RandomConsumer is VRFConsumerBase, Ownable, IChainlinkVRFAdmin {
-    event CallbackContractSet(address callback);
+    event CallbackContractUpdated(address callback);
+    event FeeUpdated(uint256 oldFee, uint256 newFee);
+    event KeyHashUpdated(bytes32 oldKeyHash, bytes32 newKeyHash);
+    event LinkTokenUpdated(address oldToken, address newToken);
 
     bytes32 internal _keyHash;
     uint256 internal _fee;
@@ -78,19 +81,25 @@ contract RandomConsumer is VRFConsumerBase, Ownable, IChainlinkVRFAdmin {
 
     function setCallbackContract(address callback) public override onlyOwner {
         _callbackContract = callback;
-        CallbackContractSet(callback);
+        emit CallbackContractUpdated(callback);
     }
 
     function setFee(uint256 fee) public override onlyOwner {
+        uint256 oldFee = _fee;
         _fee = fee;
+        emit FeeUpdated(oldFee, _fee);
     }
 
     function setKeyHash(bytes32 keyHash) public override onlyOwner {
+        bytes32 oldHash = _keyHash;
         _keyHash = keyHash;
+        emit KeyHashUpdated(oldHash, _keyHash);
     }
 
     function setLinkToken(address linkToken) public override onlyOwner {
+        address oldToken = _linkToken;
         _linkToken = linkToken;
+        emit LinkTokenUpdated(oldToken, _linkToken);
     }
 
     function withdrawLink() public override onlyOwner {
