@@ -45,7 +45,7 @@ describe('Bitcoin Feed Tests', function () {
 
     await box.updateBitcoinPriceInWei(0)
 
-    expect(await box.getBitcoinPriceInWei()).to.equal(BigNumber.from('30000000000000000000'))
+    expect(await box.getBitcoinPriceInWei()).to.equal(BigNumber.from('31000000000000000000'))
   })
 
   // TODO

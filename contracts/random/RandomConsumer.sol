@@ -79,6 +79,14 @@ contract RandomConsumer is VRFConsumerBase, Ownable, IChainlinkVRFAdmin {
         _fee = fee;
     }
 
+    function setKeyHash(bytes32 keyHash) public override onlyOwner {
+        _keyHash = keyHash;
+    }
+
+    function setLinkToken(address linkToken) public override onlyOwner {
+        _linkToken = linkToken;
+    }
+
     function withdrawLink() public override onlyOwner {
         uint256 balance = IERC20(_linkToken).balanceOf(address(this));
         IERC20(_linkToken).transfer(msg.sender, balance);

@@ -19,18 +19,13 @@ contract FakeRandomConsumer is RandomConsumer {
 
     // Mock Overrides
 
-    function getRandomNumber() public override returns (bytes32) {
+    function getRandomNumber() public override returns (bytes32 requestId) {
         require(_callbackContract != address(0), 'Callback must be set');
+        // test does not need the other checks
         return testHash;
     }
 
-    function fulfillRandomness(bytes32 requestId, uint256 randomness) internal override {
-        IChainlinkVRFCallback(_callbackContract).fulfillRandomness(requestId, randomness);
-    }
-
-    // Test functions
-
-    function setLinkToken(address link) public {
-        _linkToken = link;
+    function fulfillRandomnessWrapper(bytes32 requestId, uint256 randomness) public {
+        super.fulfillRandomness(requestId, randomness);
     }
 }

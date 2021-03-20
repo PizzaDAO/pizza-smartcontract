@@ -14,9 +14,19 @@ interface IChainlinkVRFAdmin {
 
     /**
      * Owner can set the fee in link
-     * _fee = 0.1 * 10**18; // 0.1 LINK (varies by network)
+     * fee = 0.1 * 10**18; // 0.1 LINK (varies by network)
      */
     function setFee(uint256 fee) external;
+
+    /**
+     * Owner can set the key hash
+     */
+    function setKeyHash(bytes32 keyHash) external;
+
+    /**
+     * Owner can set the link token address
+     */
+    function setLinkToken(address linkToken) external;
 
     /**
      * Owner can withdraw link from the contract
