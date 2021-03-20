@@ -128,17 +128,23 @@ describe('Box V2 Purchase Tests', function () {
             })
 
             it('Should still allow owner mint to address using old method', async () => {
-                const { box, userWallet } = testContext
+                const { box, wallet } = testContext
 
-                await box.mint(userWallet.address, 1)
+                // Make sure balance is 0 before
+                expect(await box.balanceOf(wallet.address)).to.equal(0)
+
+                await box.mint(wallet.address, 1)
 
                 expect(await box.totalSupply()).to.equal(1)
-                expect(await box.balanceOf(userWallet.address)).to.equal(1)
+                expect(await box.balanceOf(wallet.address)).to.equal(1)
             })
 
             it('Should still allow owner purchase to address using old method', async () => {
                 const { box, wallet } = testContext
                 const price: BigNumber = await box.getPrice()
+
+                // Make sure balance is 0 before
+                expect(await box.balanceOf(wallet.address)).to.equal(0)
 
                 await box.purchaseTo(wallet.address, { value: price })
 
