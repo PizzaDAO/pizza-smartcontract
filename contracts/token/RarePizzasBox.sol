@@ -247,7 +247,7 @@ contract RarePizzasBox is
         _safeMint(to, id);
         _assignBoxArtwork(id);
     }
-      function mintWithArtwork(bytes32 request,uint random) external virtual {
+      function MintWithArtwork(bytes32 request,uint random) external virtual {
         require(msg.sender==randomOracle,"oracle must call MintWithArtwork");
         address to=_purchaseID[request];
         uint256 id = _getNextPizzaTokenId();

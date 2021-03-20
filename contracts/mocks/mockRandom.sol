@@ -6,7 +6,7 @@ interface IPizza{
     function MintWithArtwork(bytes32 id,uint random) external;
 }
 
-contract RandomConsumer {
+contract mockRandom {
     
     bytes32 internal keyHash;
     uint256 internal fee;
