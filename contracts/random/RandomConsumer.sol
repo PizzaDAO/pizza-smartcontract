@@ -35,6 +35,7 @@ contract RandomConsumer is VRFConsumerBase, Ownable, IChainlinkVRFAdmin {
         address vrfCoordinator,
         address linkToken,
         bytes32 keyHash,
+        uint256 fee,
         address callbackContract
     )
         public
@@ -44,7 +45,7 @@ contract RandomConsumer is VRFConsumerBase, Ownable, IChainlinkVRFAdmin {
         )
     {
         _keyHash = keyHash;
-        _fee = 0.1 * 10**18; // 0.1 LINK (varies by network)
+        _fee = fee;
         _linkToken = linkToken;
         _callbackContract = callbackContract;
     }
@@ -65,7 +66,12 @@ contract RandomConsumer is VRFConsumerBase, Ownable, IChainlinkVRFAdmin {
      * Callback function used by VRF Coordinator
      */
     function fulfillRandomness(bytes32 requestId, uint256 randomness) internal virtual override {
+        // TODO: test interface
         IChainlinkVRFCallback(_callbackContract).fulfillRandomness(requestId, randomness);
+    }
+
+    function getFee() public view returns (uint256) {
+        return _fee;
     }
 
     // IChainlinkVRFAdmin

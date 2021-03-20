@@ -14,8 +14,9 @@ contract FakeRandomConsumer is RandomConsumer {
         address vrfCoordinator,
         address linkToken,
         bytes32 keyHash,
+        uint256 fee,
         address callbackContract
-    ) public RandomConsumer(vrfCoordinator, linkToken, keyHash, callbackContract) {}
+    ) public RandomConsumer(vrfCoordinator, linkToken, keyHash, fee, callbackContract) {}
 
     // Mock Overrides
 

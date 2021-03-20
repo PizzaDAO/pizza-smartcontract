@@ -34,6 +34,7 @@ describe('Box V2 Purchase Tests', function () {
             config.CHAINLINK_KOVAN_VRF_COORD,
             config.CHAINLINK_KOVAN_TOKEN,
             config.CHAINLINK_KOVAN_VRF_KEY_HASH,
+            config.CHAINLINK_KOVAN_VRF_FEE,
             box.address)
 
         // Initialize to set owner, since not deployed via proxy
@@ -58,6 +59,16 @@ describe('Box V2 Purchase Tests', function () {
     })
 
     describe('Check methods', () => {
+        it('Should set the VRF query fee', async () => {
+            const { random } = testContext
+            const fee: BigNumber = await random.getFee()
+
+            // it's the kovan price set in the beforeEach
+            expect(fee).to.equal(
+                BigNumber.from('1000000000000000000')
+            )
+        })
+
         it('Should get price for next Box', async () => {
             const { box } = testContext
             const price: BigNumber = await box.getPrice()
