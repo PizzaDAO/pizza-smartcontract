@@ -33,7 +33,8 @@ describe('Bitcoin Feed Tests', function () {
 
     await box.initialize(utils.getAddress('0x0000000000000000000000000000000000000000'))
 
-    await box.updateBitcoinPriceInWei(10)
+    await expect(box.updateBitcoinPriceInWei(10)).to.emit(box, 'BTCETHPriceUpdated')
+      .withArgs(BigNumber.from('31000000000000000000'), 10)
 
     expect(await box.getBitcoinPriceInWei()).to.equal(10)
   })
@@ -43,7 +44,7 @@ describe('Bitcoin Feed Tests', function () {
 
     await box.initialize(utils.getAddress('0x0000000000000000000000000000000000000000'))
 
-    await box.updateBitcoinPriceInWei(0)
+    await expect(box.updateBitcoinPriceInWei(0)).to.not.emit(box, 'BTCETHPriceUpdated')
 
     expect(await box.getBitcoinPriceInWei()).to.equal(BigNumber.from('31000000000000000000'))
   })

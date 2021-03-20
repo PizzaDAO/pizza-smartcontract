@@ -11,7 +11,7 @@ type TestContext = {
 
 let testContext: TestContext
 
-describe('Box Proxy Tests', function () {
+describe('Box Fake Upgrade Tests', function () {
   beforeEach(async () => {
     const [wallet, anotherWallet] = new MockProvider().getWallets()
 
