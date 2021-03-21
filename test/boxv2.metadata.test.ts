@@ -80,11 +80,12 @@ describe('Box Metadata Tests', function () {
       results_map.set(i, 0)
     }
 
-    const totalSupply = await box.totalSupply()
+    const totalSupply: BigNumber = await box.totalSupply()
+    console.log(`totalSupply: ${totalSupply.toString()}`)
 
     // pull out the data
     console.log('analyzing')
-    for (let i = 0; i < totalSupply; i++) {
+    for (let i = 0; i < totalSupply.toNumber(); i++) {
       let art_index: BigNumber = await box.getBoxArtworkUri(i)
       let current = results_map.get(art_index.toNumber())
       results_map.set(art_index.toNumber(), current + 1)
