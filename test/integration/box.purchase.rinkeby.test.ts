@@ -34,5 +34,11 @@ describe.skip('Box Purchase Rinkeby Feed Tests', function () {
     console.log(`-- rinkeby deployment: ${contract.address} price: ${price}`)
     console.log(`-- rinkeby deployment: ${contract.address} soldTokens: ${soldTokens}`)
     console.log(`-- rinkeby deployment: ${contract.address} btcPriceInWei: ${btcPriceInWei}`)
+
+    await contract.purchase({ value: price })
+
+    console.log(`-- rinkeby deployment: ${contract.address} price: ${(await contract.getPrice())}`)
+    console.log(`-- rinkeby deployment: ${contract.address} soldTokens: ${(await contract.totalSupply())}`)
+
   })
 })

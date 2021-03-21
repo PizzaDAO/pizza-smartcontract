@@ -8,6 +8,9 @@ import presale_devs from './reservations.mainnet.devs.json';
 
 // seed the contract with addresses
 // note the actual list is not checked into source
+
+// you cant do this on mainnet
+// when owner is set to someone else
 async function main() {
     const [deployer] = await ethers.getSigners()
     const provider = new ethers.providers.AlchemyProvider(config.NETWORK, utils.getAlchemyAPIKey(config));
