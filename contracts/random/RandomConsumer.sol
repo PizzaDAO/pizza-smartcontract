@@ -26,7 +26,6 @@ contract RandomConsumer is VRFConsumerBase, Ownable, IChainlinkVRFAdmin {
     event CallbackContractUpdated(address callback);
     event FeeUpdated(uint256 oldFee, uint256 newFee);
     event KeyHashUpdated(bytes32 oldKeyHash, bytes32 newKeyHash);
-    event LinkTokenUpdated(address oldToken, address newToken);
 
     bytes32 internal _keyHash;
     uint256 internal _fee;
@@ -94,12 +93,6 @@ contract RandomConsumer is VRFConsumerBase, Ownable, IChainlinkVRFAdmin {
         bytes32 oldHash = _keyHash;
         _keyHash = keyHash;
         emit KeyHashUpdated(oldHash, _keyHash);
-    }
-
-    function setLinkToken(address linkToken) public override onlyOwner {
-        address oldToken = _linkToken;
-        _linkToken = linkToken;
-        emit LinkTokenUpdated(oldToken, _linkToken);
     }
 
     function withdrawLink() public override onlyOwner {

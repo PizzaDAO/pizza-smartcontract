@@ -210,7 +210,6 @@ const publishRandomConsumerWeb3AdminAbi = () => {
       boxContract.abi.find((i) => i.name === 'setCallbackContract'),
       boxContract.abi.find((i) => i.name === 'setFee'),
       boxContract.abi.find((i) => i.name === 'setKeyHash'),
-      boxContract.abi.find((i) => i.name === 'setLinkToken'),
       boxContract.abi.find((i) => i.name === 'withdrawLink'),
       boxContract.abi.find((i) => i.name === 'withdraw')
     ],

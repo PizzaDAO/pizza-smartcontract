@@ -24,11 +24,6 @@ interface IChainlinkVRFAdmin {
     function setKeyHash(bytes32 keyHash) external;
 
     /**
-     * Owner can set the link token address
-     */
-    function setLinkToken(address linkToken) external;
-
-    /**
      * Owner can withdraw link from the contract
      */
     function withdrawLink() external;
