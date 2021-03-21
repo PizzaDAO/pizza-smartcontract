@@ -15,7 +15,7 @@ From the proxy owner:
 
 - [] ensure the correct proxy environment variable is correctly set
 
-`npx hardhat run --network rinkeby scripts/box.upgrade.v2.prepare.ts`
+`npx hardhat run --network rinkeby scripts/randomConsumer.deploy.ts`
 
 - [] set the random consumer environment variable in the .env file
 
