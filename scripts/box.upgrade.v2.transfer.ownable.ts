@@ -17,9 +17,9 @@ async function main() {
 
     const contract = new ethers.Contract(consumerAddress, randomConsumer.abi, wallet);
 
-    const current = await contract.getFee()
+    const currentFee = await contract.getFee()
     //verify we can query something
-    console.log(`current LINK Query Fee: ${current.toString() / 10 ** 18}`)
+    console.log(`current LINK Query Fee: ${currentFee.toString() / 10 ** 18}`)
 
     console.log('Transferring Ownable From', wallet.address)
 

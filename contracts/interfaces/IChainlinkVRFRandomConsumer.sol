@@ -7,7 +7,7 @@ pragma solidity ^0.8.0;
  */
 interface IChainlinkVRFRandomConsumer {
     /**
-     *
+     * Get a random number from the VRF
      */
     function getRandomNumber() external returns (bytes32 requestId);
 }

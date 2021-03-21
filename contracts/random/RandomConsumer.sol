@@ -61,6 +61,8 @@ contract RandomConsumer is VRFConsumerBase, Ownable, IChainlinkVRFAdmin {
         require(_callbackContract != address(0), 'Callback must be set');
         require(msg.sender == _callbackContract, 'Sender must be callback');
         require(LINK.balanceOf(address(this)) >= _fee, 'Not enough LINK');
+        // no seed param necessary
+        // https://github.com/smartcontractkit/chainlink/blob/0964ca290565587963cc4ad8f770274f5e0d9e9d/evm-contracts/src/v0.6/VRFConsumerBase.sol#L134
         return requestRandomness(_keyHash, _fee, 0);
     }
 
@@ -68,7 +70,6 @@ contract RandomConsumer is VRFConsumerBase, Ownable, IChainlinkVRFAdmin {
      * Callback function used by VRF Coordinator
      */
     function fulfillRandomness(bytes32 requestId, uint256 randomness) internal virtual override {
-        // TODO: test interface
         IChainlinkVRFCallback(_callbackContract).fulfillRandomness(requestId, randomness);
     }
 

@@ -49,7 +49,7 @@ This will deploy the contract but will not try to associate it with the proxy
 Note that currently VRF is in preview on mainnet so the random consumer contract address may need to be put on an allow list.
 
 From the proxy owner:
-- [] send some link to the Random Consumer address to cover fees (varies by network)
+- [] send some Link Tokens to the Random Consumer address to cover fees (varies by network)
 - [] call `upgradeTo(newImplementationAddress)` on the proxy with the new implementation instance address
 - - [] alternatively, use the Open Zepplin web app (available in gnosis)
 - [] call `setVRFConsumer(randomConsumerAddress)` on the proxy with the random consumer address

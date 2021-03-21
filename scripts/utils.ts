@@ -4,6 +4,7 @@ import { readFileSync, writeFileSync } from 'fs'
 import config, { NetworkConfig } from '../config'
 
 import boxContract from '../artifacts/contracts/token/RarePizzasBox.sol/RarePizzasBox.json'
+import boxContractV2 from '../artifacts/contracts/token/RarePizzasBoxV2.sol/RarePizzasBoxV2.json'
 import randomConsumer from '../artifacts/contracts/random/RandomConsumer.sol/RandomConsumer.json'
 
 const getAlchemyAPIKey = (config: NetworkConfig) => {
@@ -194,16 +195,16 @@ const publishBoxWeb3AdminAbi = () => {
 
 const publishBoxWeb3V2AdminAbi = () => {
   const boxWeb3interface = {
-    contractName: boxContract.contractName,
-    sourceName: boxContract.sourceName,
+    contractName: boxContractV2.contractName,
+    sourceName: boxContractV2.sourceName,
     abi: [
-      boxContract.abi.find((i) => i.name === 'mint'),
-      boxContract.abi.find((i) => i.name === 'purchaseTo'),
-      boxContract.abi.find((i) => i.name === 'setPresaleAllowed'),
-      boxContract.abi.find((i) => i.name === 'setSaleStartTimestamp'),
-      boxContract.abi.find((i) => i.name === 'updateBitcoinPriceInWei'),
-      boxContract.abi.find((i) => i.name === 'withdraw'),
-      boxContract.abi.find(i => i.name === 'setVRFConsumer')
+      boxContractV2.abi.find((i) => i.name === 'mint'),
+      boxContractV2.abi.find((i) => i.name === 'purchaseTo'),
+      boxContractV2.abi.find((i) => i.name === 'setPresaleAllowed'),
+      boxContractV2.abi.find((i) => i.name === 'setSaleStartTimestamp'),
+      boxContractV2.abi.find((i) => i.name === 'updateBitcoinPriceInWei'),
+      boxContractV2.abi.find((i) => i.name === 'withdraw'),
+      boxContractV2.abi.find(i => i.name === 'setVRFConsumer')
     ],
   }
 
