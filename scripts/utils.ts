@@ -4,6 +4,7 @@ import { readFileSync, writeFileSync } from 'fs'
 import config, { NetworkConfig } from '../config'
 
 import boxContract from '../artifacts/contracts/token/RarePizzasBox.sol/RarePizzasBox.json'
+import randomConsumer from '../artifacts/contracts/random/RandomConsumer.sol/RandomConsumer.json'
 
 const getAlchemyAPIKey = (config: NetworkConfig) => {
   const networkName = config.NETWORK.toLowerCase()
@@ -134,7 +135,16 @@ const getProxyAdminAddress = (config: NetworkConfig) => {
   return 'VALUE NOT FOUND'
 }
 
-
+const getRandomConsumerAddress = (config: NetworkConfig) => {
+  const networkName = config.NETWORK.toLowerCase()
+  switch (networkName) {
+    case 'mainnet':
+      return config.RAREPIZZAS_BOX_MAINNET_RANDOM_CONSUMER_ADDRESS
+    case 'rinkeby':
+      return config.RAREPIZZAS_BOX_RINKEBY_RANDOM_CONSUMER_ADDRESS
+  }
+  return 'VALUE NOT FOUND'
+}
 
 const publishBoxWeb3Abi = () => {
   const boxWeb3interface = {
@@ -203,19 +213,19 @@ const publishBoxWeb3V2AdminAbi = () => {
 }
 
 const publishRandomConsumerWeb3AdminAbi = () => {
-  const boxWeb3interface = {
-    contractName: boxContract.contractName,
-    sourceName: boxContract.sourceName,
+  const contractInterface = {
+    contractName: randomConsumer.contractName,
+    sourceName: randomConsumer.sourceName,
     abi: [
-      boxContract.abi.find((i) => i.name === 'setCallbackContract'),
-      boxContract.abi.find((i) => i.name === 'setFee'),
-      boxContract.abi.find((i) => i.name === 'setKeyHash'),
-      boxContract.abi.find((i) => i.name === 'withdrawLink'),
-      boxContract.abi.find((i) => i.name === 'withdraw')
+      randomConsumer.abi.find((i) => i.name === 'setCallbackContract'),
+      randomConsumer.abi.find((i) => i.name === 'setFee'),
+      randomConsumer.abi.find((i) => i.name === 'setKeyHash'),
+      randomConsumer.abi.find((i) => i.name === 'withdrawLink'),
+      randomConsumer.abi.find((i) => i.name === 'withdraw')
     ],
   }
 
-  const json = JSON.stringify(boxWeb3interface)
+  const json = JSON.stringify(contractInterface)
   console.log(json)
   writeFileSync('./dist/randomConsumerWeb3AdminInterface.json', json)
 }
@@ -233,16 +243,28 @@ const publishDeploymentData = (name: string, proxy: Contract) => {
   writeFileSync(`./dist/deployment-${Date.now()}.json`, json)
 }
 
-const publishUpgradeData = (name: string, proxy: string, implementation: string, randomConsumer: Contract) => {
+const publishRandomConsumerDeploymentData = (name: string, proxy: string, randomConsumer: Contract) => {
+  const deploymentData = {
+    network: config.NETWORK,
+    name: name,
+    proxy: proxy,
+    randomConsumer: {
+      address: randomConsumer.address,
+      transaction: randomConsumer.deployTransaction
+    }
+  }
+  const json = JSON.stringify(deploymentData)
+  console.log(deploymentData)
+  writeFileSync('./dist/deployment-random-latest.json', json)
+  writeFileSync(`./dist/deployment-random-${Date.now()}.json`, json)
+}
+
+const publishUpgradeData = (name: string, proxy: string, implementation: string,) => {
   const deploymentData = {
     network: config.NETWORK,
     name: name,
     proxy: proxy,
     implementation: implementation,
-    randomConsumer: {
-      address: randomConsumer.address,
-      transaction: randomConsumer.deployTransaction
-    }
   }
   const json = JSON.stringify(deploymentData)
   console.log(deploymentData)
@@ -266,12 +288,14 @@ const utils = {
   getChainlinkVRFFee: getChainlinkVRFFee,
   getProxyAddress: getProxyAddress,
   getProxyAdminAddress: getProxyAdminAddress,
+  getRandomConsumerAddress: getRandomConsumerAddress,
   parseBoxUris: parseBoxUris,
   publishBoxWeb3Abi: publishBoxWeb3Abi,
   publishBoxWeb3AdminAbi: publishBoxWeb3AdminAbi,
   publishBoxWeb3V2AdminAbi: publishBoxWeb3V2AdminAbi,
   publishRandomConsumerWeb3AdminAbi: publishRandomConsumerWeb3AdminAbi,
   publishDeploymentData: publishDeploymentData,
+  publishRandomConsumerDeploymentData: publishRandomConsumerDeploymentData,
   publishUpgradeData: publishUpgradeData
 }
 export default utils

@@ -20,7 +20,7 @@ let testContext: TestContext
 // so it is skipped when checked into source for now
 
 describe.skip('Box Purchase Rinkeby Feed Tests', function () {
-  it.skip('Should get price for next Box', async () => {
+  it('Should get price for next Box', async () => {
     const your_deployed_contract = config.RAREPIZZAS_BOX_RINKEBY_PROXY_ADDRESS
     const provider = new providers.AlchemyProvider('rinkeby', config.ALCHEMY_RINKEBY_KEY)
     const wallet = new Wallet(config.RINKEBY_PRIVATE_KEY, provider)

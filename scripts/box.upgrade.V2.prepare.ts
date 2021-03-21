@@ -21,18 +21,7 @@ async function main() {
   console.log('Upgrade Successful.  You must now update the proxy contract.')
   console.log('The V2 implementation is at:', upgradeV2Address)
 
-  // we get the chgainlink VRF to deploy
-  const RandomConsumer = await ethers.getContractFactory('RandomConsumer')
-  const randomConsumer = await RandomConsumer.deploy(
-    utils.getChainlinkVRFCoordinator(config),
-    utils.getChainlinkToken(config),
-    utils.getChainlinkVRFKeyHash(config),
-    utils.getChainlinkVRFFee(config),
-    proxy)
-
-  console.log('Random Consumer:', randomConsumer)
-
-  utils.publishUpgradeData('RarePizzasBoxV2', proxy, upgradeV2Address, randomConsumer)
+  utils.publishUpgradeData('RarePizzasBoxV2', proxy, upgradeV2Address)
   utils.publishBoxWeb3V2AdminAbi()
 }
 

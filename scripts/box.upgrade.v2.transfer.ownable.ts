@@ -10,7 +10,7 @@ async function main() {
     const provider = new ethers.providers.AlchemyProvider(config.NETWORK, utils.getAlchemyAPIKey(config));
     const wallet = new ethers.Wallet(utils.getDeploymentKey(config), provider)
 
-    const consumerAddress = 'PUT YOUR DATA HERE'
+    const consumerAddress = utils.getRandomConsumerAddress(config)
     const newOwner = utils.getProxyAdminAddress(config)
 
     console.log('Connecting to instance')

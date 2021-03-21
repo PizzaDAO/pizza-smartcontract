@@ -87,7 +87,7 @@ contract RarePizzasBoxV2 is RarePizzasBox, IChainlinkVRFCallback, IRarePizzasBox
     // Internal Stuff
 
     function _assignBoxArtwork(uint256 tokenId, uint256 random) internal virtual {
-        uint256 pseudoRandom = random % MAX_BOX_INDEX;
+        uint256 pseudoRandom = random % BOX_LENGTH;
         _tokenBoxArtworkURIs[tokenId] = pseudoRandom;
     }
 
@@ -96,7 +96,7 @@ contract RarePizzasBoxV2 is RarePizzasBox, IChainlinkVRFCallback, IRarePizzasBox
      */
     function _assignBoxArtwork(uint256 tokenId) internal override {
         uint256 pseudoRandom =
-            uint256(keccak256(abi.encodePacked(blockhash(block.difficulty - 1), tokenId, msg.sender))) % MAX_BOX_INDEX;
+            uint256(keccak256(abi.encodePacked(blockhash(block.difficulty - 1), tokenId, msg.sender))) % BOX_LENGTH;
         _tokenBoxArtworkURIs[tokenId] = pseudoRandom;
         // this function should only be called from owner or as a fallback
         // so emit an event whenever it is called
