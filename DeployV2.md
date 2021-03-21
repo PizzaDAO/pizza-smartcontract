@@ -15,7 +15,7 @@ From the proxy owner:
 
 - [] ensure the correct proxy environment variable is correctly set
 
-`npx hardhat run --network rinkeby scripts/randomConsumer.deploy.ts`
+`npx hardhat run --network mainnet scripts/randomConsumer.deploy.ts`
 
 - [] set the random consumer environment variable in the .env file
 
@@ -31,7 +31,7 @@ This will deploy the contract but will not try to associate it with the proxy
 
 ## Push Source Code for Random Consumer
 
-`npx hardhat verify --contract contracts/random/RandomConsumer.sol:RandomConsumer --network rinkeby --constructor-args scripts/randomConsumer.arguments.ts <CONTRACT_ADDRESS>`
+`npx hardhat verify --contract contracts/random/RandomConsumer.sol:RandomConsumer --network mainnet --constructor-args scripts/randomConsumer.arguments.ts <CONTRACT_ADDRESS>`
 
 ## Push Source Code for Box V2
 
