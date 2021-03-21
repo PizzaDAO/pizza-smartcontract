@@ -17,13 +17,15 @@ npx hardhat run --network rinkeby scripts/box.upgrade.v2.prepare.ts
 
 ## Push Source Code for Random Consumer
 
-npx hardhat verify --contract contracts/random/RandomConsumer.sol:RandomConsumer --network rinkeby <CONTRACT_ADDRESS> 
+npx hardhat verify --contract contracts/random/RandomConsumer.sol:RandomConsumer --network rinkeby --constructor-args scripts/randomConsumer.arguments.ts <CONTRACT_ADDRESS>
 
 ## Push Source Code for Box V2
 
-npx hardhat verify --contract contracts/token/RarePizzasBoxV2.sol:RarePizzasBoxV2 --network rinkeby <CONTRACT_ADDRESS> 
+npx hardhat verify --contract contracts/token/RarePizzasBoxV2.sol:RarePizzasBoxV2 --network rinkeby <CONTRACT_ADDRESS>
 
 ## Transfer Ownership of Random Consumer
+
+Make sure you update the contract address in the script first
 
 npx hardhat run --network rinkeby scripts/box.upgrade.v2.transfer.ownable.ts
 

@@ -66,7 +66,7 @@ describe('Box V2 Purchase Tests', function () {
 
             // it's the kovan price set in the beforeEach
             expect(fee).to.equal(
-                BigNumber.from('1000000000000000000')
+                BigNumber.from('100000000000000000')
             )
         })
     })

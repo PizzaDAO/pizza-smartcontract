@@ -193,7 +193,7 @@ const publishBoxWeb3V2AdminAbi = () => {
       boxContract.abi.find((i) => i.name === 'setSaleStartTimestamp'),
       boxContract.abi.find((i) => i.name === 'updateBitcoinPriceInWei'),
       boxContract.abi.find((i) => i.name === 'withdraw'),
-      boxContract.abi.find(i => i.name = 'setVRFConsumer')
+      boxContract.abi.find(i => i.name === 'setVRFConsumer')
     ],
   }
 

@@ -37,8 +37,5 @@ describe.skip('Box Purchase Rinkeby Feed Tests', function () {
 
     await contract.purchase({ value: price })
 
-    console.log(`-- rinkeby deployment: ${contract.address} price: ${(await contract.getPrice())}`)
-    console.log(`-- rinkeby deployment: ${contract.address} soldTokens: ${(await contract.totalSupply())}`)
-
   })
 })
