@@ -7,7 +7,7 @@ This should be run after the Deploy.md run script.
 ## Prepare the existing proxy contract for upgrade
 
 From the proxy owner:
-- [] remove users from the allow list
+- [] remove users from the allow list (if needed)
 - [] verify that purchasing is disabled
 - [] sweep funds to the owner
 
