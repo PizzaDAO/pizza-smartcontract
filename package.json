@@ -28,9 +28,11 @@
   ],
   "devDependencies": {
     "@chainlink/contracts": "^0.1.6",
+    "@ethersproject/testcases": "^5.0.12",
     "@nomiclabs/hardhat-ethers": "^2.0.1",
     "@nomiclabs/hardhat-etherscan": "^2.1.1",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@openzeppelin/contracts": "^3.4.1",
     "@openzeppelin/contracts-upgradeable": "^4.0.0-beta.0",
     "@openzeppelin/hardhat-upgrades": "^1.6.0",
     "@types/chai": "^4.2.15",
@@ -38,7 +40,9 @@
     "@types/node": "^14.14.33",
     "@typescript-eslint/eslint-plugin": "^4.17.0",
     "@typescript-eslint/parser": "^4.17.0",
+    "abi-decoder": "^2.4.0",
     "chai": "^4.3.3",
+    "chainlink": "^0.8.2",
     "dotenv": "^8.2.0",
     "eslint": "^7.21.0",
     "eslint-config-prettier": "^8.1.0",
@@ -53,8 +57,5 @@
   },
   "directories": {
     "test": "test"
-  },
-  "dependencies": {
-    "abi-decoder": "^2.4.0"
   }
 }

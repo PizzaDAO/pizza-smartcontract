@@ -6,7 +6,9 @@ import boxContract from '../artifacts/contracts/token/RarePizzasBox.sol/RarePizz
 
 
 // update the timestamp
-//rinkeby is hardcoded because you cant do this on mainnet
+
+// you cant do this on mainnet
+// when owner is set to someone else
 async function main() {
     const [deployer] = await ethers.getSigners()
     const provider = new ethers.providers.AlchemyProvider("rinkeby", config.ALCHEMY_RINKEBY_KEY);

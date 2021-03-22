@@ -5,6 +5,9 @@ import config from '../config'
 import boxContract from '../artifacts/contracts/token/RarePizzasBox.sol/RarePizzasBox.json';
 
 // Update the bitcoin price
+
+// you cant do this on mainnet
+// when owner is set to someone else
 async function main() {
     const [deployer] = await ethers.getSigners()
     const provider = new ethers.providers.AlchemyProvider(config.NETWORK, utils.getAlchemyAPIKey(config));

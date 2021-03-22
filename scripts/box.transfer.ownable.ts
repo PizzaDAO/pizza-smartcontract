@@ -4,18 +4,18 @@ import config from '../config'
 
 import boxContract from '../artifacts/contracts/token/RarePizzasBox.sol/RarePizzasBox.json';
 
-// transfer ownership of the admin interface from the signer to some owner
+// transfer ownership of the contract's admin interface from the signer to some owner
 async function main() {
   const [deployer] = await ethers.getSigners()
   const provider = new ethers.providers.AlchemyProvider(config.NETWORK, utils.getAlchemyAPIKey(config));
   const wallet = new ethers.Wallet(utils.getDeploymentKey(config), provider)
 
-  const instanceAddress = utils.getProxyAddress(config)
+  const proxy = utils.getProxyAddress(config)
   const newOwner = utils.getProxyAdminAddress(config)
 
   console.log('Connecting to instance')
 
-  const contract = new ethers.Contract(instanceAddress, boxContract.abi, wallet);
+  const contract = new ethers.Contract(proxy, boxContract.abi, wallet);
 
   const current = await contract.getBitcoinPriceInWei()
   //verify we can query something

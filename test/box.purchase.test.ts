@@ -34,7 +34,7 @@ describe('Box Purchase Tests', function () {
     testContext = {
       box,
       wallet,
-      userWallet,
+      userWallet
     }
   })
 
@@ -170,12 +170,12 @@ describe('Box Purchase Tests', function () {
         expect(await box.balanceOf(wallet.address)).to.equal(0)
       })
 
-      it('Should reject withdrawal when 0 funds', async () => {
+      it('Should reject withdrawal when not owner', async () => {
         const { box, wallet } = testContext
 
-        const instance = box.connect(wallet.address)
+        await box.transferOwnership(wallet.address)
 
-        await expect(instance.withdraw()).to.be.reverted
+        await expect(box.withdraw()).to.be.revertedWith('caller is not the owner')
       })
     })
   })

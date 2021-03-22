@@ -1,23 +1,30 @@
 import { expect } from 'chai'
-import { BigNumber, Contract, utils } from 'ethers'
+import { BigNumber, Contract, Signer, Wallet, utils } from 'ethers'
+import { MockProvider, solidity } from 'ethereum-waffle'
 import { ethers } from 'hardhat'
 
 type TestContext = {
-  box: Contract
+  box: Contract,
+  wallet: Wallet
 }
 
 let testContext: TestContext
 
-describe('Box Timestamp Mock Tests', function () {
+describe('Box Timestamp Tests', function () {
   beforeEach(async () => {
-    const Box = await ethers.getContractFactory('FakeRarePizzasBox')
+    const [wallet] = new MockProvider().getWallets()
+    const Box = await ethers.getContractFactory('RarePizzasBox')
     const box = await Box.deploy()
+
+    // Initialize to set owner, since not deployed via proxy
+    await box.initialize(utils.getAddress('0x0000000000000000000000000000000000000000'))
 
     // Pick a date. 1609459200 = Friday, 1 January 2021 00:00:00
     await box.setSaleStartTimestamp(1609459200)
 
     testContext = {
       box,
+      wallet
     }
   })
 
@@ -32,11 +39,29 @@ describe('Box Timestamp Mock Tests', function () {
 
   it('Should not allow purchase with high timestamp', async () => {
     const { box } = testContext
-    await box.setSaleStartTimestamp(32472144000)
+
+    const currentTime = await box.publicSaleStart_timestampInS()
+    await expect(box.setSaleStartTimestamp(32472144000)).to.emit(box, 'SaleStartTimestampUpdated')
+      .withArgs(currentTime, 32472144000)
+
     const price: BigNumber = await box.getPrice()
 
     await expect(box.purchase({ value: price })).to.be.reverted
 
     expect(await box.totalSupply()).to.equal(0)
+  })
+
+  it('Should not allow non-owner to set timestamp', async () => {
+    const { box, wallet } = testContext
+
+    const currentTime = await box.publicSaleStart_timestampInS()
+    await expect(box.setSaleStartTimestamp(12345)).to.emit(box, 'SaleStartTimestampUpdated')
+      .withArgs(currentTime, 12345)
+
+    await box.transferOwnership(wallet.address)
+
+    await expect(box.setSaleStartTimestamp(4567)).to.be.revertedWith('')
+
+    expect(await box.publicSaleStart_timestampInS()).to.equal(12345)
   })
 })

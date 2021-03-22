@@ -30,5 +30,5 @@ npx hardhat verify --contract contracts/token/RarePizzasBox.sol:RarePizzasBox --
 
 ## Transfer ownable
 
- npx hardhat run --network rinkeby scripts/box.transfer.ownable.ts
+ npx hardhat run --network mainnet scripts/box.transfer.ownable.ts
  
