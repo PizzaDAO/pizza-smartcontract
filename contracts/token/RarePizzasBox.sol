@@ -38,8 +38,6 @@ contract RarePizzasBox is
     // V1 Variables (do not modify this section when upgrading)
 
     event BTCETHPriceUpdated(uint256 old, uint256 current);
-    event PresaleAllowedUpdated();
-    event SaleStartTimestampUpdated(uint256 old, uint256 current);
 
     uint256 public constant MAX_TOKEN_SUPPLY = 10000;
     uint256 public constant MAX_MINTABLE_SUPPLY = 1250;
@@ -61,6 +59,13 @@ contract RarePizzasBox is
     mapping(address => uint256) internal _presalePurchaseCount;
 
     // END V1 Variables
+
+    // V2 Events Added
+
+    event PresaleAllowedUpdated();
+    event SaleStartTimestampUpdated(uint256 old, uint256 current);
+
+    // END V2 Events Added
 
     function initialize(address chainlinkBTCETHFeed) public initializer {
         __Ownable_init();

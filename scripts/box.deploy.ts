@@ -14,10 +14,10 @@ async function main() {
   // We get the contract to deploy
   const Box = await ethers.getContractFactory('RarePizzasBox')
 
-  const box = await upgrades.deployProxy(Box, [utils.getChainlinkOracle(config)])
-  await box.deployed()
+  const Proxy = await upgrades.deployProxy(Box, [utils.getChainlinkOracle(config)])
+  const proxy = await Proxy.deployed()
 
-  utils.publishDeploymentData('RarePizzasBox', box)
+  utils.publishDeploymentData('RarePizzasBox', Proxy)
   utils.publishBoxWeb3Abi()
   utils.publishBoxWeb3AdminAbi()
 }
