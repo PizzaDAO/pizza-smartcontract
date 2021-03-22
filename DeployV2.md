@@ -25,7 +25,7 @@ From the proxy owner:
 
 This will deploy the contract but will not try to associate it with the proxy
 
-`npx hardhat run --network rinkeby scripts/box.upgrade.v2.prepare.ts`
+`npx hardhat run --network mainnet scripts/box.upgrade.v2.prepare.ts`
 
 - [] make note of the **V2 Implementation Address**, we'll need it later
 
@@ -42,7 +42,7 @@ This will deploy the contract but will not try to associate it with the proxy
 - [] ensure the random consumer environment variable is correctly set
 - [] ensure the proxy admin environment variable is correctly set
 
-`npx hardhat run --network rinkeby scripts/box.upgrade.v2.transfer.ownable.ts`
+`npx hardhat run --network mainnet scripts/box.upgrade.v2.transfer.ownable.ts`
 
 ## Owner Accept upgrade contract
 
