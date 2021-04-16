@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
 
-
+import "hardhat/console.sol";
 interface RarePizzas is IERC721Upgradeable{
     function purchase() payable external;
     function getPrice() external view returns(uint);
@@ -18,6 +18,7 @@ contract slicer1155 is ERC1155Upgradeable {
     mapping(uint=>uint) public purchasePrice;
     uint public maxSlices=8;
     address public lastPurchaser;
+    uint public lastPurchasePrice;
     uint public availablePizzas;
     uint public currentPizza;
     constructor(address pizzas) public  {
@@ -61,21 +62,26 @@ contract slicer1155 is ERC1155Upgradeable {
         // require(rarePizzas.owneOf(pizza)==address(this),"pizza must be deposited");
          bool purchased=availablePizzas>0;
          if(purchased){
-             uint price=purchasePrice[currentPizza];
-             require(msg.value>(price/8),"");
+             
+             require(msg.value>(lastPurchasePrice/8),"purchase ethere must be the correct amount");
              _generateSlice(currentPizza,msg.sender);
+             availablePizzas-=1;
          }else{
              uint p=rarePizzas.getPrice();
-             require(msg.value>=p/8,"");
+             lastPurchasePrice=p;
+             require(msg.value>=p/8,"purchase ethere must be the correct amount");
              uint256 startGas = gasleft();
-             uint purchasePrice=purchaseFromCurve();
+             purchaseFromCurve();
              lastPurchaser=msg.sender;
          }
         
     }
     function purchaseFromCurve() public returns(uint){
         uint p= rarePizzas.getPrice();
-        rarePizzas.purchase{value:p}();
+        console.log("pizza purchase price",p);
+    
+        console.log("the contract balance",address(this).balance);
+        rarePizzas.purchase{value:p/8}();
 
     } 
     function burnFromDeposit(uint pizza) public{
@@ -97,7 +103,9 @@ contract slicer1155 is ERC1155Upgradeable {
     }
     
      function onERC721Received(address operator, address from, uint256 tokenId, bytes calldata data) external returns (bytes4){
+         console.log(tokenId);
          if( from==address(0)&& lastPurchaser!=address(0) ){
+              console.log("slicing");
               _generateSlice(tokenId,lastPurchaser);
               lastPurchaser=address(0);
               currentPizza=tokenId;
