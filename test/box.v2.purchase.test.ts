@@ -71,6 +71,28 @@ describe('Box V2 Purchase Tests', function () {
         })
     })
 
+    describe('Purchase Slices', function (){ //julie
+        beforeEach(async () => {
+            
+        })
+
+        describe('Happy-ish flow', () => {
+            it('Should allow purchase of box', async () => {
+                const { box, random, testHash } = testContext
+                const boxBuyers = 10
+
+                for (let i = 0; i < boxBuyers; i++) {
+                    const price: BigNumber = await box.getPrice()
+                    await box.purchaseSlice({ value: price }) // Chainlink's max cost is 200k ether.
+                    let gasAmount = await random.fulfillRandomnessWrapper(testHash, randomNumber('31' + i, 256, 512))
+                    console.log(`Gas to purchase a slice: ${gasAmount}`)
+
+                    expect(await box.totalSupply()).to.equal(i + 1)
+                }
+            })
+        })
+    })
+
     describe('Purchase a box', () => {
         describe('Happy flow', () => {
             it('Should allow purchase of box', async () => {
