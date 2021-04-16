@@ -29,8 +29,8 @@ describe('Box V2 Purchase Tests', function () {
         const RandomConsumer = await ethers.getContractFactory('FakeRandomConsumer')
         const Box = await ethers.getContractFactory('RarePizzasBoxV2')
         const box = await Box.deploy()
-        const Slices = await ethers.getContractFactory('sliceERC1155')
-        const slices = await Slices.deploy()
+        const Slices = await ethers.getContractFactory('slicer1155')
+        const slices = await Slices.deploy(box.address)
 
         // use KOVAN contract info for out tests so its clear whats happening
         // and add our V2 callback contract
@@ -77,17 +77,18 @@ describe('Box V2 Purchase Tests', function () {
     describe('Purchase Slices', function (){
         describe('Happy-ish flow', () => {
             it('Should allow purchase of box', async () => {
-                const { slices, box, random, testHash } = testContext
-                const boxBuyers = 10
+                const { slices, box, random, testHash, wallet } = testContext
 
-                for (let i = 0; i < boxBuyers; i++) {
-                    const price: BigNumber = await box.getPrice()
-                    await slices.purchaseSlice({ value: price }) // Chainlink's max cost is 200k ether.
-                    let gasAmount = await random.fulfillRandomnessWrapper(testHash, randomNumber('31' + i, 256, 512))
-                    console.log(`Gas to purchase a slice: ${gasAmount}`)
+                const price: BigNumber = await box.getPrice()
+                await wallet.sendTransaction({
+                    to: slices.address,
+                    value: price
+                })
+                await slices.purchaseSlice({ value: price/8 }) // Chainlink's max cost is 200k ether.
+                let gasAmount = await random.fulfillRandomnessWrapper(testHash, randomNumber('31' + "37", 256, 512))
+                console.log(`Gas to purchase a slice: ${gasAmount}`)
 
-                    expect(await box.totalSupply()).to.equal(i + 1)
-                }
+                expect(await box.totalSupply()).to.equal(i + 1)
             })
         })
     })
