@@ -1,12 +1,12 @@
 
-pragma solidity ^0.6.0;
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
-import "@openzeppelin/contracts/token/IERC721.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
 
 
-interface RarePizzas is IERC721{
-    function purchase() external;
+interface RarePizzas is IERC721Upgradeable{
+    function purchase() payable external;
     function getPrice() external view returns(uint);
 }
 
@@ -25,15 +25,15 @@ contract slicer1155 is ERC1155Upgradeable {
         rarePizzas=RarePizzas(pizzas);
     }
     function _generateSlice(uint pizza,address receiver) internal {
-        require(rarePizzas.owneOf(pizza)==address(this),"pizza must be deposited");
+        require(rarePizzas.ownerOf(pizza)==address(this),"pizza must be deposited");
         require(totalSlices[pizza]<maxSlices,"total slices must be less than max slices");
         totalSlices[pizza]+=1;
         _mint(receiver, pizza, 1, "");
     }
      function _generateSlices(uint pizza,address[] memory receivers) internal {
-        require(rarePizzas.owneOf(pizza)==address(this),"pizza must be deposited");
+        require(rarePizzas.ownerOf(pizza)==address(this),"pizza must be deposited");
         require(receivers.length+totalSlices[pizza]<=8,"total slices must be less than max slices");
-        for(uint i=0;i<receiver.length;i++){
+        for(uint i=0;i<receivers.length;i++){
             totalSlices[pizza]+=1;
             _mint(receivers[i], pizza, 1, "");
         }
@@ -41,10 +41,10 @@ contract slicer1155 is ERC1155Upgradeable {
         
     }
       function _generateSlices(uint pizza,address receiver) internal {
-        require(rarePizzas.owneOf(pizza)==address(this),"pizza must be deposited");
-        require(receivers.length+totalSlices[pizza]<=8,"total slices must be less than max slices");
-
-        for(uint i=0;i<maxSlices;i++){
+        require(rarePizzas.ownerOf(pizza)==address(this),"pizza must be deposited");
+        //require(1+totalSlices[pizza]<=8,"total slices must be less than max slices");
+        
+        for(uint i=0;i<maxSlices-totalSlices[pizza];i++){
             totalSlices[pizza]+=1;
             _mint(receiver, pizza, 1,"");
         }
@@ -53,7 +53,7 @@ contract slicer1155 is ERC1155Upgradeable {
     }
     function sliceFromDeposit(uint pizza) public {
 
-         rarePizzas.tranferFrom(msg.sender,address(this),pizza);
+         rarePizzas.safeTransferFrom(msg.sender,address(this),pizza);
         _generateSlices(pizza,msg.sender);
 
     }
@@ -61,8 +61,8 @@ contract slicer1155 is ERC1155Upgradeable {
         // require(rarePizzas.owneOf(pizza)==address(this),"pizza must be deposited");
          bool purchased=availablePizzas>0;
          if(purchased){
-             uint price=purchasePrice[pizza];
-             require(msg.value>(purchasePrice/8),"");
+             uint price=purchasePrice[currentPizza];
+             require(msg.value>(price/8),"");
              _generateSlice(currentPizza,msg.sender);
          }else{
              uint p=rarePizzas.getPrice();
@@ -76,6 +76,7 @@ contract slicer1155 is ERC1155Upgradeable {
     function purchaseFromCurve() public returns(uint){
         uint p= rarePizzas.getPrice();
         rarePizzas.purchase{value:p}();
+
     } 
     function burnFromDeposit(uint pizza) public{
          safeTransferFrom(
@@ -86,7 +87,7 @@ contract slicer1155 is ERC1155Upgradeable {
         ""
         );
         _burnSlices(pizza);
-        rarePizzas.tranferFrom(address(this),msg.sender,pizza);
+        rarePizzas.safeTransferFrom(address(this),msg.sender,pizza);
     }
    
 
@@ -102,6 +103,6 @@ contract slicer1155 is ERC1155Upgradeable {
               currentPizza=tokenId;
               availablePizzas=7;
          }
-        return RarePizzas.onERC721Received.selector;
+        return 0x150b7a02;
      }
 }
