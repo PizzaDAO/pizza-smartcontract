@@ -71,11 +71,7 @@ describe('Box V2 Purchase Tests', function () {
         })
     })
 
-    describe('Purchase Slices', function (){ //julie
-        beforeEach(async () => {
-            
-        })
-
+    describe('Purchase Slices', function (){
         describe('Happy-ish flow', () => {
             it('Should allow purchase of box', async () => {
                 const { box, random, testHash } = testContext
