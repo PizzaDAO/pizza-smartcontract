@@ -30,7 +30,7 @@ describe('Box V2 Purchase Tests', function () {
         const Box = await ethers.getContractFactory('RarePizzasBoxV2')
         const box = await Box.deploy()
         const Slices = await ethers.getContractFactory('slicer1155')
-        const slices = await Slices.deploy(box.address)
+        
 
         // use KOVAN contract info for out tests so its clear whats happening
         // and add our V2 callback contract
@@ -52,8 +52,9 @@ describe('Box V2 Purchase Tests', function () {
 
         // just a hardcoded value
         const testHash = '0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4'
-
+        const slices = await Slices.deploy(box.address)
         testContext = {
+            slices,
             box,
             random,
             testHash,
@@ -80,15 +81,19 @@ describe('Box V2 Purchase Tests', function () {
                 const { slices, box, random, testHash, wallet } = testContext
 
                 const price: BigNumber = await box.getPrice()
-                await wallet.sendTransaction({
+                /*await expect(await wallet.sendTransaction({
                     to: slices.address,
-                    value: price
-                })
-                await slices.purchaseSlice({ value: price/8 }) // Chainlink's max cost is 200k ether.
+                    value: ethers.utils.parseEther("1.0")
+                })).to.changeEtherBalance(slices.address,  ethers.utils.parseEther("1.0")); 
+                **/
+                //console.log(wallet.provider)
+               
+                await slices.purchaseSlice({ value: price.div(8) }) // Chainlink's max cost is 200k ether.
                 let gasAmount = await random.fulfillRandomnessWrapper(testHash, randomNumber('31' + "37", 256, 512))
-                console.log(`Gas to purchase a slice: ${gasAmount}`)
-
-                expect(await box.totalSupply()).to.equal(i + 1)
+                console.log(await gasAmount.wait())
+                console.log(await slices.currentPizza())
+                console.log(await slices.availablePizzas())
+                //expect(await box.totalSupply()).to.equal(i + 1)
             })
         })
     })
@@ -101,7 +106,7 @@ describe('Box V2 Purchase Tests', function () {
 
                 for (let i = 0; i < boxBuyers; i++) {
                     const price: BigNumber = await box.getPrice()
-                    await box.purchase({ value: price })
+                    await box.purchase({ value: price.div(8) })
                     await random.fulfillRandomnessWrapper(testHash, randomNumber('31' + i, 256, 512))
 
                     expect(await box.totalSupply()).to.equal(i + 1)
@@ -156,7 +161,7 @@ describe('Box V2 Purchase Tests', function () {
                 expect(await box.balanceOf(wallet.address)).to.equal(0)
 
                 await box.mint(wallet.address, 1)
-
+                
                 expect(await box.totalSupply()).to.equal(1)
                 expect(await box.balanceOf(wallet.address)).to.equal(1)
             })
@@ -168,7 +173,7 @@ describe('Box V2 Purchase Tests', function () {
                 // Make sure balance is 0 before
                 expect(await box.balanceOf(wallet.address)).to.equal(0)
 
-                await box.purchaseTo(wallet.address, { value: price })
+                await box.purchaseTo(wallet.address,{ value: price })
 
                 expect(await box.totalSupply()).to.equal(1)
                 expect(await box.balanceOf(wallet.address)).to.equal(1)
