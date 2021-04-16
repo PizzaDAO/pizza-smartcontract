@@ -54,13 +54,7 @@ contract slicer1155 is ERC1155Upgradeable {
         );
         
     }
-    function purchaseSliceFromCurve(){
-
-    }
-
-    function _burnSlices(uint pizza){
-        require()
-    }
-    
+   
+   
     
 }
