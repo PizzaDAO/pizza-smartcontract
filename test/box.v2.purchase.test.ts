@@ -12,6 +12,7 @@ import config, { NetworkConfig } from '../config'
 use(solidity)
 
 type TestContext = {
+    slices: Contract
     box: Contract
     random: Contract
     testHash: string,
@@ -28,6 +29,8 @@ describe('Box V2 Purchase Tests', function () {
         const RandomConsumer = await ethers.getContractFactory('FakeRandomConsumer')
         const Box = await ethers.getContractFactory('RarePizzasBoxV2')
         const box = await Box.deploy()
+        const Slices = await ethers.getContractFactory('sliceERC1155')
+        const slices = await Slices.deploy()
 
         // use KOVAN contract info for out tests so its clear whats happening
         // and add our V2 callback contract
@@ -74,12 +77,12 @@ describe('Box V2 Purchase Tests', function () {
     describe('Purchase Slices', function (){
         describe('Happy-ish flow', () => {
             it('Should allow purchase of box', async () => {
-                const { box, random, testHash } = testContext
+                const { slices, box, random, testHash } = testContext
                 const boxBuyers = 10
 
                 for (let i = 0; i < boxBuyers; i++) {
                     const price: BigNumber = await box.getPrice()
-                    await box.purchaseSlice({ value: price }) // Chainlink's max cost is 200k ether.
+                    await slices.purchaseSlice({ value: price }) // Chainlink's max cost is 200k ether.
                     let gasAmount = await random.fulfillRandomnessWrapper(testHash, randomNumber('31' + i, 256, 512))
                     console.log(`Gas to purchase a slice: ${gasAmount}`)
 
