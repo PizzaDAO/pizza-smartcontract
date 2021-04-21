@@ -35,7 +35,7 @@ This will deploy the contract but will not try to associate it with the proxy
 
 ## Push Source Code for Box V2
 
-`npx hardhat verify --contract contracts/token/RarePizzasBoxV2.sol:RarePizzasBoxV2 --network rinkeby <CONTRACT_ADDRESS>`
+`npx hardhat verify --contract contracts/token/RarePizzasBoxV2.sol:RarePizzasBoxV2 --network mainnet 0x56E13df561A0FA817262653208954B64DC4d920c`
 
 ## Transfer Ownership of Random Consumer
 
