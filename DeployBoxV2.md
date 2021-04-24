@@ -1,4 +1,4 @@
-# DEPLOY V2 RUN SCRIPT
+# DEPLOY BOX V2 RUN SCRIPT
 
 This is the run script for deploying the upgraded V2 contract to an environment.
 

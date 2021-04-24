@@ -35,6 +35,14 @@ const networks: NetworksUserConfig = {
     url: `https://eth-ropsten.alchemyapi.io/v2/${config.ALCHEMY_ROPSTEN_KEY}`,
     accounts: [`0x${config.ROPSTEN_PRIVATE_KEY}`],
   },
+  matic: {
+    url: `https://rpc-mainnet.maticvigil.com/v1/${config.VIGIL_MATIC_KEY}`,
+    accounts: [`0x${config.MATIC_PRIVATE_KEY}`],
+  },
+  mumbai: {
+    url: `https://rpc-mumbai.maticvigil.com/v1/${config.VIGIL_MUMBAI_KEY}`,
+    accounts: [`0x${config.MATIC_MUMBAI_PRIVATE_KEY}`],
+  },
 }
 
 const getNetworks = (config: NetworkConfig) => {
