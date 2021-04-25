@@ -2,20 +2,26 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721EnumerableUpgradeable.sol";
-import "./IRarePizzasBox.sol";
+import '@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721EnumerableUpgradeable.sol';
+import './IRarePizzasBox.sol';
 
 /**
  * Public interface for interacting with rare pizzas
  */
-interface IRarePizzas is IERC721EnumerableUpgradeable {
+interface IRarePizzas is IRarePizzasBox {
     /**
-     * Get the maximum supply of pizzas
+     * Verify if a specific box has already been redeemed
      */
-    function maxSupply() external view returns (uint256);
+    function isRedeemed(uint256 boxTokenId) external view returns (bool);
 
     /**
-     * Try to purchase one pizza
+     * Redeem a RarePizzasBox for a pizza
      */
-    function redeem(IRarePizzasBox box) external payable;
+    function redeemRarePizzasBox(uint256 boxTokenId) external;
+
+    /**
+     * Purchase a revealed pizza
+     * TODO: pass in something so we know which one, such as the matix tx hash?
+     */
+    // TODO: function purchaseRevealed(bytes32 jobId) external payable;
 }
