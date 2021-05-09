@@ -38,7 +38,7 @@ contract RarePizzasBoxV2 is RarePizzasBox, IChainlinkVRFCallback, IRarePizzasBox
 
     // IChainlinkVRFCallback
 
-    function fulfillRandomness(bytes32 request, uint256 random) external override {
+    function fulfillRandomness(bytes32 request, uint256 random) external virtual override {
         require(msg.sender == _chainlinkVRFConsumer, 'caller not VRF');
         address to = _purchaseID[request];
 
