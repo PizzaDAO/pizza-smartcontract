@@ -97,6 +97,7 @@ describe('Box V3 Purchase Tests', function () {
                 await boxV3.purchaseSlice({ value: price.div(8) })
                 let receipt=await random.fulfillRandomnessWrapper(testHash, randomNumber('31' + 3, 256, 512))
                 console.log(await receipt.wait())
+                price = await boxV3.getPrice()
                 for (let i = 0; i < boxBuyers; i++) {
                     
                     
@@ -109,7 +110,7 @@ describe('Box V3 Purchase Tests', function () {
                 }
                 await boxV3.purchaseSlice({ value: price.div(8) })
                 await expect(boxV3.purchaseSlice({ value: price.div(8) })).to.be.revertedWith('a slice is currently queried');
-                await random.fulfillRandomnessWrapper(testHash, randomNumber('31' + 3, 256, 512))
+                await random.fulfillRandomnessWrapper(testHash, randomNumber('31' + 4, 256, 512))
                 console.log(await boxV3.availableSlices())
                 console.log((await boxV3.currentSliceID()).toString())
             })

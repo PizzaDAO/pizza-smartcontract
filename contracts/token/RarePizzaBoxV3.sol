@@ -7,7 +7,7 @@ import '@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol';
 
 import './RarePizzasBoxV2.sol';
-
+import "hardhat/console.sol";
 import '../interfaces/IChainlinkVRFRandomConsumer.sol';
 import '../interfaces/IRarePizzasBoxV2Admin.sol';
 
@@ -38,8 +38,10 @@ contract RarePizzasBoxV3 is RarePizzasBoxV2 {
         address to = _purchaseID[request];
 
         require(to != address(0), 'purchase must exist');
+       
         uint256 id = _getNextPizzaTokenId();
         if (sliceQuery[request]) {
+            console.log(id,"MINTING NEW SLICE");
             sliceQueried=false;
             _mintNewSlice(to, id, random);
         } else {
@@ -56,11 +58,13 @@ contract RarePizzasBoxV3 is RarePizzasBoxV2 {
         uint256 random
     ) internal {
         uint256 pseudoRandom = random % BOX_LENGTH;
-        sliceType[id] = pseudoRandom;
-        slicedBoxes.push(id);
-        currentSliceID=id;
+        
+        //sliceType[id] = pseudoRandom;
+        
+        currentSliceID=((slicedBoxes.length+1)*1000)+pseudoRandom;
+        slicedBoxes.push(currentSliceID);
         availableSlices=7;
-        bool result = ISlice(sliceAddress).externalSliceMint(to, id);
+        bool result = ISlice(sliceAddress).externalSliceMint(to, currentSliceID);
         require(result, 'slice minting must work');
     }
 
@@ -88,6 +92,7 @@ contract RarePizzasBoxV3 is RarePizzasBoxV2 {
         if (availableSlices == 0) {
             _externalSliceQuery(msg.sender);
             sliceQueried=true;
+            _purchased_pizza_count.increment();
         } else {
             _mintSlice(msg.sender, currentSliceID);
         }
