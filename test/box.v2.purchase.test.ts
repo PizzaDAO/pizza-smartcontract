@@ -59,7 +59,7 @@ describe('Box V2 Purchase Tests', function () {
             random,
             testHash,
             wallet,
-            userWallet,
+            userWallet
         }
     })
 
@@ -83,6 +83,7 @@ describe('Box V2 Purchase Tests', function () {
                 const price: BigNumber = await box.getPrice()
                 /*await expect(await wallet.sendTransaction({
                     to: slices.address,
+<<<<<<< Updated upstream
                     value: ethers.utils.parseEther("1.0")
                 })).to.changeEtherBalance(slices.address,  ethers.utils.parseEther("1.0")); 
                 **/
@@ -94,6 +95,15 @@ describe('Box V2 Purchase Tests', function () {
                 console.log(await slices.currentPizza())
                 console.log(await slices.availablePizzas())
                 //expect(await box.totalSupply()).to.equal(i + 1)
+=======
+                    value: price
+                })
+                await slices.purchaseSlice({ value: price.div(8) }) // Chainlink's max cost is 200k ether.
+                let gasAmount = await random.fulfillRandomnessWrapper(testHash, randomNumber('31' + "37", 256, 512))
+                console.log(`Gas to purchase a slice: ${gasAmount}`)
+
+                // expect(await box.totalSupply()).to.equal(i + 1)
+>>>>>>> Stashed changes
             })
         })
     })
