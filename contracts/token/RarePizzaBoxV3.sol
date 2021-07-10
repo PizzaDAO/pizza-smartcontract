@@ -20,16 +20,16 @@ contract RarePizzasBoxV3 is RarePizzasBoxV2 {
     using CountersUpgradeable for CountersUpgradeable.Counter;
     using SafeMathUpgradeable for uint256;
 
-    // V2 Variables (do not modify this section when upgrading)
+    // V3 Variables (do not modify this section when upgrading)
 
-    mapping(bytes32 => bool) public sliceQuery;
+    mapping(bytes32 => bool) public isSliceRequest;
     mapping(uint256 => uint256) public sliceType;
     uint256 public availableSlices;
     uint256 public currentSliceID;
     uint256[] public slicedBoxes;
     address public sliceAddress;
-    bool public sliceQueried;
-    // END V2 Variables
+    bool public sliceRequested;
+    // END V3 Variables
 
     // IChainlinkVRFCallback
 
@@ -39,15 +39,17 @@ contract RarePizzasBoxV3 is RarePizzasBoxV2 {
 
         require(to != address(0), 'purchase must exist');
         uint256 id = _getNextPizzaTokenId();
-        if (sliceQuery[request]) {
-            sliceQueried=false;
+        if (isSliceRequest[request]) {
+            sliceRequested=false;
             _mintNewSlice(to, id, random);
         } else {
             _safeMint(to, id);
             _assignBoxArtwork(id, random);
         }
     }
+    bool sliceAddressSet;
     function setSliceAddress(address a) public {
+        require(sliceAddressSet==false);
         sliceAddress=a;
     }
     function _mintNewSlice(
@@ -77,7 +79,7 @@ contract RarePizzasBoxV3 is RarePizzasBoxV2 {
                 (_presalePurchaseCount[msg.sender] < _presaleAllowed[msg.sender]),
             "sale hasn't started"
         );
-        require(sliceQueried==false,"a slice is currently queried");
+        require(sliceRequested==false,"a slice is currently requested");
         require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY - 1, 'exceeds supply.');
 
         uint256 price = getPrice() / 8;
@@ -87,7 +89,7 @@ contract RarePizzasBoxV3 is RarePizzasBoxV2 {
         // Presale addresses can purchase up to X total
         if (availableSlices == 0) {
             _externalSliceQuery(msg.sender);
-            sliceQueried=true;
+            sliceRequested=true;
         } else {
             _mintSlice(msg.sender, currentSliceID);
         }
@@ -101,7 +103,7 @@ contract RarePizzasBoxV3 is RarePizzasBoxV2 {
         if (_chainlinkVRFConsumer != address(0)) {
             try IChainlinkVRFRandomConsumer(_chainlinkVRFConsumer).getRandomNumber() returns (bytes32 requestId) {
                 _purchaseID[requestId] = to;
-                sliceQuery[requestId] = true;
+                isSliceRequest[requestId] = true;
                 return;
             } catch (bytes memory reason) {
                 if (reason.length == 0) {
