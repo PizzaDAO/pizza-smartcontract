@@ -49,9 +49,10 @@ This is the run script for deploying the RarePizzas.sol contract with all depend
 - [] ensure the RAREPIZZAS_ORDER_API_MAINNET_ORACLE_NODE_ADDRESS environment variable is set
 - [] ensure the CHAINLINK_MAINNET_TOKEN environment variable is set
 
-`npx hardhat run --network mainnet scripts/orderAPIOracle.deploy.ts`
+`npx hardhat run --network rinkeby scripts/orderAPIOracle.deploy.ts`
 
-- [] Call `setFulfillmentPermission` with CHAINLINK_MAINNET_TOKEN
+- [] Verify `setFulfillmentPermission` RAREPIZZAS_ORDER_API_MAINNET_ORACLE_NODE_ADDRESS is set on the contract
+- [] Call `setFulfillmentPermission` with the emergency funding address (optional)
 - [] Call `transferOwnership` to transfer to RAREPIZZAS_MAINNET_PROXY_ADMIN_ADDRESS
 - [] set the RAREPIZZAS_ORDER_API_MAINNET_ORACLE_CONTRACT_ADDRESS environment variable in the .env file
 
@@ -61,6 +62,7 @@ For this step, it is required that the chainlink node be operational and pointed
 
 At a high level:
 - Deploy the chainlink oracle with the proper configuration
+- Configure a bridge pointed to the API
 - set up the job that is expected to run.  Get the job ID
 - come back to this repository and:
 
@@ -75,7 +77,7 @@ At a high level:
 - [] ensure the RAREPIZZAS_ORDER_API_MAINNET_JOB_FEE environment variable is set
 - [] ensure the RAREPIZZAS_MAINNET_PROXY_ADDRESS environment variable is set
 
-`npx hardhat run --network mainnet scripts/orderAPIConsumer.deploy.ts`
+`npx hardhat run --network rinkeby scripts/orderAPIConsumer.deploy.ts`
 
 - [] set the RAREPIZZAS_ORDER_API_CONSUMER_MAINNET_CONTRACT_ADDRESS environment variable in the .env file
 - [] Call `transferOwnership` to transfer to RAREPIZZAS_MAINNET_PROXY_ADMIN_ADDRESS
