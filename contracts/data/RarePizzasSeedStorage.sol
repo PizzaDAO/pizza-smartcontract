@@ -16,6 +16,8 @@ contract RarePizzasSeedStorage is OwnableUpgradeable, IChainlinkVRFCallback, IRa
     IChainlinkVRFRandomConsumer internal _chainlinkVRFConsumer;
     address internal _authorizedRequestor;
 
+    uint256 private _fallbackRandomSeed;
+
     mapping(bytes32 => uint256) public pizzaSeeds;
     mapping(bytes32 => bytes32) internal _randomRequestsForJobs;
 
@@ -37,8 +39,6 @@ contract RarePizzasSeedStorage is OwnableUpgradeable, IChainlinkVRFCallback, IRa
     function fulfillRandomness(bytes32 request, uint256 random) external virtual override {
         require(msg.sender == address(_chainlinkVRFConsumer), 'caller not VRF');
         bytes32 jobId = _randomRequestsForJobs[request];
-
-        // TODO: verify that a non existant job resolves zero
         require(jobId != 0, 'request must exist');
         _setSeed(jobId, random);
     }
@@ -68,14 +68,19 @@ contract RarePizzasSeedStorage is OwnableUpgradeable, IChainlinkVRFCallback, IRa
             }
         }
 
-        // fallback
-        uint256 pseudoRandom =
-            uint256(
-                keccak256(
-                    abi.encodePacked(block.timestamp, blockhash(block.difficulty - 1), block.number, jobId, msg.sender)
+        uint256 pseudoRandom = uint256(
+            keccak256(
+                abi.encodePacked(
+                    block.timestamp,
+                    blockhash(block.difficulty - 1),
+                    block.number,
+                    jobId,
+                    _fallbackRandomSeed,
+                    msg.sender
                 )
-            );
-
+            )
+        );
+        _fallbackRandomSeed = pseudoRandom;
         _setSeed(jobId, pseudoRandom);
     }
 
@@ -91,6 +96,10 @@ contract RarePizzasSeedStorage is OwnableUpgradeable, IChainlinkVRFCallback, IRa
         address old = address(_chainlinkVRFConsumer);
         _chainlinkVRFConsumer = IChainlinkVRFRandomConsumer(consumer);
         emit VRFConsumerUpdated(old, address(_chainlinkVRFConsumer));
+    }
+
+    function setFallbackRandomSeed(uint256 fallbackRandomSeed) public virtual override onlyOwner {
+        _fallbackRandomSeed = fallbackRandomSeed;
     }
 
     // Internal Stuff

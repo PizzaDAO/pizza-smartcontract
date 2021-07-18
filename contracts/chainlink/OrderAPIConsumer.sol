@@ -42,6 +42,8 @@ contract OrderAPIConsumer is Ownable, ChainlinkClient, IOrderAPIConsumer, IOrder
     event JobIdUpdated(bytes32 previous, bytes32 current);
     event FeeUpdated(uint256 previous, uint256 current);
 
+    event FulfillResponse(bytes32 requestId, bytes32 result);
+
     /**
      * Network: Kovan
      * Oracle: 0x2f90A6D021db21e1B2A077c5a37B3C7E75D15b7e
@@ -78,7 +80,10 @@ contract OrderAPIConsumer is Ownable, ChainlinkClient, IOrderAPIConsumer, IOrder
     // IOrderAPICallback
 
     function fulfillResponse(bytes32 requestId, bytes32 result) public recordChainlinkFulfillment(requestId) {
-        _callback.fulfillResponse(requestId, result);
+        if (address(_callback) != address(0)) {
+            _callback.fulfillResponse(requestId, result);
+        }
+        emit FulfillResponse(requestId, result);
     }
 
     // IOrderAPIConsumerAdmin

@@ -16,4 +16,6 @@ interface IRarePizzasSeedStorageAdmin {
      * Allows owner to set the VRF consumer address
      */
     function setVRFConsumer(address consumer) external;
+
+    function setFallbackRandomSeed(uint256 fallbackRandomSeed) external;
 }
