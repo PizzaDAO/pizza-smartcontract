@@ -17,7 +17,7 @@ const getAlchemyAPIKey = (config: NetworkConfig) => {
       return config.ALCHEMY_RINKEBY_KEY
     case 'matic':
         return config.ALCHEMY_MATIC_KEY
-    case 'mumbai':
+    case 'maticmum':
       return config.ALCHEMY_MUMBAI_KEY
   }
   return 'VALUE NOT FOUND'
@@ -32,7 +32,7 @@ const getDeploymentKey = (config: NetworkConfig) => {
       return config.RINKEBY_PRIVATE_KEY
     case 'matic':
         return config.MATIC_PRIVATE_KEY
-    case 'mumbai':
+    case 'maticmum':
       return config.MATIC_MUMBAI_PRIVATE_KEY
   }
   return 'VALUE NOT FOUND'
@@ -64,7 +64,7 @@ const getChainlinkToken = (config: NetworkConfig) => {
       return config.CHAINLINK_RINKEBY_TOKEN
     case 'matic':
         return config.CHAINLINK_MATIC_TOKEN
-    case 'mumbai':
+    case 'maticmum':
       return config.CHAINLINK_MATIC_MUMBAI_TOKEN
   }
   return 'VALUE NOT FOUND'
@@ -82,7 +82,7 @@ const getChainlinkVRFCoordinator = (config: NetworkConfig) => {
       return config.CHAINLINK_RINKEBY_VRF_COORD
     case 'matic':
         return config.CHAINLINK_MATIC_VRF_COORD
-    case 'mumbai':
+    case 'maticmum':
       return config.CHAINLINK_MATIC_MUMBAI_VRF_COORD
   }
   return 'VALUE NOT FOUND'
@@ -100,7 +100,7 @@ const getChainlinkVRFKeyHash = (config: NetworkConfig) => {
       return config.CHAINLINK_RINKEBY_VRF_KEY_HASH
     case 'matic':
         return config.CHAINLINK_MATIC_VRF_KEY_HASH
-    case 'mumbai':
+    case 'maticmum':
       return config.CHAINLINK_MATIC_MUMBAI_VRF_KEY_HASH
   }
   return 'VALUE NOT FOUND'
@@ -118,7 +118,7 @@ const getChainlinkVRFFee = (config: NetworkConfig) => {
       return config.CHAINLINK_RINKEBY_VRF_FEE
     case 'matic':
         return config.CHAINLINK_MATIC_VRF_FEE
-    case 'mumbai':
+    case 'maticmum':
       return config.CHAINLINK_MATIC_MUMBAI_VRF_FEE
   }
   return 'VALUE NOT FOUND'
@@ -236,7 +236,7 @@ const getRandomConsumerAddress = (config: NetworkConfig) => {
       return config.RAREPIZZAS_BOX_RINKEBY_RANDOM_CONSUMER_ADDRESS
     case 'matic':
         return config.RAREPIZZAS_MATIC_RANDOM_CONSUMER_ADDRESS
-    case 'mumbai':
+    case 'maticmum':
       return config.RAREPIZZAS_MUMBAI_RANDOM_CONSUMER_ADDRESS
   }
   return 'VALUE NOT FOUND'
@@ -280,7 +280,7 @@ const getStorageProxyAddress = (config: NetworkConfig) => {
   switch (networkName) {
     case 'matic':
       return config.RAREPIZZAS_SEEDSTORAGE_MATIC_PROXY_ADDRESS
-    case 'mumbai':
+    case 'maticmum':
       return config.RAREPIZZAS_SEEDSTORAGE_MUMBAI_PROXY_ADDRESS
   }
   return 'VALUE NOT FOUND'
@@ -294,7 +294,7 @@ const getStorageProxyAdminAddress = (config: NetworkConfig) => {
   switch (networkName) {
     case 'matic':
       return config.RAREPIZZAS_MATIC_PROXY_ADMIN_ADDRESS
-    case 'mumbai':
+    case 'maticmum':
       return config.RAREPIZZAS_MUMBAI_PROXY_ADMIN_ADDRESS
   }
   return 'VALUE NOT FOUND'
@@ -308,7 +308,7 @@ const getStorageProxyAuthorizedRequestorAddress = (config: NetworkConfig) => {
   switch (networkName) {
     case 'matic':
       return config.RAREPIZZAS_SEEDSTORAGE_AUTHORIZED_REQUESTOR_MATIC_ADDRESS
-    case 'mumbai':
+    case 'maticmum':
       return config.RAREPIZZAS_SEEDSTORAGE_AUTHORIZED_REQUESTOR_MUMBAI_ADDRESS
   }
   return 'VALUE NOT FOUND'
