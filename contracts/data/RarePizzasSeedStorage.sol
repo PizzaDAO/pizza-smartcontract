@@ -29,9 +29,7 @@ contract RarePizzasSeedStorage is OwnableUpgradeable, IChainlinkVRFCallback, IRa
         __Ownable_init();
 
         // set the address of the authorized requestor
-        if (authorizedRequestor != address(0)) {
-            _authorizedRequestor = authorizedRequestor;
-        }
+        _authorizedRequestor = authorizedRequestor;
     }
 
     // IChainlinkVRFCallback

@@ -13,7 +13,7 @@ This is the run script for deploying the RarePizzas.sol contract with all depend
 
 - [] ensure the rarepizzas polygon MATIC_PRIVATE_KEY eenvironment variable is set
 
-`npx hardhat run --network polygon scripts/rarePizzasSeedStorage.deploy.v1.ts`
+`npx hardhat run --network polygon scripts/pizza.storagte.deploy.ts`
 
 - [] set the polygon RAREPIZZAS_SEEDSTORAGE_MATIC_PROXY_ADDRESS environment variable in the .env file
 
@@ -36,15 +36,15 @@ This is the run script for deploying the RarePizzas.sol contract with all depend
 
 - [] Call `transferOwnership` to transfer to RAREPIZZAS_MATIC_PROXY_ADMIN_ADDRESS
 
-## Deploy the Mainnet RarePizzas.sol contract
+## Deploy the Ethereum RarePizzas.sol contract
 
 - [] ensure the RAREPIZZAS_BOX_MAINNET_PROXY_ADDRESS environemnt variable is set
 
-`npx hardhat run --network polygon scripts/rarePizzas.deploy.v1.ts`
+`npx hardhat run --network rinkeby scripts/rarePizzas.deploy.v1.ts`
 
 - [] set the RAREPIZZAS_MAINNET_PROXY_ADDRESS environment variable in the .env file
 
-## Deploy the Mainnet OrderAPIOracle.sol contract
+## Deploy the Ethereum OrderAPIOracle.sol contract
 
 - [] ensure the RAREPIZZAS_ORDER_API_MAINNET_ORACLE_NODE_ADDRESS environment variable is set
 - [] ensure the CHAINLINK_MAINNET_TOKEN environment variable is set
@@ -58,18 +58,19 @@ This is the run script for deploying the RarePizzas.sol contract with all depend
 
 ## Configure the chainlink oracle
 
-For this step, it is required that the chainlink node be operational and pointed to the OrderAPIOracle contract.  This happens in another repository.
+For this step, it is required that the chainlink node be operational and pointed to the OrderAPIOracle contract. This happens in another repository.
 
 At a high level:
+
 - Deploy the chainlink oracle with the proper configuration
 - Configure a bridge pointed to the API
-- set up the job that is expected to run.  Get the job ID
+- set up the job that is expected to run. Get the job ID
 - come back to this repository and:
 
 - [] set the RAREPIZZAS_ORDER_API_MAINNET_JOB_ID environment variable in the .env file
 - [] set the RAREPIZZAS_ORDER_API_MAINNET_JOB_FEE environment variable in the .env file
 
-## Deploy the Mainnet OrderAPIConsumer.sol contract
+## Deploy the Ethereum OrderAPIConsumer.sol contract
 
 - [] ensure the CHAINLINK_MAINNET_TOKEN environment variable is set
 - [] ensure the RAREPIZZAS_ORDER_API_MAINNET_ORACLE_CONTRACT_ADDRESS environment variable is set
@@ -105,18 +106,17 @@ push the source code for the oracle api consumer:
 
 push the source code for the rarepizzas contract:
 
-`npx hardhat verify --contract contracts/token/RarePizzas.sol:RarePizzas --network mainnet --constructor-args scripts/RarePizzas.arguments.ts <CONTRACT_ADDRESS>` 
-
+`npx hardhat verify --contract contracts/token/RarePizzas.sol:RarePizzas --network mainnet --constructor-args scripts/RarePizzas.arguments.ts <CONTRACT_ADDRESS>`
 
 ## TODO:
 
 - A diagram showing all the architecture and its interaction
 
 Mainnet job spec has 2 tasks to run in the job
+
 - first is to call matic for a random number
 - second is to pass the random number to the API
 
 build an initiator that sends a TX to the matic network
-
 
 need a multi sig for matic/polygon

@@ -6,6 +6,7 @@ import config, { NetworkConfig } from '../config'
 import boxContract from '../artifacts/contracts/token/RarePizzasBox.sol/RarePizzasBox.json'
 import boxContractV2 from '../artifacts/contracts/token/RarePizzasBoxV2.sol/RarePizzasBoxV2.json'
 import randomConsumer from '../artifacts/contracts/random/RandomConsumer.sol/RandomConsumer.json'
+import seedStorage from '../artifacts/contracts/data/RarePizzasSeedStorage.sol/RarePizzasSeedStorage.json'
 
 const getAlchemyAPIKey = (config: NetworkConfig) => {
   const networkName = config.NETWORK.toLowerCase()
@@ -389,6 +390,27 @@ const publishBoxWeb3V2AdminAbi = () => {
 }
 
 /**
+ * Publish a truncated version of the RarePizzasSeedStorage ABI
+ */
+ const publishRarePizzasSeedStorageAbi = (proxy: Contract) => {
+  const contractInterface = {
+    contractName: seedStorage.contractName,
+    sourceName: seedStorage.sourceName,
+    proxy: proxy,
+    abi: [
+      seedStorage.abi.find((i) => i.name === 'fulfillRandomness'),
+      seedStorage.abi.find((i) => i.name === 'getPizzaSeed'),
+      seedStorage.abi.find((i) => i.name === 'getRandomNumber'),
+      seedStorage.abi.find((i) => i.name === 'pizzaSeeds')
+    ],
+  }
+
+  const json = JSON.stringify(contractInterface)
+  console.log(json)
+  writeFileSync('./dist/rarePizzasSeedStorageAbiInterface.json', json)
+}
+
+/**
  * Publish a truncated version of the Random Conusmer Web3 Admin ABI
  */
 const publishRandomConsumerWeb3AdminAbi = () => {
@@ -487,6 +509,7 @@ const utils = {
   publishBoxWeb3Abi: publishBoxWeb3Abi,
   publishBoxWeb3AdminAbi: publishBoxWeb3AdminAbi,
   publishBoxWeb3V2AdminAbi: publishBoxWeb3V2AdminAbi,
+  publishRarePizzasSeedStorageAbi: publishRarePizzasSeedStorageAbi,
   publishRandomConsumerWeb3AdminAbi: publishRandomConsumerWeb3AdminAbi,
   publishDeploymentData: publishDeploymentData,
   publishRandomConsumerDeploymentData: publishRandomConsumerDeploymentData,
