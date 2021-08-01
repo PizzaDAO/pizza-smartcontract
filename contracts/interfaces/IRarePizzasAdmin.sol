@@ -8,6 +8,8 @@ interface IRarePizzasAdmin {
      */
     function redeemRarePizzasBoxForOwner(uint256 boxTokenId) external;
 
+    function setContractURI(string memory URI) external;
+
     /**
      * Set the contract for the order api client
      */
