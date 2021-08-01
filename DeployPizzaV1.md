@@ -25,6 +25,7 @@ This is the run script for deploying the RarePizzas.sol contract with all depend
 `npx hardhat run --network polygon scripts/randomConsumer.deploy.ts`
 
 - [] set the polygon RAREPIZZAS_MATIC_RANDOM_CONSUMER_ADDRESS environment variable in the .env file
+- [] call setCallbackContract with the address of the random consumer
 - [] Call `transferOwnership` to transfer to RAREPIZZAS_MATIC_PROXY_ADMIN_ADDRESS
 - [] Fund with link
 

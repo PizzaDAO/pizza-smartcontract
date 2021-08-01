@@ -19,6 +19,7 @@ From the proxy owner:
 `npx hardhat run --network mainnet scripts/randomConsumer.ethereum.deploy.ts`
 
 - [] set the random consumer environment variable in the .env file
+- [] fund the random consumer with LINK
 
 ## Prepare the V2 Contract
 

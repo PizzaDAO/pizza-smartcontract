@@ -454,10 +454,7 @@ const publishRandomConsumerDeploymentData = (name: string, proxy: string, random
     network: config.NETWORK,
     name: name,
     proxy: proxy,
-    randomConsumer: {
-      address: randomConsumer.address,
-      transaction: randomConsumer.deployTransaction
-    }
+    randomConsumer: randomConsumer
   }
   const json = JSON.stringify(deploymentData)
   console.log(deploymentData)
