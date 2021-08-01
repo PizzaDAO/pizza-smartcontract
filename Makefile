@@ -14,3 +14,6 @@ deploy-storage-mumbai:
 
 deploy-random-mumbai:
 	npx hardhat run --network maticmum scripts/randomConsumer.polygon.deploy.ts
+
+set-storage-random-mumbai:
+	npx hardhat run --network maticmum scripts/pizza.storage.setRandomConsumer.ts
