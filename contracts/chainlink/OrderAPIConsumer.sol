@@ -7,12 +7,15 @@ import '@chainlink/contracts/src/v0.6/ChainlinkClient.sol';
 
 interface IOrderAPIConsumer {
     /**
-     * Call the rendering API
+     * Call the rendering API with the address of the requestor
      */
     function executeRequest(address requestor) external returns (bytes32 requestId);
 }
 
 interface IOrderAPICallback {
+    /**
+     * Call the callback function with the job id and the result (usually the ipfs hash)
+     */
     function fulfillResponse(bytes32 requestId, bytes32 result) external;
 }
 

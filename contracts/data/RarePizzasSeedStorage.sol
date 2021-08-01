@@ -55,7 +55,7 @@ contract RarePizzasSeedStorage is OwnableUpgradeable, IChainlinkVRFCallback, IRa
         if (address(_chainlinkVRFConsumer) != address(0)) {
             try _chainlinkVRFConsumer.getRandomNumber() returns (bytes32 requestId) {
                 _randomRequestsForJobs[requestId] = jobId;
-                // request it out
+                // request is in flight
                 return;
             } catch (bytes memory reason) {
                 if (reason.length == 0) {
@@ -84,6 +84,7 @@ contract RarePizzasSeedStorage is OwnableUpgradeable, IChainlinkVRFCallback, IRa
 
     // Admin functions
 
+    // authorized requestor is the account that is allowed to call
     function setAuthorizedRequestor(address requestor) public virtual override onlyOwner {
         address old = _authorizedRequestor;
         _authorizedRequestor = requestor;
