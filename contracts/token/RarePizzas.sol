@@ -41,6 +41,8 @@ contract RarePizzas is
 
     string public constant _uriBase = 'ipfs://';
 
+    string private _contractURI;
+
     // Other contracts this contract interacts with
     IOrderAPIConsumer internal _orderAPIClient;
     IRarePizzasBox internal _rarePizzasBoxContract;
@@ -52,13 +54,17 @@ contract RarePizzas is
     event OrderAPIClientUpdated(address previous, address current);
     event InternalArtworkAssigned(uint256 tokenId, bytes32 artworkURI);
 
-    // A collection of Pizza Box Token Id's that have been redeemed
+    // A collection of Box Token Id's that have been redeemed
     mapping(uint256 => address) internal _redeemedBoxTokenAddress;
 
     // A collection of all of the pizza artwork IPFS hashes
     mapping(uint256 => bytes32) internal _tokenPizzaArtworkURIs;
 
+    // A collection of render jobs associated with the requestor
     mapping(bytes32 => address) internal _renderRequests;
+
+    // A collection of render jobs associated with the box token id
+    mapping(bytes32 => uint256) internal _renderTokenIds;
 
     // END V1 Variables
 
@@ -70,13 +76,14 @@ contract RarePizzas is
         if (rarePizzasBoxContract != address(0)) {
             _rarePizzasBoxContract = IRarePizzasBox(rarePizzasBoxContract);
         }
+
+        _contractURI = 'https://raw.githubusercontent.com/PizzaDAO/pizza-smartcontract/master/data/opensea_pizza_metadata.mainnet.json';
     }
 
     // IOpenSeaCompatible
     function contractURI() public view virtual override returns (string memory) {
         // Metadata provided via github link so that it can be updated or modified
-        return
-            'https://raw.githubusercontent.com/PizzaDAO/pizza-smartcontract/master/data/opensea_pizza_metadata.mainnet.json';
+        return _contractURI;
     }
 
     // IRarePizzas
@@ -109,17 +116,8 @@ contract RarePizzas is
     }
 
     function purchase() public payable virtual override nonReentrant {
-        require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY, 'exceeds supply.');
-
-        // purchase a box
-
-        // TODO: verify that this method works
+        // redirect to the box contract
         _rarePizzasBoxContract.purchase();
-
-        // get the last token id of the owner and redeem it
-        uint256 balance = _rarePizzasBoxContract.balanceOf(msg.sender);
-        uint256 boxTokenId = _rarePizzasBoxContract.tokenOfOwnerByIndex(msg.sender, balance);
-        _redeemRarePizzasBox(msg.sender, boxTokenId);
     }
 
     // IOrderAPICallback
@@ -130,7 +128,9 @@ contract RarePizzas is
         require(_renderRequests[request] != address(0), 'valid request must exist');
 
         address requestor = _renderRequests[request];
-        _internalMintPizza(requestor, result);
+        uint256 boxTokenId = _renderTokenIds[request];
+
+        _internalMintPizza(requestor, boxTokenId, result);
     }
 
     // IERC721 Overrides
@@ -157,6 +157,10 @@ contract RarePizzas is
         _redeemRarePizzasBox(boxOwner, boxTokenId);
     }
 
+    function setContractURI(string memory URI) external virtual override onlyOwner {
+        _contractURI = URI;
+    }
+
     function setOrderAPIClient(address orderAPIClient) public virtual override onlyOwner {
         address previous = address(_orderAPIClient);
         _orderAPIClient = IOrderAPIConsumer(orderAPIClient);
@@ -181,17 +185,23 @@ contract RarePizzas is
         emit InternalArtworkAssigned(tokenId, artworkURI);
     }
 
-    function _getNextPizzaTokenId() internal view virtual returns (uint256) {
-        return totalSupply();
+    function _getPizzaTokenId(uint256 boxTokenId) internal view virtual returns (uint256) {
+        // TODO: add pizza DNA?
+        return boxTokenId;
     }
 
-    function _externalMintPizza(address requestor) internal virtual {
+    function _externalMintPizza(address requestor, uint256 boxTokenId) internal virtual {
         bytes32 requestId = _orderAPIClient.executeRequest(requestor);
         _renderRequests[requestId] = requestor;
+        _renderTokenIds[requestId] = boxTokenId;
     }
 
-    function _internalMintPizza(address requestor, bytes32 artwork) internal virtual {
-        uint256 id = _getNextPizzaTokenId();
+    function _internalMintPizza(
+        address requestor,
+        uint256 boxTokenId,
+        bytes32 artwork
+    ) internal virtual {
+        uint256 id = _getPizzaTokenId(boxTokenId);
         _safeMint(requestor, id);
         _assignPizzaArtwork(id, artwork);
     }
@@ -200,7 +210,6 @@ contract RarePizzas is
         require(_redeemedBoxTokenAddress[boxTokenId] == address(0), 'box already redeemed');
         _redeemedBoxTokenAddress[boxTokenId] = requestor;
 
-        // Call the render api
-        _externalMintPizza(requestor);
+        _externalMintPizza(requestor, boxTokenId);
     }
 }
