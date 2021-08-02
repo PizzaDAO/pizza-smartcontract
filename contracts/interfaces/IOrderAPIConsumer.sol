@@ -25,7 +25,7 @@ interface IOrderAPIConsumerAdmin {
     /**
      * Set the job id
      */
-    function setJobId(bytes32 jobId) external;
+    function setJobId(string memory jobId) external;
 
     /**
      * Set the fee for executing the job

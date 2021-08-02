@@ -28,7 +28,7 @@ interface IOrderAPIConsumerAdmin {
     /**
      * Set the job id
      */
-    function setJobId(bytes32 jobId) external;
+    function setJobId(string memory jobId) external;
 
     /**
      * Set the fee for executing the job
@@ -47,25 +47,21 @@ contract OrderAPIConsumer is Ownable, ChainlinkClient, IOrderAPIConsumer, IOrder
 
     event FulfillResponse(bytes32 requestId, bytes32 result);
 
-    /**
-     * Network: Kovan
-     * Oracle: 0x2f90A6D021db21e1B2A077c5a37B3C7E75D15b7e
-     * Job ID: 29fa9aa13bf1468788b7cc4a500a45b8
-     * Fee: 0.1 * 10**18; // 0.1 LINK
-     */
     constructor(
         address link,
         address oracle,
         address callback,
-        bytes32 jobId,
+        string memory jobId,
         uint256 fee
     ) public Ownable() {
         setChainlinkToken(link);
         setChainlinkOracle(oracle);
 
-        _callback = IOrderAPICallback(callback);
-        _jobId = jobId;
-        _fee = fee;
+        if (callback != address(0)) {
+            _callback = IOrderAPICallback(callback);
+        }
+        setJobId(jobId);
+        _fee = fee; //0.1 * 10**18; // 0.1 LINK
     }
 
     // IOrderAPIConsumer
@@ -97,9 +93,9 @@ contract OrderAPIConsumer is Ownable, ChainlinkClient, IOrderAPIConsumer, IOrder
         emit CallbackUpdated(previous, address(_callback));
     }
 
-    function setJobId(bytes32 jobId) public override onlyOwner {
+    function setJobId(string memory jobId) public override onlyOwner {
         bytes32 previous = _jobId;
-        _jobId = jobId;
+        _jobId = _stringToBytes32(jobId);
         emit JobIdUpdated(previous, _jobId);
     }
 
@@ -107,5 +103,16 @@ contract OrderAPIConsumer is Ownable, ChainlinkClient, IOrderAPIConsumer, IOrder
         uint256 previous = _fee;
         _fee = fee;
         emit FeeUpdated(previous, _fee);
+    }
+
+    function _stringToBytes32(string memory source) internal pure returns (bytes32 result) {
+        bytes memory _b = bytes(source);
+        if (_b.length == 0) {
+            return 0x0;
+        }
+
+        assembly {
+            result := mload(add(source, 32))
+        }
     }
 }
