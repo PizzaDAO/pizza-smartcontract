@@ -6,7 +6,8 @@ For Laszlo!
 - Clone Repository
 
 ```
-git clone git@github.com:PizzaDAO/pizza-smartcontract.git && cd pizza-smartcontract
+git clone git@github.com:PizzaDAO/pizza-smartcontract.git
+cd pizza-smartcontract
 ```
 - Install dependencies
 
