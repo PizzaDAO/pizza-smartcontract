@@ -3,6 +3,7 @@
 pragma solidity ^0.6.6;
 
 import '@openzeppelin/contracts/access/Ownable.sol';
+import '@openzeppelin/contracts/utils/Address.sol';
 import '@chainlink/contracts/src/v0.6/ChainlinkClient.sol';
 
 interface IOrderAPIConsumer {
@@ -37,6 +38,8 @@ interface IOrderAPIConsumerAdmin {
 }
 
 contract OrderAPIConsumer is Ownable, ChainlinkClient, IOrderAPIConsumer, IOrderAPIConsumerAdmin {
+    using Address for address;
+
     IOrderAPICallback private _callback;
     bytes32 private _jobId;
     uint256 private _fee;
@@ -79,7 +82,8 @@ contract OrderAPIConsumer is Ownable, ChainlinkClient, IOrderAPIConsumer, IOrder
     // IOrderAPICallback
 
     function fulfillResponse(bytes32 requestId, bytes32 result) public recordChainlinkFulfillment(requestId) {
-        if (address(_callback) != address(0)) {
+        // only invoke the callback if it is set properly
+        if (address(_callback) != address(0) && isContract(_callback)) {
             _callback.fulfillResponse(requestId, result);
         }
         emit FulfillResponse(requestId, result);

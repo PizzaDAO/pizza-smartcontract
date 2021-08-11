@@ -93,8 +93,8 @@ contract RarePizzas is
     }
 
     function redeemRarePizzasBox(uint256 boxTokenId) public override nonReentrant {
-        require(msg.sender == _rarePizzasBoxContract.ownerOf(boxTokenId), 'caller must own box');
-        _redeemRarePizzasBox(msg.sender, boxTokenId);
+        require(_msgSender() == _rarePizzasBoxContract.ownerOf(boxTokenId), 'caller must own box');
+        _redeemRarePizzasBox(_msgSender(), boxTokenId);
     }
 
     // IRarePizzasBox overrides
@@ -124,7 +124,7 @@ contract RarePizzas is
 
     function fulfillResponse(bytes32 request, bytes32 result) public virtual override {
         // TODO: verify should expect the client and not the EOA of the node
-        require(msg.sender == address(_orderAPIClient), 'caller not order api');
+        require(_msgSender() == address(_orderAPIClient), 'caller not order api');
         require(_renderRequests[request] != address(0), 'valid request must exist');
 
         address requestor = _renderRequests[request];
