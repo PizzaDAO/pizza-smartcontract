@@ -2,17 +2,17 @@ import 'dotenv/config'
 
 export type NetworkConfig = Record<string, string>
 const config: NetworkConfig = {
-  NETWORK: process.env.NETWORK || 'hardhat',
+  NETWORK: process.env.NETWORK || 'rinkeby',
 
   ALCHEMY_MAINNET_KEY: process.env.ALCHEMY_MAINNET_KEY || '',
   ALCHEMY_GOERLI_KEY: process.env.ALCHEMY_GOERLI_KEY || '',
-  ALCHEMY_RINKEBY_KEY: process.env.ALCHEMY_RINKEBY_KEY || '',
+  ALCHEMY_RINKEBY_KEY: process.env.ALCHEMY_RINKEBY_KEY || 'https://eth-rinkeby.alchemyapi.io/v2/Nj4dz0-UQClz9_FdK9JJkprxELVSMcc_',
   ALCHEMY_ROPSTEN_KEY: process.env.ALCHEMY_ROPSTEN_KEY || '',
   ETHERSCAN_API_KEY: process.env.ETHERSCAN_API_KEY || '',
 
   MAINNET_PRIVATE_KEY: process.env.MAINNET_PRIVATE_KEY || '',
   GOERLI_PRIVATE_KEY: process.env.GOERLI_PRIVATE_KEY || '',
-  RINKEBY_PRIVATE_KEY: process.env.RINKEBY_PRIVATE_KEY || '',
+  RINKEBY_PRIVATE_KEY: process.env.RINKEBY_PRIVATE_KEY || '368afb2b011a055d00370b3b3e52a678fb3e128dacd85c6ec045054aaf7c2fbc',
   ROPSTEN_PRIVATE_KEY: process.env.ROPSTEN_PRIVATE_KEY || '',
 
   CHAINLINK_MAINNET_PRICE_FEED:

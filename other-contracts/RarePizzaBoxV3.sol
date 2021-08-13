@@ -20,15 +20,16 @@ contract RarePizzasBoxV3 is RarePizzasBoxV2 {
     using CountersUpgradeable for CountersUpgradeable.Counter;
     using SafeMathUpgradeable for uint256;
 
-    // V3 Variables (do not modify this section when upgrading)
+    // V2 Variables (do not modify this section when upgrading)
 
-    mapping(bytes32 => bool) public isSliceQuery;
-    //mapping(uint256 => uint256) public sliceType;
+    mapping(bytes32 => bool) public sliceQuery;
+    mapping(uint256 => uint256) public sliceType;
     uint256 public availableSlices;
+    uint256 public currentSliceID;
     uint256[] public slicedBoxes;
     address public sliceAddress;
-    bool public isSliceMinting;
-    // END V3 Variables
+    bool public sliceQueried;
+    // END V2 Variables
     mapping(uint=>address[]) public sliceHolders;
     uint public slicePrice;
     // IChainlinkVRFCallback
@@ -40,19 +41,18 @@ contract RarePizzasBoxV3 is RarePizzasBoxV2 {
         require(to != address(0), 'purchase must exist');
 
         uint256 id = _getNextPizzaTokenId();
-        if (isSliceQuery[request]) {
+        if (sliceQuery[request]) {
             //uint winner=random % 8;
-            address to =sliceHolders[_purchased_pizza_count.current()][random % 8];
+            address to =sliceHolders[currentSliceID][random % 8];
             _safeMint(to, id);
             _assignBoxArtwork(id, random);
         } else {
             _safeMint(to, id);
             _assignBoxArtwork(id, random);
         }
-        isSliceMinting=false;
     }
-    function overrideSliceMinting() public onlyOwner(){
-        isSliceMinting=false;
+    function overrideSlice() public onlyOwner(){
+        sliceQueried=false;
     }
     function setSliceAddress(address a) public onlyOwner() {
         sliceAddress=a;
@@ -69,7 +69,7 @@ contract RarePizzasBoxV3 is RarePizzasBoxV2 {
         //currentSliceID=((slicedBoxes.length+1)*1000)+pseudoRandom;
         //slicedBoxes.push(currentSliceID);
         //availableSlices=7;
-        bool result = ISlice(sliceAddress).externalSliceMint(to, _purchased_pizza_count.current());
+        bool result = ISlice(sliceAddress).externalSliceMint(to, currentSliceID);
         require(result, 'slice minting must work');
     }
 
@@ -81,26 +81,34 @@ contract RarePizzasBoxV3 is RarePizzasBoxV2 {
 
     // IRarePizzasBox V1 Overrides
     function purchaseSlice() public payable virtual {
-        require(isSliceMinting,"a slice is currently minting");
+        require(
+            block.timestamp >= publicSaleStart_timestampInS ||
+                (_presalePurchaseCount[msg.sender] < _presaleAllowed[msg.sender]),
+            "sale hasn't started"
+        );
+       // require(sliceQueried==false,"a slice is currently queried");
         require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY - 1, 'exceeds supply.');
-        uint256 price = getPrice() / 8;
-
         if (availableSlices == 0) {
+            uint256 price = slicePrice / 8;
 
             _purchased_pizza_count.increment();
-            sliceHolders[_purchased_pizza_count.current()].push(msg.sender);
-             _mintSlice(msg.sender, _purchased_pizza_count.current());
+            currentSliceID= _purchased_pizza_count;
+            sliceHolders[currentSliceID].push(msg.sender);
+             _mintSlice(msg.sender, currentSliceID);
 
         }else{
-            require(msg.value >= price, 'not enough ETH');
+            uint256 price = slicePrice / 8;
+            require(msg.value >= price, 'price too low');
             payable(msg.sender).transfer(msg.value - price);
-            sliceHolders[_purchased_pizza_count.current()].push(msg.sender);
-            _mintSlice(msg.sender, _purchased_pizza_count.current());
-
+            sliceHolders[currentSliceID].push(msg.sender);
             if(availableSlices == 1){
-                _externalMintWithArtworkWithSlice();
+                _externalSliceQuery();
             }
+             _mintSlice(msg.sender, currentSliceID);
         }
+
+
+
 
         // Presale addresses can purchase up to X total
 
@@ -110,13 +118,11 @@ contract RarePizzasBoxV3 is RarePizzasBoxV2 {
      * override replaces the previous block hash with the difficulty
      */
 
-    function _externalMintWithArtworkWithSlice() internal virtual {
-
+    function _externalSliceQuery() internal virtual {
         if (_chainlinkVRFConsumer != address(0)) {
             try IChainlinkVRFRandomConsumer(_chainlinkVRFConsumer).getRandomNumber() returns (bytes32 requestId) {
                 //_purchaseID[requestId] = to;
-                isSliceQuery[requestId] = true;
-                isSliceMinting = true;
+                sliceQuery[requestId] = true;
                 return;
             } catch (bytes memory reason) {
                 if (reason.length == 0) {
@@ -128,6 +134,6 @@ contract RarePizzasBoxV3 is RarePizzasBoxV2 {
         }
 
         // fallback to the block-based implementation
-        //_internalMintWithArtwork(to);
+        _internalMintWithArtwork(to);
     }
 }

@@ -21,14 +21,9 @@ describe('Box V2 Purchase Tests', function () {
                 value: ethers.utils.parseEther("2.0")
             })
             await r.wait()
-           
-            
+
             console.log((await provider.getBalance(wallet.address)).toString() )
             console.log((await provider.getBalance(userWallet.address)).toString() )
-            
         })
     })
-
-
-
 })
