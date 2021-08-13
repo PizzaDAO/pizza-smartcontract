@@ -41,19 +41,19 @@ contract RarePizzasBox is
 
     uint256 public constant MAX_TOKEN_SUPPLY = 10000;
     uint256 public constant MAX_MINTABLE_SUPPLY = 1250;
-    uint256 public constant MAX_PURCHASABLE_SUPPLY = 8750;
+    uint256 public constant MAX_PURCHASABLE_SUPPLY = 8750; //max purchasable supply
 
-    uint256 public publicSaleStart_timestampInS;
-    uint256 public bitcoinPriceInWei;
+    uint256 public publicSaleStart_timestampInS;      //public sale start time
+    uint256 public bitcoinPriceInWei;  //price of 1 bitcoin in wei
 
     string public constant _uriBase = 'https://ipfs.io/ipfs/';
 
-    address internal _chainlinkBTCETHFeed;
+    address internal _chainlinkBTCETHFeed;  //chainlink's BTCETH price feed
 
     CountersUpgradeable.Counter public _minted_pizza_count;
     CountersUpgradeable.Counter public _purchased_pizza_count;
 
-    mapping(uint256 => uint256) internal _tokenBoxArtworkURIs;
+    mapping(uint256 => uint256) internal _tokenBoxArtworkURIs;   //IPFS links to tokenbox artwork, arranged by ID from 0 to 100
 
     mapping(address => uint256) internal _presaleAllowed;
     mapping(address => uint256) internal _presalePurchaseCount;
@@ -72,7 +72,7 @@ contract RarePizzasBox is
         __ERC721_init('Rare Pizza Box', 'ZABOX');
 
         // Date and time (GMT): Set to PI
-        publicSaleStart_timestampInS = 3141592653;
+        publicSaleStart_timestampInS = 3141592653;      //public sale start time, pi day
         // starting value:  31.00 ETH
         bitcoinPriceInWei = 31000000000000000000;
 

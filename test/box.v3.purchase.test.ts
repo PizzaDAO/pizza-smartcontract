@@ -28,12 +28,12 @@ describe('Box V3 Purchase Tests', function () {
     beforeEach(async () => {
         const [wallet, userWallet] = new MockProvider().getWallets()
         const RandomConsumer = await ethers.getContractFactory('FakeRandomConsumer')
-        const Box = await ethers.getContractFactory('RarePizzasBoxV2')
+        const BoxV2 = await ethers.getContractFactory('RarePizzasBoxV2')
         const BoxV3 = await ethers.getContractFactory('RarePizzasBoxV3')
-        const box = await Box.deploy()
+        const boxV2 = await BoxV2.deploy()
         const boxV3 = await BoxV3.deploy()
         const Slices = await ethers.getContractFactory('slice1155')
-        
+
 
         // use KOVAN contract info for out tests so its clear whats happening
         // and add our V2 callback contract
@@ -51,7 +51,7 @@ describe('Box V3 Purchase Tests', function () {
         await box.setSaleStartTimestamp(1609459200)
 
         // set up the consumer to the mock contract
-        await box.setVRFConsumer(random.address)
+        await box.setVRFCo nsumer(random.address)
         await boxV3.setSaleStartTimestamp(1609459200)
 
         await boxV3.setVRFConsumer(random.address)
@@ -94,20 +94,20 @@ describe('Box V3 Purchase Tests', function () {
                 await random.fulfillRandomnessWrapper(testHash, randomNumber('31' + 2, 256, 512))
 
                 price = await boxV3.getPrice()
-                
+
                 await boxV3.purchaseSlice({ value: price.div(8) })
                 let receipt=await random.fulfillRandomnessWrapper(testHash, randomNumber('31' + 3, 256, 512))
                 console.log(await receipt.wait())
                 price = await boxV3.getPrice()
                 for (let i = 0; i < boxBuyers; i++) {
-                    
-                    
+
+
                     await boxV3.purchaseSlice({ value: price.div(8) })
-                    
-                   
+
+
                     console.log(await boxV3.availableSlices())
                     console.log(await boxV3.currentSliceID())
-                    
+
                 }
                 await boxV3.purchaseSlice({ value: price.div(8) })
                 await expect(boxV3.purchaseSlice({ value: price.div(8) })).to.be.revertedWith('a slice is currently queried');
@@ -118,5 +118,5 @@ describe('Box V3 Purchase Tests', function () {
             })
         })
     })
-   
+
 })
