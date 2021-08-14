@@ -10,14 +10,13 @@ interface RarePizzas is IERC721Upgradeable{
     function getPrice() external view returns(uint);
 }
 
-contract slice1155 is ERC1155Upgradeable {
+contract sliceReservations is ERC1155Upgradeable {
 
     address public rarePizzas;
 
-  
+
     constructor(address pizzas) public  {
         __ERC1155_init("pizza slices");
-            
         rarePizzas=pizzas;
     }
     function externalSliceMint(address to, uint256 id) external returns (bool){
