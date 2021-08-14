@@ -83,7 +83,7 @@ contract OrderAPIConsumer is Ownable, ChainlinkClient, IOrderAPIConsumer, IOrder
 
     function fulfillResponse(bytes32 requestId, bytes32 result) public recordChainlinkFulfillment(requestId) {
         // only invoke the callback if it is set properly
-        if (address(_callback) != address(0) && isContract(_callback)) {
+        if (address(_callback) != address(0) && address(_callback).isContract()) {
             _callback.fulfillResponse(requestId, result);
         }
         emit FulfillResponse(requestId, result);

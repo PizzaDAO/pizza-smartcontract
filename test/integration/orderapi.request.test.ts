@@ -5,7 +5,7 @@ import { MockProvider, deployMockContract, MockContract } from 'ethereum-waffle'
 
 import config, { NetworkConfig } from '../../config'
 
-import { abi } from '../../artifacts/contracts/chainlink/OrderAPIConsumer.sol/OrderAPIConsumer.json'
+import SPEC from '../../artifacts/contracts/chainlink/OrderAPIConsumer.sol/OrderAPIConsumer.json'
 
 type TestContext = {
     box: Contract
@@ -27,7 +27,7 @@ describe.skip('Order API Consumer Rinkeby Test', function () {
 
         console.log(`Requesting from: ${wallet.address}`)
 
-        const contract = new Contract(your_deployed_contract, abi, wallet)
+        const contract = new Contract(your_deployed_contract, SPEC.abi, wallet)
 
         const requestId = await contract.executeRequest(wallet.address, {type: 0, gasLimit: 150000})
 

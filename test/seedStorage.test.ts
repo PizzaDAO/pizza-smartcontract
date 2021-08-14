@@ -32,13 +32,13 @@ describe('Box V2 Purchase Tests', function () {
         const SeedStorage = await ethers.getContractFactory('RarePizzasSeedStorage')
         const contract = await SeedStorage.deploy()
 
-        // use KOVAN contract info for out tests so its clear whats happening
+        // use RINKEBY contract info for out tests so its clear whats happening
         // and add our V2 callback contract
         const random = await RandomConsumer.deploy(
-            config.CHAINLINK_KOVAN_VRF_COORD,
-            config.CHAINLINK_KOVAN_TOKEN,
-            config.CHAINLINK_KOVAN_VRF_KEY_HASH,
-            config.CHAINLINK_KOVAN_VRF_FEE,
+            config.CHAINLINK_RINKEBY_VRF_COORD,
+            config.CHAINLINK_RINKEBY_TOKEN,
+            config.CHAINLINK_RINKEBY_VRF_KEY_HASH,
+            config.CHAINLINK_RINKEBY_VRF_FEE,
             contract.address)
 
         // Initialize to set owner, since not deployed via proxy

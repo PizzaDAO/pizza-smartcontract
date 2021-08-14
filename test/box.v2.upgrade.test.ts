@@ -17,10 +17,10 @@ let testContext: TestContext
 let getKovanRandomConsumer = async (box: Contract) => {
     const RandomConsumer = await ethers.getContractFactory('FakeRandomConsumer')
     return await RandomConsumer.deploy(
-        config.CHAINLINK_KOVAN_VRF_COORD,
-        config.CHAINLINK_KOVAN_TOKEN,
-        config.CHAINLINK_KOVAN_VRF_KEY_HASH,
-        config.CHAINLINK_KOVAN_VRF_FEE,
+        config.CHAINLINK_RINKEBY_VRF_COORD,
+        config.CHAINLINK_RINKEBY_TOKEN,
+        config.CHAINLINK_RINKEBY_VRF_KEY_HASH,
+        config.CHAINLINK_RINKEBY_VRF_FEE,
         box.address)
 }
 
