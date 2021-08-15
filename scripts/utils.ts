@@ -7,6 +7,7 @@ import boxContract from '../artifacts/contracts/token/RarePizzasBox.sol/RarePizz
 import boxContractV2 from '../artifacts/contracts/token/RarePizzasBoxV2.sol/RarePizzasBoxV2.json'
 import randomConsumer from '../artifacts/contracts/random/RandomConsumer.sol/RandomConsumer.json'
 import seedStorage from '../artifacts/contracts/data/RarePizzasSeedStorage.sol/RarePizzasSeedStorage.json'
+import rarePizzas from '../artifacts/contracts/token/RarePizzas.sol/RarePizzas.json'
 
 const getAlchemyAPIKey = (config: NetworkConfig) => {
   const networkName = config.NETWORK.toLowerCase()
@@ -411,6 +412,31 @@ const publishBoxWeb3V2AdminAbi = () => {
 }
 
 /**
+ * Publish a truncated version of the RarePizzas ABI
+ */
+ const publishRarePizzasAbi = (proxy: Contract) => {
+  const contractInterface = {
+    contractName: rarePizzas.contractName,
+    sourceName: rarePizzas.sourceName,
+    proxy: proxy,
+    abi: [
+      rarePizzas.abi.find((i) => i.name === 'InternalArtworkAssigned'),
+      rarePizzas.abi.find((i) => i.name === 'balanceOf'),
+      rarePizzas.abi.find((i) => i.name === 'contractURI'),
+      rarePizzas.abi.find((i) => i.name === 'maxSupply'),
+      rarePizzas.abi.find((i) => i.name === 'purchase'),
+      rarePizzas.abi.find((i) => i.name === 'redeemRarePizzasBox'),
+      rarePizzas.abi.find((i) => i.name === 'redeemRarePizzasBoxForOwner'),
+      rarePizzas.abi.find((i) => i.name === 'totalSupply')
+    ],
+  }
+
+  const json = JSON.stringify(contractInterface)
+  console.log(json)
+  writeFileSync('./dist/rarePizzasAbiInterface.json', json)
+}
+
+/**
  * Publish a truncated version of the Random Conusmer Web3 Admin ABI
  */
 const publishRandomConsumerWeb3AdminAbi = () => {
@@ -509,6 +535,7 @@ const utils = {
   publishRarePizzasSeedStorageAbi: publishRarePizzasSeedStorageAbi,
   publishRandomConsumerWeb3AdminAbi: publishRandomConsumerWeb3AdminAbi,
   publishDeploymentData: publishDeploymentData,
+  publishRarePizzasAbi: publishRarePizzasAbi,
   publishRandomConsumerDeploymentData: publishRandomConsumerDeploymentData,
   publishUpgradeData: publishUpgradeData
 }

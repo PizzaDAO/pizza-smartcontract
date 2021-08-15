@@ -41,7 +41,7 @@ This is the run script for deploying the RarePizzas.sol contract with all depend
 
 - [] ensure the RAREPIZZAS_BOX_MAINNET_PROXY_ADDRESS environemnt variable is set
 
-`npx hardhat run --network rinkeby scripts/rarePizzas.deploy.v1.ts`
+`npx hardhat run --network mainnet scripts/rarePizzas.deploy.v1.ts`
 
 - [] set the RAREPIZZAS_MAINNET_PROXY_ADDRESS environment variable in the .env file
 
@@ -50,7 +50,7 @@ This is the run script for deploying the RarePizzas.sol contract with all depend
 - [] ensure the RAREPIZZAS_ORDER_API_MAINNET_ORACLE_NODE_ADDRESS environment variable is set
 - [] ensure the CHAINLINK_MAINNET_TOKEN environment variable is set
 
-`npx hardhat run --network rinkeby scripts/orderAPIOracle.deploy.ts`
+`npx hardhat run --network mainnet scripts/orderAPIOracle.deploy.ts`
 
 - [] Verify `setFulfillmentPermission` RAREPIZZAS_ORDER_API_MAINNET_ORACLE_NODE_ADDRESS is set on the contract
 - [] Call `setFulfillmentPermission` with the emergency funding address (optional)
@@ -65,7 +65,7 @@ At a high level:
 
 - Deploy the chainlink oracle with the proper configuration
 - Configure a bridge pointed to the API
-- set up the job that is expected to run. Get the job ID
+- set up the job that is expected to run. Get the job ID, inbound and outbound transfer tokens
 - come back to this repository and:
 
 - [] set the RAREPIZZAS_ORDER_API_MAINNET_JOB_ID environment variable in the .env file
@@ -79,7 +79,7 @@ At a high level:
 - [] ensure the RAREPIZZAS_ORDER_API_MAINNET_JOB_FEE environment variable is set
 - [] ensure the RAREPIZZAS_MAINNET_PROXY_ADDRESS environment variable is set
 
-`npx hardhat run --network rinkeby scripts/orderAPIConsumer.deploy.ts`
+`npx hardhat run --network mainnet scripts/orderAPIConsumer.deploy.ts`
 
 - [] set the RAREPIZZAS_ORDER_API_CONSUMER_MAINNET_CONTRACT_ADDRESS environment variable in the .env file
 - [] Call `transferOwnership` to transfer to RAREPIZZAS_MAINNET_PROXY_ADMIN_ADDRESS
@@ -89,7 +89,7 @@ At a high level:
 
 - [] ensure the RAREPIZZAS_ORDER_API_CONSUMER_MAINNET_CONTRACT_ADDRESS environment variable is set
 
-`npx hardhat run --network polygon scripts/rarePizzas.configure.v1.ts`
+`npx hardhat run --network mainnet scripts/rarePizzas.configure.v1.ts`
 
 - [] Call `transferOwnership` to transfer RAREPIZZAS_MAINNET_PROXY_ADMIN_ADDRESS
 

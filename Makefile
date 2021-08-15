@@ -18,8 +18,14 @@ deploy-random-mumbai:
 set-storage-random-mumbai:
 	npx hardhat run --network maticmum scripts/pizza.storage.setRandomConsumer.ts
 
+deploy-rarepizzas-rinkeby:
+	npx hardhat run --network rinkeby scripts/rarePizzas.deploy.v1.ts
+
 deploy-oracle-rinkeby:
 	npx hardhat run --network rinkeby scripts/orderAPIOracle.deploy.ts
 
 deploy-api-rinkeby:
 	npx hardhat run --network rinkeby scripts/orderAPIConsumer.deploy.ts
+
+rarepizzas-configure:
+	npx hardhat run --network rinkeby scripts/rarePizzas.configure.v1.ts
