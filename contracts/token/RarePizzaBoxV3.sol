@@ -81,14 +81,13 @@ contract RarePizzasBoxV3 is RarePizzasBoxV2 {
 
     // IRarePizzasBox V1 Overrides
     function purchaseSlice() public payable virtual {
-        require(isBoxMinting,"a box is currently minting");
+        require(!isBoxMinting,"a box is currently minting");
         require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY - 1, 'exceeds supply.');
-        uint256 price = getPrice() / 8;
+        uint256 price = getPrice().div(8);
 
         sliceHolders[totalSupply()].push(msg.sender);
-        _mintSlice(msg.sender, totalSupply()*10+availableSlices);
+        _mintSlice(msg.sender, totalSupply());
         sliceHolders[totalSupply()].push(msg.sender);
-
 
         require(msg.value >= price, 'not enough ETH');
         payable(msg.sender).transfer(msg.value - price);
