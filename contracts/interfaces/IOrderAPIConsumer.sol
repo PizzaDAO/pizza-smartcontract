@@ -31,4 +31,8 @@ interface IOrderAPIConsumerAdmin {
      * Set the fee for executing the job
      */
     function setFee(uint256 fee) external;
+
+    function withdrawLink() external;
+
+    function withdraw() external;
 }

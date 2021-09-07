@@ -27,5 +27,8 @@ deploy-oracle-rinkeby:
 deploy-api-rinkeby:
 	npx hardhat run --network rinkeby scripts/orderAPIConsumer.deploy.ts
 
-rarepizzas-configure:
+configure-rarepizzas-rinkeby:
 	npx hardhat run --network rinkeby scripts/rarePizzas.configure.v1.ts
+
+verify-rarepizzas-rinkeby:
+	npx hardhat verify --contract contracts/token/RarePizzas.sol:RarePizzas --network rinkeby 0x602b70c390198ad0a52ba06a5b15a52bed36698d

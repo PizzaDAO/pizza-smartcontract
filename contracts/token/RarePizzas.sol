@@ -33,6 +33,9 @@ contract RarePizzas is
     using CountersUpgradeable for CountersUpgradeable.Counter;
     using SafeMathUpgradeable for uint256;
 
+    bytes constant sha256MultiHash = hex'1220';
+    bytes constant ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+
     // V1 Variables (do not modify this section when upgrading)
 
     uint256 public constant MAX_TOKEN_SUPPLY = 10000;
@@ -146,7 +149,7 @@ contract RarePizzas is
         returns (string memory)
     {
         require(_exists(tokenId), 'does not exist, paisano');
-        return string(abi.encodePacked(_uriBase, _tokenPizzaArtworkURIs[tokenId]));
+        return string(abi.encodePacked(_uriBase, _base58Encode(_tokenPizzaArtworkURIs[tokenId])));
     }
 
     // IRarePizzasAdmin
@@ -173,6 +176,11 @@ contract RarePizzas is
         emit RarePizzasBoxContractUpdated(previous, address(_rarePizzasBoxContract));
     }
 
+    function setPizzaArtworkURI(uint256 tokenId, bytes32 uri) public virtual override onlyOwner {
+        _tokenPizzaArtworkURIs[tokenId] = uri;
+        emit InternalArtworkAssigned(tokenId, uri);
+    }
+
     function withdraw() public virtual override onlyOwner {
         uint256 balance = address(this).balance;
         payable(msg.sender).transfer(balance);
@@ -186,7 +194,7 @@ contract RarePizzas is
     }
 
     function _getPizzaTokenId(uint256 boxTokenId) internal view virtual returns (uint256) {
-        // TODO: add pizza DNA?
+        // TODO: pizza DNA?
         return boxTokenId;
     }
 
@@ -209,7 +217,49 @@ contract RarePizzas is
     function _redeemRarePizzasBox(address requestor, uint256 boxTokenId) internal virtual {
         require(_redeemedBoxTokenAddress[boxTokenId] == address(0), 'box already redeemed');
         _redeemedBoxTokenAddress[boxTokenId] = requestor;
-
         _externalMintPizza(requestor, boxTokenId);
+    }
+
+    function _base58Encode(bytes32 input) internal pure virtual returns (bytes memory) {
+        // based on: https://github.com/MrChico/verifyIPFS/blob/master/contracts/verifyIPFS.sol#L28
+        if (input.length == 0) return new bytes(0);
+
+        // prepend the stripped multihash values
+        bytes memory source = abi.encodePacked(sha256MultiHash, input);
+        // the ipfs hash takes up 46 characters
+        uint8[] memory digits = new uint8[](46);
+        digits[0] = 0;
+        uint8 digitlength = 1;
+        for (uint256 i = 0; i < source.length; ++i) {
+            uint256 carry = uint8(source[i]);
+            for (uint256 j = 0; j < digitlength; ++j) {
+                carry += uint256(digits[j]) * 256;
+                digits[j] = uint8(carry % 58);
+                carry = carry / 58;
+            }
+
+            while (carry > 0) {
+                digits[digitlength] = uint8(carry % 58);
+                digitlength++;
+                carry = carry / 58;
+            }
+        }
+        return _toAlphabet(_reverse(digits));
+    }
+
+    function _reverse(uint8[] memory input) internal pure virtual returns (uint8[] memory) {
+        uint8[] memory output = new uint8[](input.length);
+        for (uint256 i = 0; i < input.length; i++) {
+            output[i] = input[input.length - 1 - i];
+        }
+        return output;
+    }
+
+    function _toAlphabet(uint8[] memory indices) internal pure virtual returns (bytes memory) {
+        bytes memory output = new bytes(indices.length);
+        for (uint256 i = 0; i < indices.length; i++) {
+            output[i] = ALPHABET[indices[i]];
+        }
+        return output;
     }
 }

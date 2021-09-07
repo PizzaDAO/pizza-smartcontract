@@ -5,6 +5,7 @@ pragma solidity ^0.6.6;
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/utils/Address.sol';
 import '@chainlink/contracts/src/v0.6/ChainlinkClient.sol';
+import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
 interface IOrderAPIConsumer {
     /**
@@ -48,7 +49,7 @@ contract OrderAPIConsumer is Ownable, ChainlinkClient, IOrderAPIConsumer, IOrder
     event JobIdUpdated(bytes32 previous, bytes32 current);
     event FeeUpdated(uint256 previous, uint256 current);
 
-    event FulfillResponse(bytes32 requestId, bytes32 result);
+    event ResponseFulfilled(bytes32 requestId, bytes32 result);
 
     constructor(
         address link,
@@ -82,11 +83,15 @@ contract OrderAPIConsumer is Ownable, ChainlinkClient, IOrderAPIConsumer, IOrder
     // IOrderAPICallback
 
     function fulfillResponse(bytes32 requestId, bytes32 result) public recordChainlinkFulfillment(requestId) {
+        // The result returned is the CID decoded from Base58
+        // and truncated to include only the 32-byte digest
+        // see: https://docs.ipfs.io/concepts/content-addressing/#cid-conversion
+        emit ResponseFulfilled(requestId, result);
+
         // only invoke the callback if it is set properly
         if (address(_callback) != address(0) && address(_callback).isContract()) {
             _callback.fulfillResponse(requestId, result);
         }
-        emit FulfillResponse(requestId, result);
     }
 
     // IOrderAPIConsumerAdmin
@@ -107,6 +112,16 @@ contract OrderAPIConsumer is Ownable, ChainlinkClient, IOrderAPIConsumer, IOrder
         uint256 previous = _fee;
         _fee = fee;
         emit FeeUpdated(previous, _fee);
+    }
+
+    function withdrawLink() public onlyOwner {
+        uint256 balance = IERC20(chainlinkTokenAddress()).balanceOf(address(this));
+        IERC20(chainlinkTokenAddress()).transfer(msg.sender, balance);
+    }
+
+    function withdraw() public onlyOwner {
+        uint256 balance = address(this).balance;
+        payable(msg.sender).transfer(balance);
     }
 
     function _stringToBytes32(string memory source) internal pure returns (bytes32 result) {

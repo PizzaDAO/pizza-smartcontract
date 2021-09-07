@@ -8,6 +8,9 @@ interface IRarePizzasAdmin {
      */
     function redeemRarePizzasBoxForOwner(uint256 boxTokenId) external;
 
+    /**
+     * set the contract URI that opensea uses for collections
+     */
     function setContractURI(string memory URI) external;
 
     /**
@@ -19,6 +22,11 @@ interface IRarePizzasAdmin {
      * Set the contract for boxes
      */
     function setRarePizzasBoxContract(address boxContract) external;
+
+    /**
+     * Set the artwork for a specific tokenid (emergencies only)
+     */
+    function setPizzaArtworkURI(uint256 tokenId, bytes32 uri) external;
 
     /**
      * Withdraw ether from this contract (Callable by owner)

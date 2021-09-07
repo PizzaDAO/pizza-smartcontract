@@ -15,8 +15,8 @@ async function main() {
     console.log('Connecting to instance')
     const contract = new ethers.Contract(instanceAddress, Contract.abi, wallet);
 
-    console.log(`setOrderAPIClient: ${utils.getOrderAPIConsumerContractAddress(config))}`)
-    await contract.setOrderAPIClient(utils.getOrderAPIConsumerContractAddress(config))
+    console.log(`setOrderAPIClient: ${utils.getOrderAPIConsumerContractAddress(config)}`)
+    await contract.setOrderAPIClient(utils.getOrderAPIConsumerContractAddress(config), {type: 0, gasLimit: 120000})
 
     console.log('complete')
 }
