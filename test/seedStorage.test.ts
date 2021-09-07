@@ -24,7 +24,7 @@ type TestContext = {
 const MAX_NUMBER_OF_BOXES = 10 * 1000
 let testContext: TestContext
 
-describe('Box V2 Purchase Tests', function () {
+describe('Polygon VRF Seed Storage Tests', function () {
     beforeEach(async () => {
         const [...signers] = await ethers.getSigners()
         const [wallet, userWallet] = new MockProvider().getWallets()

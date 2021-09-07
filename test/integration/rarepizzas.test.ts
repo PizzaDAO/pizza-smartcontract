@@ -36,7 +36,7 @@ describe.skip('Rare Pizzas Rinkeby Integration Tests', function () {
 
         await contract.redeemRarePizzasBox(548, {type: 0, gasLimit: 2500000})
 
-        // sleep for some time
+        // TODO: sleep for some time
 
         // check the result event
 

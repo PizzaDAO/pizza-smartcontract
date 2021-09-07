@@ -70,6 +70,7 @@ contract OrderAPIConsumer is Ownable, ChainlinkClient, IOrderAPIConsumer, IOrder
 
     // IOrderAPIConsumer
 
+    // TODO: add the token id and the recipe type to the interface
     function executeRequest(address requestor) public override returns (bytes32 requestId) {
         // TODO: prevent other folks from calling this besides our contract
         // possibly: set the fee arbitrarily high

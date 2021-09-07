@@ -33,29 +33,21 @@ contract RarePizzas is
     using CountersUpgradeable for CountersUpgradeable.Counter;
     using SafeMathUpgradeable for uint256;
 
+    event RarePizzasBoxContractUpdated(address previous, address current);
+    event OrderAPIClientUpdated(address previous, address current);
+    event InternalArtworkAssigned(uint256 tokenId, bytes32 artworkURI);
+
     bytes constant sha256MultiHash = hex'1220';
     bytes constant ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 
     // V1 Variables (do not modify this section when upgrading)
 
-    uint256 public constant MAX_TOKEN_SUPPLY = 10000;
-    uint256 public constant MAX_MINTABLE_SUPPLY = 1250;
-    uint256 public constant MAX_PURCHASABLE_SUPPLY = 8750;
-
     string public constant _uriBase = 'ipfs://';
-
     string private _contractURI;
 
     // Other contracts this contract interacts with
     IOrderAPIConsumer internal _orderAPIClient;
     IRarePizzasBox internal _rarePizzasBoxContract;
-
-    CountersUpgradeable.Counter public _minted_pizza_count;
-    CountersUpgradeable.Counter public _purchased_pizza_count;
-
-    event RarePizzasBoxContractUpdated(address previous, address current);
-    event OrderAPIClientUpdated(address previous, address current);
-    event InternalArtworkAssigned(uint256 tokenId, bytes32 artworkURI);
 
     // A collection of Box Token Id's that have been redeemed
     mapping(uint256 => address) internal _redeemedBoxTokenAddress;
@@ -80,13 +72,19 @@ contract RarePizzas is
             _rarePizzasBoxContract = IRarePizzasBox(rarePizzasBoxContract);
         }
 
+        // TODO: update with real value
         _contractURI = 'https://raw.githubusercontent.com/PizzaDAO/pizza-smartcontract/master/data/opensea_pizza_metadata.mainnet.json';
     }
 
     // IOpenSeaCompatible
+
     function contractURI() public view virtual override returns (string memory) {
         // Metadata provided via github link so that it can be updated or modified
         return _contractURI;
+    }
+
+    function setContractURI(string memory URI) external virtual override onlyOwner {
+        _contractURI = URI;
     }
 
     // IRarePizzas
@@ -102,6 +100,8 @@ contract RarePizzas is
 
     // IRarePizzasBox overrides
 
+    // redirect to the box contract
+
     function getBitcoinPriceInWei() public view virtual override returns (uint256) {
         return _rarePizzasBoxContract.getBitcoinPriceInWei();
     }
@@ -115,18 +115,16 @@ contract RarePizzas is
     }
 
     function maxSupply() public view virtual override returns (uint256) {
-        return MAX_TOKEN_SUPPLY;
+        return _rarePizzasBoxContract.maxSupply();
     }
 
     function purchase() public payable virtual override nonReentrant {
-        // redirect to the box contract
         _rarePizzasBoxContract.purchase();
     }
 
     // IOrderAPICallback
 
     function fulfillResponse(bytes32 request, bytes32 result) public virtual override {
-        // TODO: verify should expect the client and not the EOA of the node
         require(_msgSender() == address(_orderAPIClient), 'caller not order api');
         require(_renderRequests[request] != address(0), 'valid request must exist');
 
@@ -138,9 +136,6 @@ contract RarePizzas is
 
     // IERC721 Overrides
 
-    /**
-     * @dev See {IERC721Metadata-tokenURI}.
-     */
     function tokenURI(uint256 tokenId)
         public
         view
@@ -158,10 +153,6 @@ contract RarePizzas is
         address boxOwner = _rarePizzasBoxContract.ownerOf(boxTokenId);
         require(boxOwner != address(0), 'box token must exist');
         _redeemRarePizzasBox(boxOwner, boxTokenId);
-    }
-
-    function setContractURI(string memory URI) external virtual override onlyOwner {
-        _contractURI = URI;
     }
 
     function setOrderAPIClient(address orderAPIClient) public virtual override onlyOwner {
