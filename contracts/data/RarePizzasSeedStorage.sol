@@ -49,6 +49,9 @@ contract RarePizzasSeedStorage is OwnableUpgradeable, IChainlinkVRFCallback, IRa
 
     // TODO: add to an interface
 
+    // Get a random number from chainlink VRF.
+    // note this function expects a job id and explicitly allows
+    // the same job id to be submitted more than once
     function getRandomNumber(bytes32 jobId) external virtual {
         require(msg.sender == _authorizedRequestor, 'caller not authorized');
 

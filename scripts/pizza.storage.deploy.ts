@@ -10,7 +10,7 @@ async function main() {
     console.log('Preparing RarePizzasSeedStorage with the account:', deployer.address)
     console.log('Account balance:', (await deployer.getBalance()).toString())
 
-    // we get the chgainlink VRF to deploy
+    // we get the contract to deploy
     const Contract = await ethers.getContractFactory('RarePizzasSeedStorage')
     const Proxy = await upgrades.deployProxy(
         Contract, [utils.getStorageProxyAuthorizedRequestorAddress(config)]
