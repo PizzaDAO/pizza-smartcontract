@@ -7,7 +7,7 @@ import '@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol';
 
 import './RarePizzasBoxV2.sol';
-
+import 'hardhat/console.sol';
 import '../interfaces/IChainlinkVRFRandomConsumer.sol';
 import '../interfaces/IRarePizzasBoxV2Admin.sol';
 
@@ -18,7 +18,7 @@ contract RarePizzasBoxV3 is RarePizzasBoxV2 {
     bytes32 batchMintRequest;
     uint256 public batchMintRandom;
     address[] batchMintUsers;
-    batchMintStatus status;
+    batchMintStatus public status;
     enum batchMintStatus {
         OPEN,
         QUEUED,
@@ -49,11 +49,19 @@ contract RarePizzasBoxV3 is RarePizzasBoxV2 {
         _queryForBatch();
     }
 
+    // 2280506
+    // 2269231
     function finishBatchMint() external onlyOwner {
-        require(status == batchMintStatus.FETCHED, 'minting has been queued');
+        require(status == batchMintStatus.FETCHED, 'random number must be fetched');
         uint256 random = batchMintRandom;
         for (uint256 i = 0; i < batchMintUsers.length; i++) {
-            _safeMint(batchMintUsers[i], (random**i) % 100);
+            //console.log((random**i) % 100, 'the box id');
+            uint256 id = _getNextPizzaTokenId();
+            _safeMint(batchMintUsers[i], id);
+            _assignBoxArtwork(id, (uint256(keccak256(abi.encode(random + i)))) % 100);
+            // _assignBoxArtwork(id, random**(i + 1) % 100);
+            // _safeMint(batchMintUsers[i], (uint256(keccak256(abi.encode(random + i)))) % 100);
+            // _safeMint(batchMintUsers[i], random**(i + 1) % 100);
         }
         status = batchMintStatus.OPEN;
     }
