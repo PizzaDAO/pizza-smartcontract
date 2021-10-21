@@ -6,7 +6,11 @@ interface IOrderAPIConsumer {
     /**
      * Call the rendering API
      */
-    function executeRequest(address requestor) external returns (bytes32 requestId);
+    function executeRequest(
+        address requestor,
+        uint256 tokenId,
+        uint256 recipeId
+    ) external returns (bytes32 requestId);
 }
 
 interface IOrderAPICallback {

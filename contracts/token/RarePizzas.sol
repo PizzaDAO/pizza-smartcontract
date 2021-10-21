@@ -37,10 +37,10 @@ contract RarePizzas is
     event OrderAPIClientUpdated(address previous, address current);
     event InternalArtworkAssigned(uint256 tokenId, bytes32 artworkURI);
 
+    // V1 Variables (do not modify this section when upgrading)
+
     bytes constant sha256MultiHash = hex'1220';
     bytes constant ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
-
-    // V1 Variables (do not modify this section when upgrading)
 
     string public constant _uriBase = 'ipfs://';
     string private _contractURI;
@@ -93,9 +93,27 @@ contract RarePizzas is
         return _redeemedBoxTokenAddress[boxTokenId] != address(0);
     }
 
-    function redeemRarePizzasBox(uint256 boxTokenId) public override nonReentrant {
+    function addressOfRedeemer(uint256 boxTokenId) public view override returns (address) {
+        return _redeemedBoxTokenAddress[boxTokenId];
+    }
+
+    function redeemRarePizzasBox(uint256 boxTokenId, uint256 recipeId) public override nonReentrant {
         require(_msgSender() == _rarePizzasBoxContract.ownerOf(boxTokenId), 'caller must own box');
-        _redeemRarePizzasBox(_msgSender(), boxTokenId);
+        _redeemRarePizzasBox(_msgSender(), boxTokenId, recipeId);
+    }
+
+    // Box ERC-721 redirects
+
+    function boxTotalSupply() external view override returns (uint256) {
+        return _rarePizzasBoxContract.totalSupply();
+    }
+
+    function boxTokenOfOwnerByIndex(address owner, uint256 index) external view override returns (uint256 tokenId) {
+        return _rarePizzasBoxContract.tokenOfOwnerByIndex(owner, index);
+    }
+
+    function boxBalanceOf(address owner) external view override returns (uint256 balance) {
+        return _rarePizzasBoxContract.balanceOf(owner);
     }
 
     // IRarePizzasBox overrides
@@ -124,12 +142,15 @@ contract RarePizzas is
 
     // IOrderAPICallback
 
-    function fulfillResponse(bytes32 request, bytes32 result) public virtual override {
+    // handle the callback from the order api
+    function fulfillResponse(bytes32 request, bytes32 result) public virtual override nonReentrant {
         require(_msgSender() == address(_orderAPIClient), 'caller not order api');
-        require(_renderRequests[request] != address(0), 'valid request must exist');
 
         address requestor = _renderRequests[request];
+        require(requestor != address(0), 'valid request must exist');
+
         uint256 boxTokenId = _renderTokenIds[request];
+        require(!_exists(boxTokenId), 'token already redeemed');
 
         _internalMintPizza(requestor, boxTokenId, result);
     }
@@ -149,27 +170,24 @@ contract RarePizzas is
 
     // IRarePizzasAdmin
 
-    function redeemRarePizzasBoxForOwner(uint256 boxTokenId) public virtual override onlyOwner {
-        address boxOwner = _rarePizzasBoxContract.ownerOf(boxTokenId);
-        require(boxOwner != address(0), 'box token must exist');
-        _redeemRarePizzasBox(boxOwner, boxTokenId);
-    }
-
+    // set the address of the order api client
     function setOrderAPIClient(address orderAPIClient) public virtual override onlyOwner {
         address previous = address(_orderAPIClient);
         _orderAPIClient = IOrderAPIConsumer(orderAPIClient);
         emit OrderAPIClientUpdated(previous, address(_orderAPIClient));
     }
 
+    // set the box contract address
     function setRarePizzasBoxContract(address boxContract) public virtual override onlyOwner {
         address previous = address(_rarePizzasBoxContract);
         _rarePizzasBoxContract = IRarePizzasBox(boxContract);
         emit RarePizzasBoxContractUpdated(previous, address(_rarePizzasBoxContract));
     }
 
-    function setPizzaArtworkURI(uint256 tokenId, bytes32 uri) public virtual override onlyOwner {
-        _tokenPizzaArtworkURIs[tokenId] = uri;
-        emit InternalArtworkAssigned(tokenId, uri);
+    // the multi sig can update the artwork for a pizza
+    function setPizzaArtworkURI(uint256 tokenId, bytes32 artworkURI) public virtual override onlyOwner {
+        _tokenPizzaArtworkURIs[tokenId] = artworkURI;
+        emit InternalArtworkAssigned(tokenId, artworkURI);
     }
 
     function withdraw() public virtual override onlyOwner {
@@ -189,8 +207,12 @@ contract RarePizzas is
         return boxTokenId;
     }
 
-    function _externalMintPizza(address requestor, uint256 boxTokenId) internal virtual {
-        bytes32 requestId = _orderAPIClient.executeRequest(requestor);
+    function _externalMintPizza(
+        address requestor,
+        uint256 boxTokenId,
+        uint256 recipeId
+    ) internal virtual {
+        bytes32 requestId = _orderAPIClient.executeRequest(requestor, boxTokenId, recipeId);
         _renderRequests[requestId] = requestor;
         _renderTokenIds[requestId] = boxTokenId;
     }
@@ -205,10 +227,14 @@ contract RarePizzas is
         _assignPizzaArtwork(id, artwork);
     }
 
-    function _redeemRarePizzasBox(address requestor, uint256 boxTokenId) internal virtual {
+    function _redeemRarePizzasBox(
+        address requestor,
+        uint256 boxTokenId,
+        uint256 recipeId
+    ) internal virtual {
         require(_redeemedBoxTokenAddress[boxTokenId] == address(0), 'box already redeemed');
         _redeemedBoxTokenAddress[boxTokenId] = requestor;
-        _externalMintPizza(requestor, boxTokenId);
+        _externalMintPizza(requestor, boxTokenId, recipeId);
     }
 
     function _base58Encode(bytes32 input) internal pure virtual returns (bytes memory) {

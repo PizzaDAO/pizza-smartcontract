@@ -6,7 +6,10 @@ import '@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721Enume
 import './IRarePizzasBox.sol';
 
 /**
- * Public interface for interacting with rare pizzas
+ * Public interface for interacting with rare pizzas.
+ *
+ * Since this contract is tightly coupled with the box contract,
+ * most of the functions redirect to make interacting with the app easier
  */
 interface IRarePizzas is IRarePizzasBox {
     /**
@@ -15,13 +18,29 @@ interface IRarePizzas is IRarePizzasBox {
     function isRedeemed(uint256 boxTokenId) external view returns (bool);
 
     /**
-     * Redeem a RarePizzasBox for a pizza
+     * Get the address of the user that redeemed
      */
-    function redeemRarePizzasBox(uint256 boxTokenId) external;
+    function addressOfRedeemer(uint256 boxTokenId) external view returns (address);
 
     /**
-     * Purchase a revealed pizza
-     * TODO: pass in something so we know which one, such as the matix tx hash?
+     * Redeem a RarePizzasBox for a pizza
      */
-    // TODO: function purchaseRevealed(bytes32 jobId) external payable;
+    function redeemRarePizzasBox(uint256 boxTokenId, uint256 recipeId) external;
+
+    // Box ERC-721 redirects
+
+    /**
+     * Get the total supply of boxes
+     */
+    function boxTotalSupply() external view returns (uint256);
+
+    /**
+     * Get a specific token id owned by a user
+     */
+    function boxTokenOfOwnerByIndex(address owner, uint256 index) external view returns (uint256 tokenId);
+
+    /**
+     * Get the box balance of a user
+     */
+    function boxBalanceOf(address owner) external view returns (uint256 balance);
 }

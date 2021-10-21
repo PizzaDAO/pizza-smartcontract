@@ -12,7 +12,12 @@ import '../interfaces/IRarePizzasSeedStorageAdmin.sol';
 /**
  * Contract requests random numbers from VRF and then emits them as events
  */
-contract RarePizzasSeedStorage is OwnableUpgradeable, IChainlinkVRFCallback, IRarePizzasSeedStorageAdmin {
+contract RarePizzasSeedStorage is
+    OwnableUpgradeable,
+    IChainlinkVRFCallback,
+    IRarePizzasSeedStorage,
+    IRarePizzasSeedStorageAdmin
+{
     IChainlinkVRFRandomConsumer internal _chainlinkVRFConsumer;
     address internal _authorizedRequestor;
 
@@ -38,6 +43,8 @@ contract RarePizzasSeedStorage is OwnableUpgradeable, IChainlinkVRFCallback, IRa
         require(msg.sender == address(_chainlinkVRFConsumer), 'caller not VRF');
         bytes32 jobId = _randomRequestsForJobs[request];
         require(jobId != 0, 'request must exist');
+
+        _fallbackRandomSeed = random;
         _setSeed(jobId, random);
     }
 
@@ -52,7 +59,7 @@ contract RarePizzasSeedStorage is OwnableUpgradeable, IChainlinkVRFCallback, IRa
     // Get a random number from chainlink VRF.
     // note this function expects a job id and explicitly allows
     // the same job id to be submitted more than once
-    function getRandomNumber(bytes32 jobId) external virtual {
+    function getRandomNumber(bytes32 jobId) external virtual override {
         require(msg.sender == _authorizedRequestor, 'caller not authorized');
 
         if (address(_chainlinkVRFConsumer) != address(0)) {
@@ -69,6 +76,7 @@ contract RarePizzasSeedStorage is OwnableUpgradeable, IChainlinkVRFCallback, IRa
             }
         }
 
+        // fallback
         uint256 pseudoRandom = uint256(
             keccak256(
                 abi.encodePacked(
@@ -76,8 +84,7 @@ contract RarePizzasSeedStorage is OwnableUpgradeable, IChainlinkVRFCallback, IRa
                     blockhash(block.difficulty - 1),
                     block.number,
                     jobId,
-                    _fallbackRandomSeed,
-                    msg.sender
+                    _fallbackRandomSeed
                 )
             )
         );

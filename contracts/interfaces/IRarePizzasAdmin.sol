@@ -4,11 +4,6 @@ pragma solidity ^0.8.0;
 
 interface IRarePizzasAdmin {
     /**
-     * Allow owner to redeem a box for a user
-     */
-    function redeemRarePizzasBoxForOwner(uint256 boxTokenId) external;
-
-    /**
      * set the contract URI that opensea uses for collections
      */
     function setContractURI(string memory URI) external;

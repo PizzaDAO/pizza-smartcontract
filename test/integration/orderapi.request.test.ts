@@ -29,7 +29,9 @@ describe.skip('Order API Consumer Rinkeby Test', function () {
 
         const contract = new Contract(your_deployed_contract, SPEC.abi, wallet)
 
-        const requestId = await contract.executeRequest(wallet.address, {type: 0, gasLimit: 150000})
+        const token_id = 2
+        const recipe_id = 3
+        const requestId = await contract.executeRequest(wallet.address, token_id, recipe_id, {type: 0, gasLimit: 150000})
 
         // sleep for some time
 

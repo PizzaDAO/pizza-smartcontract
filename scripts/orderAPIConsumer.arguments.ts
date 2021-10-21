@@ -3,9 +3,9 @@ import config, { NetworkConfig } from '../config'
 
 
 module.exports = [
-    utils.getChainlinkVRFCoordinator(config),
     utils.getChainlinkToken(config),
-    utils.getChainlinkVRFKeyHash(config),
-    utils.getChainlinkVRFFee(config),
-    utils.getBoxProxyAddress(config)
+    utils.getOrderAPIOracleContractAddress(config),
+    utils.getRarePizzasProxyAddress(config),
+    utils.getOrderAPIJobId(config),
+    utils.getOrderAPIJobFee(config)
 ];
