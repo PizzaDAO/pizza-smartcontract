@@ -23,6 +23,8 @@ interface IRarePizzasAdmin {
      */
     function setPizzaArtworkURI(uint256 tokenId, bytes32 uri) external;
 
+    function toggleSaleIsActive() external;
+
     /**
      * Withdraw ether from this contract (Callable by owner)
      */

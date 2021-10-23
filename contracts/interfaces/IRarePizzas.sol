@@ -12,6 +12,8 @@ import './IRarePizzasBox.sol';
  * most of the functions redirect to make interacting with the app easier
  */
 interface IRarePizzas is IRarePizzasBox {
+    function isSaleActive() external view returns (bool);
+
     /**
      * Verify if a specific box has already been redeemed
      */

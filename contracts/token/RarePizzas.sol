@@ -33,11 +33,14 @@ contract RarePizzas is
     using CountersUpgradeable for CountersUpgradeable.Counter;
     using SafeMathUpgradeable for uint256;
 
+    event SaleActive(bool state);
     event RarePizzasBoxContractUpdated(address previous, address current);
     event OrderAPIClientUpdated(address previous, address current);
     event InternalArtworkAssigned(uint256 tokenId, bytes32 artworkURI);
 
     // V1 Variables (do not modify this section when upgrading)
+
+    bool private saleIsActive;
 
     bytes constant sha256MultiHash = hex'1220';
     bytes constant ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
@@ -68,6 +71,8 @@ contract RarePizzas is
         __ReentrancyGuard_init();
         __ERC721_init('Rare Pizzas', 'PIZZA');
 
+        saleIsActive = false;
+
         if (rarePizzasBoxContract != address(0)) {
             _rarePizzasBoxContract = IRarePizzasBox(rarePizzasBoxContract);
         }
@@ -88,6 +93,9 @@ contract RarePizzas is
     }
 
     // IRarePizzas
+    function isSaleActive() external view override returns (bool) {
+        return saleIsActive;
+    }
 
     function isRedeemed(uint256 boxTokenId) public view override returns (bool) {
         return _redeemedBoxTokenAddress[boxTokenId] != address(0);
@@ -98,6 +106,7 @@ contract RarePizzas is
     }
 
     function redeemRarePizzasBox(uint256 boxTokenId, uint256 recipeId) public override nonReentrant {
+        require(saleIsActive == true, 'redeem not active');
         require(_msgSender() == _rarePizzasBoxContract.ownerOf(boxTokenId), 'caller must own box');
         _redeemRarePizzasBox(_msgSender(), boxTokenId, recipeId);
     }
@@ -190,6 +199,11 @@ contract RarePizzas is
         emit InternalArtworkAssigned(tokenId, artworkURI);
     }
 
+    function toggleSaleIsActive() public virtual override onlyOwner {
+        saleIsActive = !saleIsActive;
+        emit SaleActive(saleIsActive);
+    }
+
     function withdraw() public virtual override onlyOwner {
         uint256 balance = address(this).balance;
         payable(msg.sender).transfer(balance);
@@ -203,7 +217,6 @@ contract RarePizzas is
     }
 
     function _getPizzaTokenId(uint256 boxTokenId) internal view virtual returns (uint256) {
-        // TODO: pizza DNA?
         return boxTokenId;
     }
 
