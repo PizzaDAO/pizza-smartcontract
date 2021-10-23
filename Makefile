@@ -5,6 +5,7 @@ environment:
 
 build:
 	npx hardhat compile
+	#npx webpack
 
 test:
 	npx hardhat test
