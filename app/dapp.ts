@@ -14,7 +14,7 @@ const defaultGasLimit: number = 210000
 
 type TokenSupply = {
     existingBoxes: number
-    exisitingPizzas: number
+    existingPizzas: number
     totalBoxes: number
     totalPizzas: number
 }
@@ -31,7 +31,8 @@ type BoxToken = {
 
 type AppContext = {
     app: {
-        countTotal: TokenSupply
+        countTotal: TokenSupply,
+        price: number,
         btcPrice: number,
         ethPrice: number,
         boxSaleIsActive: boolean,
@@ -42,7 +43,7 @@ type AppContext = {
     contract: Contract | undefined,
     provider: providers.Web3Provider | undefined
     user: {
-        balance: UserBalance,
+        balance: UserBalance, // should name refactor to boxTokenBalance?
         boxTokens: BoxToken[],
         pizzaTokens: number[]
     }
@@ -55,6 +56,7 @@ type AppContext = {
 
 let state: AppContext = {
     app: {
+        price: 0,
         btcPrice: 0,
         ethPrice: 0,
         boxSaleIsActive: true,
@@ -62,7 +64,7 @@ let state: AppContext = {
         statusMessage: "",
         countTotal: {
             existingBoxes: 0,
-            exisitingPizzas: 0,
+            existingPizzas: 0,
             totalBoxes: 0,
             totalPizzas: 0
         },
@@ -74,9 +76,9 @@ let state: AppContext = {
         balance: {
             boxTokenCount: 0,
             pizzaTokenCount: 0
-        }.
+        },
         boxTokens: [],
-        pizzatokens: []
+        pizzaTokens:[]
     },
     wallet: {
         address: undefined,
@@ -114,54 +116,57 @@ const DOM = {
 
         // Header
         if (context.app.pizzaSaleIsActive) {
-            DOM.fields.dappHeader.innerHTML = "Redeem Pizza"
+            DOM.labels.dappHeader.innerHTML = "Redeem Pizza"
         }  else {
-            DOM.fields.dappHeader.innerHTML = "Pizza redemption coming soon!"
+            DOM.labels.dappHeader.innerHTML = "Pizza redemption coming soon!"
         }
         
         // connect button
         if (context.wallet.address && context.wallet.contract) {
             const rhs = context.wallet.address.length - 4
-            DOM.fields.connectLabel.innerHTML = `${context.wallet.address.substr(0, 5)}...${context.wallet.address.substr(rhs, 4)}`
+            DOM.labels.connectLabel.innerHTML = `${context.wallet.address.substr(0, 5)}...${context.wallet.address.substr(rhs, 4)}`
             DOM.buttons.connect.innerHTML = "CONNECTED"
            
         } else {
-            DOM.fields.connectLabel.innerHTML = "Connect Wallet:"
+            DOM.labels.connectLabel.innerHTML = "Connect Wallet:"
             DOM.buttons.connect.innerHTML = "CONNECT"
             
         }
 
         // availability
-        if (context.app.countTotal.box === 0) {
-            DOM.fields.remaining.innerHTML = "????"
+        //
+        // is this available boxes or pizzas to mint?
+        //
+        if (context.app.countTotal.totalBoxes === 0) {
+            DOM.labels.remaining.innerHTML = "????"
         } else {
-            const remaining = context.app.countTotal.maxMintableSupply - context.app.countTotal.totalSupply
+            const remaining = context.app.countTotal.totalBoxes - context.app.countTotal.existingBoxes
             // accounting for the admin holdover
             // TODO: this may not be completetly accurate
             // since we may mint some throughout the period.
             if (remaining <= 1) {
-                DOM.fields.remaining.innerHTML = `0`
+                DOM.labels.remaining.innerHTML = `0`
             } else {
-                DOM.fields.remaining.innerHTML = `${remaining}`
+                DOM.labels.remaining.innerHTML = `${remaining}`
             }
             
         }
 
-        // Pizzas redeemed
-        // add data about pizzaredemptions
+        // // Pizzas redeemed
+        // // add data about pizzaredemptions
 
-        // quantity
-        if (context.app.saleIsActive) {
-            DOM.fields.quantityLabel.innerHTML = "Max Quantity: 20"
-        } else {
-            DOM.fields.quantityLabel.innerHTML = "Sale is not Active"
-        }
+        // // quantity
+        // if (context.app.pizzaSaleIsActive) {
+        //     DOM.labels.quantityLabel.innerHTML = "Max Quantity: 20"
+        // } else {
+        //     DOM.labels.quantityLabel.innerHTML = "Sale is not Active"
+        // }
 
         // error
         if (context.app.statusMessage != "") {
-            DOM.fields.errorLabel.innerHTML = context.app.statusMessage
+            DOM.labels.errorLabel.innerHTML = context.app.statusMessage
         } else {
-            DOM.fields.errorLabel.innerHTML = ""
+            DOM.labels.errorLabel.innerHTML = ""
         }
 
         // buy button
@@ -243,6 +248,8 @@ const actions = {
             const price = await state.contract?.getPrice()
             state.app.price = price
 
+            const quantity = 1;//DOM
+
             const amount = price.mul(quantity)
             const gasLimit = defaultGasLimit * quantity
 
@@ -304,12 +311,12 @@ const actions = {
             if (!actions.contract.isConnected()) {
                 return
             }
-            // TODO: pizza sale state
+            // TODO: pizza sale state (??)
             const presaleActive = await state.contract?.presaleIsActive()
-            state.app.presaleIsActive = presaleActive
+            state.app.boxSaleIsActive = presaleActive
 
             const saleActive = await state.contract?.saleIsActive()
-            state.app.saleIsActive = saleActive
+            state.app.pizzaSaleIsActive = saleActive
 
             console.log(`refreshSaleState: presaleIsActive ${presaleActive} saleActive ${saleActive}`)
             DOM.refreshState(state)
@@ -319,16 +326,33 @@ const actions = {
                 return
             }
             console.log("refresh supply")
-            const maxMintableSupply = await state.contract?.maxMintableSupply()
-            const maxAdminSupply = await state.contract?.maxAdminSupply()
-            const totalSupply = await state.contract?.totalSupply()
-            console.log(`maxSupply: ${maxMintableSupply} maxAdminSupply: ${maxAdminSupply} totalSupply: ${totalSupply}`)
-
+            //const maxMintableSupply = await state.contract?.maxMintableSupply()
+            //const maxAdminSupply = await state.contract?.maxAdminSupply()
+            const maxSupply = await state.contract?.maxSupply()
+            const boxTotalSupply = await state.contract?.boxTotalSupply()
+            console.log(`maxSupply: ${maxSupply} boxTotalSupply: ${boxTotalSupply}`)
+            const existingBoxes = await state.contract?
+            // what are the semantics here?
+            // state.app.countTotal looks like four numbers
+            // { existingBoxes, existingPizzas, totalBoxes, totalPizzas }
+            // state.app.countTotal is also a TokenSupply type which is
+            // type TokenSupply = {
+            // existingBoxes: number
+            // exisitingPizzas: number
+            // totalBoxes: number
+            // totalPizzas: number
+            // }
+            // how do these reconcile??
             state.app.countTotal = {
-                maxMintableSupply: maxMintableSupply,
-                maxAdminSupply: maxAdminSupply,
-                totalSupply: totalSupply
+                //maxMintableSupply: maxMintableSupply,
+                //maxAdminSupply: maxAdminSupply,
+                existingBoxes: 0,
+                existingPizzas: 0,
+                totalBoxes: boxTotalSupply,
+                totalPizzas: 0
             }
+
+            //not sure what's wrong here
             DOM.refreshState(state)
         },
         
@@ -424,17 +448,23 @@ const actions = {
                 return
             }
             console.log("refresh balance")
-            const token_balance = await state.wallet.contract?.balanceOf(state.wallet.address)
-            console.log(`token_balance: ${token_balance}`)
-
+            // seems we only have boxTokenBalance available
+            // I don't know if this 'balance' is a count of tokens or some other measure
+            // The contract code says 'Get the box balance of a user' — is that a $ value or a cardinal value?
+            const boxTokenBalance = await state.wallet.contract?.boxBalanceOf(state.wallet.address)
+            console.log(`boxTokenBalance: ${boxTokenBalance}`)
+            // ???
             state.user.balance = {
-                tokenCount: token_balance,
+                boxTokenCount: boxTokenBalance,
+                pizzaTokenCount: 0
+                //tokenCount: token_balance,
             }
             DOM.refreshState(state)
         },
         resetBalances: async () => {
             state.user.balance = {
-                tokenCount: 0
+                boxTokenCount: 0,
+                pizzaTokenCount: 0
             }
             await actions.contract.refreshContract()
         }
