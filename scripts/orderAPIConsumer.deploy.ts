@@ -15,9 +15,12 @@ async function main() {
     const contract = await Contract.deploy(
         utils.getChainlinkToken(config),
         utils.getOrderAPIOracleContractAddress(config),
+        utils.getOrderApiConsumerAuthorizedRequestorAddress(config),
         utils.getRarePizzasProxyAddress(config),
         utils.getOrderAPIJobId(config),
         utils.getOrderAPIJobFee(config))
+
+    // TODO: fund with link?
 
     console.log('OderAPIConsumer:', contract)
     // TODO: distro stuff

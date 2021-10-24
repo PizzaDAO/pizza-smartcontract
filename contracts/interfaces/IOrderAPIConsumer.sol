@@ -21,6 +21,8 @@ interface IOrderAPICallback {
 }
 
 interface IOrderAPIConsumerAdmin {
+    function setAuthorizedRequestor(address requestor) external;
+
     /**
      * set the callback address used by the consumer
      */

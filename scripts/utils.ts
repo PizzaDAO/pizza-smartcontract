@@ -315,6 +315,17 @@ const getStorageProxyAuthorizedRequestorAddress = (config: NetworkConfig) => {
   return 'VALUE NOT FOUND'
 }
 
+const getOrderApiConsumerAuthorizedRequestorAddress = (config: NetworkConfig) => {
+  const networkName = config.NETWORK.toLowerCase()
+  switch (networkName) {
+    case 'mainnet':
+      return config.RAREPIZZAS_ORDER_API_CONSUMER_AUTHORIZED_REQUESTOR_MAINNET_ADDRESS
+    case 'rinkeby':
+      return config.RAREPIZZAS_ORDER_API_CONSUMER_AUTHORIZED_REQUESTOR_RINKEBY_ADDRESS
+  }
+  return 'VALUE NOT FOUND'
+}
+
 /**
  * Publish a truncated version of the Box Web3 ABI
  */
@@ -528,6 +539,7 @@ const utils = {
   getStorageProxyAddress: getStorageProxyAddress,
   getStorageProxyAdminAddress: getStorageProxyAdminAddress,
   getStorageProxyAuthorizedRequestorAddress:getStorageProxyAuthorizedRequestorAddress,
+  getOrderApiConsumerAuthorizedRequestorAddress:getOrderApiConsumerAuthorizedRequestorAddress,
   parseBoxUris: parseBoxUris,
   publishBoxWeb3Abi: publishBoxWeb3Abi,
   publishBoxWeb3AdminAbi: publishBoxWeb3AdminAbi,

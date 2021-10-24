@@ -44,6 +44,7 @@ This is the run script for deploying the RarePizzas.sol contract with all depend
 `npx hardhat run --network mainnet scripts/rarePizzas.deploy.v1.ts`
 
 - [] set the RAREPIZZAS_MAINNET_PROXY_ADDRESS environment variable in the .env file
+- [] set the RAREPIZZAS_ORDER_API_CONSUMER_AUTHORIZED_REQUESTOR_MAINNET_ADDRESS variable in the .env file
 
 ## Deploy the Ethereum OrderAPIOracle.sol contract
 
@@ -75,6 +76,7 @@ At a high level:
 
 - [] ensure the CHAINLINK_MAINNET_TOKEN environment variable is set
 - [] ensure the RAREPIZZAS_ORDER_API_MAINNET_ORACLE_CONTRACT_ADDRESS environment variable is set
+- [] ensure the RAREPIZZAS_ORDER_API_CONSUMER_AUTHORIZED_REQUESTOR_MAINNET_ADDRESS environment variable is set (it's usually the same as RAREPIZZAS_MAINNET_PROXY_ADDRESS)
 - [] ensure the RAREPIZZAS_ORDER_API_MAINNET_JOB_ID environment variable is set
 - [] ensure the RAREPIZZAS_ORDER_API_MAINNET_JOB_FEE environment variable is set
 - [] ensure the RAREPIZZAS_MAINNET_PROXY_ADDRESS environment variable is set
