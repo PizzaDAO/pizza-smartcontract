@@ -8,19 +8,13 @@ import '@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol';
 
 import './RarePizzasBox.sol';
 
-import '../interfaces/IChainlinkVRFRandomConsumer.sol';
+import '../interfaces/IChainlinkVRFCallback.0.8.0.sol';
+import '../interfaces/IChainlinkVRFRandomConsumer.0.8.0.sol';
 import '../interfaces/IRarePizzasBoxV2Admin.sol';
 
 /**
- * Public interface for interacting with rare pizzas box V2
+ *
  */
-interface IChainlinkVRFCallback {
-    /**
-     * Callback function called by the VRF consumer with random response
-     */
-    function fulfillRandomness(bytes32 request, uint256 random) external;
-}
-
 contract RarePizzasBoxV2 is RarePizzasBox, IChainlinkVRFCallback, IRarePizzasBoxV2Admin {
     using AddressUpgradeable for address;
     using CountersUpgradeable for CountersUpgradeable.Counter;

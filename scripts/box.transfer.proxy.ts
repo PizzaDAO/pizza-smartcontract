@@ -5,7 +5,7 @@ import config from '../config'
 // transfer ownership of the upgrade proxy from the signer to some owner
 async function main() {
   const [deployer] = await ethers.getSigners()
-  const newOwner = utils.getProxyAdminAddress(config)
+  const newOwner = utils.getBoxProxyAdminAddress(config)
 
   console.log('Owner:', deployer.address)
   console.log('- balance:', (await deployer.getBalance()).toString())

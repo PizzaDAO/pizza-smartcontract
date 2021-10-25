@@ -1,4 +1,4 @@
-# DEPLOY V2 RUN SCRIPT
+# DEPLOY BOX V2 RUN SCRIPT
 
 This is the run script for deploying the upgraded V2 contract to an environment.
 
@@ -7,17 +7,19 @@ This should be run after the Deploy.md run script.
 ## Prepare the existing proxy contract for upgrade
 
 From the proxy owner:
+
 - [] remove users from the allow list (if needed)
 - [] verify that purchasing is disabled
 - [] sweep funds to the owner
 
-## Deploy RandomConsumer 
+## Deploy RandomConsumer
 
 - [] ensure the correct proxy environment variable is correctly set
 
-`npx hardhat run --network mainnet scripts/randomConsumer.deploy.ts`
+`npx hardhat run --network mainnet scripts/randomConsumer.ethereum.deploy.ts`
 
 - [] set the random consumer environment variable in the .env file
+- [] fund the random consumer with LINK
 
 ## Prepare the V2 Contract
 
@@ -31,11 +33,11 @@ This will deploy the contract but will not try to associate it with the proxy
 
 ## Push Source Code for Random Consumer
 
-`npx hardhat verify --contract contracts/random/RandomConsumer.sol:RandomConsumer --network mainnet --constructor-args scripts/randomConsumer.arguments.ts <CONTRACT_ADDRESS>`
+`npx hardhat verify --contract contracts/random/RandomConsumer.sol:RandomConsumer --network mainnet --constructor-args scripts/randomConsumer.ethereum.arguments.ts <CONTRACT_ADDRESS>`
 
 ## Push Source Code for Box V2
 
-`npx hardhat verify --contract contracts/token/RarePizzasBoxV2.sol:RarePizzasBoxV2 --network rinkeby <CONTRACT_ADDRESS>`
+`npx hardhat verify --contract contracts/token/RarePizzasBoxV2.sol:RarePizzasBoxV2 --network mainnet 0x56E13df561A0FA817262653208954B64DC4d920c`
 
 ## Transfer Ownership of Random Consumer
 
@@ -49,6 +51,7 @@ This will deploy the contract but will not try to associate it with the proxy
 Note that currently VRF is in preview on mainnet so the random consumer contract address may need to be put on an allow list.
 
 From the proxy owner:
+
 - [] send some Link Tokens to the Random Consumer address to cover fees (varies by network)
 - [] call `upgradeTo(newImplementationAddress)` on the proxy with the new implementation instance address
 - - [] alternatively, use the Open Zepplin web app (available in gnosis)
@@ -59,6 +62,7 @@ From the proxy owner:
 ## Contract is ready to be enabled
 
 From the proxy owner:
+
 - [] update the bitcoin price (if needed)
 - [] seed the allow list (if needed)
 - [] set the start timestamp (if needed)

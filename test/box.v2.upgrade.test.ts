@@ -14,13 +14,13 @@ type TestContext = {
 
 let testContext: TestContext
 
-let getKovanRandomConsumer = async (box: Contract) => {
+let getRinkebyRandomConsumer = async (box: Contract) => {
     const RandomConsumer = await ethers.getContractFactory('FakeRandomConsumer')
     return await RandomConsumer.deploy(
-        config.CHAINLINK_KOVAN_VRF_COORD,
-        config.CHAINLINK_KOVAN_TOKEN,
-        config.CHAINLINK_KOVAN_VRF_KEY_HASH,
-        config.CHAINLINK_KOVAN_VRF_FEE,
+        config.CHAINLINK_RINKEBY_VRF_COORD,
+        config.CHAINLINK_RINKEBY_TOKEN,
+        config.CHAINLINK_RINKEBY_VRF_KEY_HASH,
+        config.CHAINLINK_RINKEBY_VRF_FEE,
         box.address)
 }
 
@@ -52,7 +52,7 @@ describe('Box V2 Real Upgrade Tests', function () {
         const { box } = testContext
 
         // deploy the upgraded contracts
-        const random = await getKovanRandomConsumer(box)
+        const random = await getRinkebyRandomConsumer(box)
 
         // run the upgrade
         const BoxV2 = await ethers.getContractFactory('RarePizzasBoxV2')
