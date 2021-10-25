@@ -8,7 +8,7 @@ import '@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol';
 
 import './RarePizzasBoxV2.sol';
 import 'hardhat/console.sol';
-import '../interfaces/IChainlinkVRFRandomConsumer.sol';
+import '../interfaces/IChainlinkVRFRandomConsumer.0.8.0.sol';
 import '../interfaces/IRarePizzasBoxV2Admin.sol';
 
 contract RarePizzasBoxV3 is RarePizzasBoxV2 {
