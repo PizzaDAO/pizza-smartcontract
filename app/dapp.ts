@@ -252,8 +252,10 @@ const actions = {
                 return await state.contract?.isRedeemed(tokenId)
             } catch (error) {
                 console.log(error)
-                state.app.statusMessage = error
-                DOM.refreshState(state)
+                if (error instanceof Error) {
+                    state.app.statusMessage = error.message
+                    DOM.refreshState(state)
+                }
                 return false
             }
         },
@@ -267,8 +269,10 @@ const actions = {
                 return await state.contract?.addressOfRedeemer(tokenId)
             } catch (error) {
                 console.log(error)
-                state.app.statusMessage = error
-                DOM.refreshState(state)
+                if (error instanceof Error) {
+                    state.app.statusMessage = error.message
+                    DOM.refreshState(state)
+                }
                 return false
             }
         },
@@ -287,7 +291,7 @@ const actions = {
             const amount = price.mul(quantity)
 
             let estimatedGas = await state.contract?.estimateGas.purchase()
-            if (estimatedGas.lt(defaultGasLimit)) {
+            if (estimatedGas === undefined || estimatedGas.lt(defaultGasLimit)) {
                 estimatedGas = BigNumber.from(defaultGasLimit)
             }
 
@@ -311,7 +315,7 @@ const actions = {
             console.log(`redeem: redeem a box`)
 
             let estimatedGas = await state.contract?.estimateGas.redeemRarePizzasBox(boxTokenId, desiredRecipe)
-            if (estimatedGas.lt(defaultGasLimit)) {
+            if (estimatedGas === undefined || estimatedGas.lt(defaultGasLimit)) {
                 estimatedGas = BigNumber.from(defaultGasLimit)
             }
 
@@ -388,8 +392,10 @@ const actions = {
                 return active
             } catch (error) {
                 console.log(error)
-                state.app.statusMessage = error
-                DOM.refreshState(state)
+                if (error instanceof Error) {
+                    state.app.statusMessage = error.message
+                    DOM.refreshState(state)
+                }
                 return false
             }
         },
