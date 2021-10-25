@@ -7,10 +7,23 @@ declare var navigator: any;
 declare var window: any;
 
 // Addresses for the pizza contract
-const rinkebyAddress = '0x1E01E8AfDA51C980650b66a71Ca3Bc981FF10eA7'
-const mainnetAddress = '0xA4d5fB4Ff0Fa1565fb7D8f5Db88E4c0f2f445046'
+const rinkebyAddress = '0x4bC497fF4ccaA5C3E052Fe47179bd68CA551B347'
+const mainnetAddress = ''
+// Addresses for the box contract
+const boxRinkebyAddress = "0x8f5AE25105C3c03Bce89aE3b5ed1E30456755fAb"
+const boxMainnetAddress = "0x4ae57798AEF4aF99eD03818f83d2d8AcA89952c7"
 
-const defaultGasLimit: number = 210000
+// This dapp connects primarily to the pizza contract
+// and brokers most read values through there since some
+// box methods are passed through, but for certain things
+// like subscribing to events it uses the box contract directly
+// the distinction is wether or not a user context is needed.
+// all user context events happen through the pizza contract.
+
+const defaultGasLimit: number = 300000
+
+const ethSymbol = 'Ξ'
+const btcSymbol = '₿'
 
 type TokenSupply = {
     existingBoxes: number
@@ -31,26 +44,29 @@ type BoxToken = {
 
 type AppContext = {
     app: {
-        countTotal: TokenSupply,
-        price: number,
-        btcPrice: number,
-        ethPrice: number,
-        boxSaleIsActive: boolean,
+        countTotal: TokenSupply
+        price: number
+        btcPrice: number
+        ethPrice: number
+        boxSaleIsActive: boolean
         pizzaSaleIsActive: boolean
-        statusMessage: string,
-        remaining: Function
+        statusMessage: string
+        remainingBoxCount: Function
+        unredeemedBoxCount: Function
     }
-    contract: Contract | undefined,
+    contract: Contract | undefined
+    boxContract: Contract | undefined
     provider: providers.Web3Provider | undefined
     user: {
-        balance: UserBalance, // should name refactor to boxTokenBalance?
-        boxTokens: BoxToken[],
+        balance: UserBalance
+        boxTokens: BoxToken[]
         pizzaTokens: number[]
+        unredeemedBoxTokens: Function
     }
     wallet: {
         address: string | undefined
-        contract: Contract | undefined,
-        signer: Signer | undefined;
+        contract: Contract | undefined
+        signer: Signer | undefined
     }
 }
 
@@ -68,9 +84,11 @@ let state: AppContext = {
             totalBoxes: 0,
             totalPizzas: 0
         },
-        remaining: () => (state.app.countTotal.totalBoxes - state.app.countTotal.existingBoxes),
+        remainingBoxCount: () => (state.app.countTotal.totalBoxes - state.app.countTotal.existingBoxes),
+        unredeemedBoxCount: () => (state.app.countTotal.existingBoxes - state.app.countTotal.existingPizzas)
     },
     contract: undefined,
+    boxContract: undefined,
     provider: undefined,
     user: {
         balance: {
@@ -78,7 +96,10 @@ let state: AppContext = {
             pizzaTokenCount: 0
         },
         boxTokens: [],
-        pizzaTokens:[]
+        pizzaTokens:[],
+        unredeemedBoxTokens: () => state.user.boxTokens.filter((box, i, arr) => {
+            return box.isRedeemed == false
+        })
     },
     wallet: {
         address: undefined,
@@ -98,15 +119,19 @@ const DOM = {
     },
     contract: {
         address: document.querySelector('#contractLabel'),
+        boxAddress: document.querySelector('#contractLabel'),
     },
     labels: {
+        // TODO: real values for all these labels
+        // they are wrong
         dappHeader: document.querySelector('#app-header'),
         connectLabel: document.querySelector('#connect-button-label'),
-        remaining: document.querySelector('#amountAvail'),
-        quantityLabel: document.querySelector('#quantity-subheader'),
+        remainingBoxes: document.querySelector('#amountAvail'),
+        redeemedPizzas: document.querySelector('#pizza-quantity'),
+        redeemPizzaTextLabel: document.querySelector('#quantity-subheader'),
         errorLabel: document.querySelector('#errorText'),
         buyLabel: document.querySelector('#mint-button-header'),
-        // TODO: more labels
+        
     },
     selectors: {
         quantity: document.querySelector('#frogQuantity'),
@@ -130,37 +155,26 @@ const DOM = {
         } else {
             DOM.labels.connectLabel.innerHTML = "Connect Wallet:"
             DOM.buttons.connect.innerHTML = "CONNECT"
-            
         }
 
-        // availability
-        //
-        // is this available boxes or pizzas to mint?
-        //
+        // Box availability
         if (context.app.countTotal.totalBoxes === 0) {
-            DOM.labels.remaining.innerHTML = "????"
+            DOM.labels.remainingBoxes.innerHTML = "????"
         } else {
-            const remaining = context.app.countTotal.totalBoxes - context.app.countTotal.existingBoxes
-            // accounting for the admin holdover
-            // TODO: this may not be completetly accurate
-            // since we may mint some throughout the period.
+            const remaining = context.app.remainingBoxCount()
             if (remaining <= 1) {
-                DOM.labels.remaining.innerHTML = `0`
+                DOM.labels.remainingBoxes.innerHTML = `0`
             } else {
-                DOM.labels.remaining.innerHTML = `${remaining}`
+                DOM.labels.remainingBoxes.innerHTML = `${remaining}`
             }
-            
         }
 
-        // // Pizzas redeemed
-        // // add data about pizzaredemptions
-
-        // // quantity
-        // if (context.app.pizzaSaleIsActive) {
-        //     DOM.labels.quantityLabel.innerHTML = "Max Quantity: 20"
-        // } else {
-        //     DOM.labels.quantityLabel.innerHTML = "Sale is not Active"
-        // }
+        // Pizzas redeemed
+        if (context.app.pizzaSaleIsActive) {
+            DOM.labels.redeemPizzaTextLabel.innerHTML = "Redeem Pizza!"
+        } else {
+            DOM.labels.redeemPizzaTextLabel.innerHTML = "Redeeming pizzas is not Active"
+        }
 
         // error
         if (context.app.statusMessage != "") {
@@ -176,12 +190,35 @@ const DOM = {
             DOM.buttons.buy.disabled = true
         }
 
+        const userUnredeemedBoxes = context.user.unredeemedBoxTokens()
+
+        // redeem button
+        if (context.app.pizzaSaleIsActive && context.wallet.address && context.wallet.contract && userUnredeemedBoxes.length > 0) {
+            DOM.buttons.redeem.disabled = false
+        } else {
+            DOM.buttons.redeem.disabled = true
+        }
+
+        // redeem query selector
+        // TODO: specify the array of box id's that can be redeemed
+
+        // available recipes query selector
+        // TODO: specify the recipes
+
         // contract
         if (context.contract === undefined) {
             console.log("refresh no contract")
             DOM.contract.address.innerHTML = "Not Connected"
         } else {
             DOM.contract.address.textContent = context.contract.address
+        }
+
+        // box contract
+        if (context.boxContract === undefined) {
+            console.log("refresh no box contract")
+            DOM.contract.boxAddress.innerHTML = "Not Connected"
+        } else {
+            DOM.contract.boxAddress.textContent = context.boxContract.address
         }
     }
 }
@@ -196,20 +233,7 @@ const helpers = {
 
 const actions = {
     app: {
-        isSaleActive: async () => {
-            if (!actions.contract.isConnected()) {
-                return false
-            }
-
-            try {
-                return await state.contract?.isSaleActive()
-            } catch (error) {
-                console.log(error)
-                state.app.statusMessage = error
-                DOM.refreshState(state)
-                return false
-            }
-        },
+        // is a box redeemed
         isRedeemed: async (tokenId: number) => {
             if (!actions.contract.isConnected()) {
                 return false
@@ -224,6 +248,7 @@ const actions = {
                 return false
             }
         },
+        // address of whoever redeemed a box
         addressOfRedeemer: async (tokenId: number) => {
             if (!actions.contract.isConnected()) {
                 return "0x00"
@@ -238,7 +263,7 @@ const actions = {
                 return false
             }
         },
-
+        // purchase a box
         purchase: async () => {
             if (!actions.contract.isConnected()) {
                 return
@@ -251,19 +276,55 @@ const actions = {
             const quantity = 1;//DOM
 
             const amount = price.mul(quantity)
-            const gasLimit = defaultGasLimit * quantity
 
-            await state.wallet.contract?.purchase({ value: amount, gasLimit: gasLimit })
+            let estimatedGas = await state.contract?.estimateGas.purchase()
+            if (estimatedGas.lt(defaultGasLimit)) {
+                estimatedGas = BigNumber.from(defaultGasLimit)
+            }
+
+            // TODO: callstatic?
+
+            await state.wallet.contract?.purchase({ value: amount, gasLimit: estimatedGas })
             await actions.contract.refreshContract()
         },
+        // redeem a box for a pizza
+        redeemBox: async (boxTokenId: number, desiredRecipe: number) => {
+            if (!actions.contract.isConnected()) {
+                return
+            }
 
-        
+            if (await state.contract?.isRedeemed(boxTokenId)) {
+                state.app.statusMessage = "box already redeemed"
+                DOM.refreshState(state)
+                return
+            }
+
+            console.log(`redeem: redeem a box`)
+
+            let estimatedGas = await state.contract?.estimateGas.redeemRarePizzasBox(boxTokenId, desiredRecipe)
+            if (estimatedGas.lt(defaultGasLimit)) {
+                estimatedGas = BigNumber.from(defaultGasLimit)
+            }
+
+            // TODO: callstatic?
+
+            await state.wallet.contract?.redeemRarePizzasBox(boxTokenId, desiredRecipe, { gasLimit: estimatedGas })
+            await actions.contract.refreshContract()
+        }
     },
     contract: {
         isConnected: () => {
             const contract = state.contract
             if (contract === undefined) {
-                console.log('contract: contract not connected')
+                console.log('contract: pizza contract not connected')
+                return false
+            }
+            return true
+        },
+        isBoxConnected: () => {
+            const contract = state.boxContract
+            if (contract === undefined) {
+                console.log('contract: box contract not connected')
                 return false
             }
             return true
@@ -277,10 +338,19 @@ const actions = {
             const chainId = await window.ethereum.request({ method: 'eth_chainId' });
             console.log(`chainId: ${chainId}`)
 
+            // connect pizza
             const contractAddress = chainId === '0x4' ? rinkebyAddress : mainnetAddress
-            console.log(`contract connect: ${contractAddress}`)
+            console.log(`contract pizza connect: ${contractAddress}`)
             const contract = new Contract(contractAddress, abi, state.provider)
             state.contract = contract
+
+            // connect box
+            const boxContractAddress = chainId === '0x4' ? boxRinkebyAddress : boxMainnetAddress
+            console.log(`contract box connect: ${boxContractAddress}`)
+            // note the abi here is the pizza abi, which has functions not on the box
+            // but since it inherits, it works wihtout adding redundant data to the page
+            const boxContract = new Contract(boxContractAddress, abi, state.provider)
+            state.boxContract = boxContract
 
             actions.events.subscribeContractEvents();
             actions.events.subscribeTokenEvents() 
@@ -290,69 +360,58 @@ const actions = {
                 return
             }
             console.log("refreshContract")
+            await actions.contract.isSaleActive()
             await actions.contract.refreshPrice()
-            await actions.contract.refreshSaleState()
             await actions.contract.refreshSupply()
             await actions.user.refreshUserBalance()
             DOM.refreshState(state)
+        },
+        isSaleActive: async () => {
+            if (!actions.contract.isConnected()) {
+                return false
+            }
+
+            try {
+                const active = await state.contract?.isSaleActive()
+                state.app.pizzaSaleIsActive = active
+                console.log(`isSaleActive: ${active}`)
+                DOM.refreshState(state)
+                return active
+            } catch (error) {
+                console.log(error)
+                state.app.statusMessage = error
+                DOM.refreshState(state)
+                return false
+            }
         },
         refreshPrice: async () => {
             if (!actions.contract.isConnected()) {
                 BigNumber.from(state.app.price)
             }
-            
+            // TODO: fixme
             const price = await state.contract?.price()
             state.app.price = price
             console.log(`refreshPrice: ${price}`)
             DOM.refreshState(state)
             return BigNumber.from(state.app.price)
         },
-        refreshSaleState: async () => {
-            if (!actions.contract.isConnected()) {
-                return
-            }
-            // TODO: pizza sale state (??)
-            const presaleActive = await state.contract?.presaleIsActive()
-            state.app.boxSaleIsActive = presaleActive
-
-            const saleActive = await state.contract?.saleIsActive()
-            state.app.pizzaSaleIsActive = saleActive
-
-            console.log(`refreshSaleState: presaleIsActive ${presaleActive} saleActive ${saleActive}`)
-            DOM.refreshState(state)
-        },
         refreshSupply: async () => {
             if (!actions.contract.isConnected()) {
                 return
             }
             console.log("refresh supply")
-            //const maxMintableSupply = await state.contract?.maxMintableSupply()
-            //const maxAdminSupply = await state.contract?.maxAdminSupply()
             const maxSupply = await state.contract?.maxSupply()
             const boxTotalSupply = await state.contract?.boxTotalSupply()
-            console.log(`maxSupply: ${maxSupply} boxTotalSupply: ${boxTotalSupply}`)
-            const existingBoxes = await state.contract?
-            // what are the semantics here?
-            // state.app.countTotal looks like four numbers
-            // { existingBoxes, existingPizzas, totalBoxes, totalPizzas }
-            // state.app.countTotal is also a TokenSupply type which is
-            // type TokenSupply = {
-            // existingBoxes: number
-            // exisitingPizzas: number
-            // totalBoxes: number
-            // totalPizzas: number
-            // }
-            // how do these reconcile??
+            const pizzaTotalSupply = await state.contract?.totalSupply()
+            console.log(`maxSupply: ${maxSupply} boxTotalSupply: ${boxTotalSupply} pizzaTotalSupply: ${pizzaTotalSupply}` )
+
             state.app.countTotal = {
-                //maxMintableSupply: maxMintableSupply,
-                //maxAdminSupply: maxAdminSupply,
-                existingBoxes: 0,
-                existingPizzas: 0,
-                totalBoxes: boxTotalSupply,
-                totalPizzas: 0
+                existingBoxes: boxTotalSupply,
+                existingPizzas: pizzaTotalSupply,
+                totalBoxes: maxSupply,
+                totalPizzas: maxSupply
             }
 
-            //not sure what's wrong here
             DOM.refreshState(state)
         },
         
@@ -393,21 +452,27 @@ const actions = {
             await actions.contract.refreshContract()
         },
         subscribeContractEvents: () => {
-            // TODO: sale active and other events
             state.contract?.on('SaleActive', actions.contract.refreshContract)
-            state.contract?.on('PresaleActive', actions.contract.refreshContract)
-            state.contract?.on('PresaleLimitChanged', actions.contract.refreshContract)
+            // TODO: verify if we even need this it might be redundant since transfer fires
+            state.contract?.on('InternalArtworkAssigned', actions.contract.refreshContract)
+            state.boxContract?.on('InternalArtworkAssigned', actions.contract.refreshContract)
         },
         subscribeTokenEvents: () => {
             state.contract?.on('Transfer', actions.events.handlers.tokenTransferred)
+            state.boxContract?.on('Transfer', actions.events.handlers.tokenTransferred)
         },
         subscribeWalletEvents: () => {
             window.ethereum.on("accountsChanged", actions.events.handlers.accountsChanged)
             window.ethereum.on("chainChanged", actions.events.handlers.chainChanged)
             window.ethereum.on("disconnect", actions.events.handlers.accountsDisconnect)
         },
+        unsubscribeContractEvents: () => {
+            state.contract?.off('SaleActive', actions.contract.refreshContract)
+            state.contract?.off('InternalArtworkAssigned', actions.contract.refreshContract)
+        },
         unsubscribeTokenEvents: () => {
             state.contract?.off('Transfer', actions.events.handlers.tokenTransferred)
+            state.boxContract?.off('Transfer', actions.events.handlers.tokenTransferred)
         }
     },
     provider: {
@@ -452,13 +517,17 @@ const actions = {
             // I don't know if this 'balance' is a count of tokens or some other measure
             // The contract code says 'Get the box balance of a user' — is that a $ value or a cardinal value?
             const boxTokenBalance = await state.wallet.contract?.boxBalanceOf(state.wallet.address)
+            const pizzaTokenBalance = await state.wallet.contract?.balanceOf(state.wallet.address)
             console.log(`boxTokenBalance: ${boxTokenBalance}`)
-            // ???
+            console.log(`pizzaTokenBalance: ${pizzaTokenBalance}`)
             state.user.balance = {
                 boxTokenCount: boxTokenBalance,
-                pizzaTokenCount: 0
+                pizzaTokenCount: pizzaTokenBalance
                 //tokenCount: token_balance,
             }
+
+            // TODO: iterate through the collections and get the user's id's
+
             DOM.refreshState(state)
         },
         resetBalances: async () => {
@@ -547,6 +616,17 @@ DOM.contract.address.addEventListener('click', async () => {
     }
 })
 
+DOM.contract.boxAddress.addEventListener('click', async () => {
+    state.app.statusMessage = ""
+    DOM.refreshState(state)
+
+    if (state.contract !== undefined) {
+        const contract = state.boxContract?.address
+        const subdomain = contract === boxRinkebyAddress ? "rinkeby" : "www"
+        window.open(`https://${subdomain}.etherscan.io/address/${contract}`, "_blank");
+    }
+})
+
 DOM.buttons.connect.addEventListener('click', async () => {
     state.app.statusMessage = ""
     DOM.refreshState(state)
@@ -566,6 +646,22 @@ DOM.buttons.buy.addEventListener('click', async () => {
 
     if (actions.wallet.isConnected()) {
         await actions.app.purchase()
+    } else {
+        actions.wallet.requestAccess()
+    }
+})
+
+DOM.buttons.redeem.addEventListener('click', async () => {
+    state.app.statusMessage = ""
+    DOM.refreshState(state)
+
+    // TODO: read query selector values
+
+    const boxTokenId = 1
+    const desiredRecipe = 3
+
+    if (actions.wallet.isConnected()) {
+        await actions.app.redeemBox(boxTokenId, desiredRecipe)
     } else {
         actions.wallet.requestAccess()
     }
