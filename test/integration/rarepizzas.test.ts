@@ -34,7 +34,7 @@ describe.skip('Rare Pizzas Rinkeby Integration Tests', function () {
         // testnet instanceif you don't have any
         const tokenId = 548
 
-        await contract.redeemRarePizzasBox(548, 3, {type: 0, gasLimit: 2500000})
+        await contract.redeemRarePizzasBox(tokenId, 1, {type: 0, gasLimit: 2500000})
 
         // TODO: sleep for some time
 

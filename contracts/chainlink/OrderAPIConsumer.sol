@@ -26,6 +26,8 @@ interface IOrderAPICallback {
 }
 
 interface IOrderAPIConsumerAdmin {
+    function setAuthorizedRequestor(address requestor) external;
+
     /**
      * set the callback address used by the consumer
      */
@@ -49,10 +51,12 @@ interface IOrderAPIConsumerAdmin {
 contract OrderAPIConsumer is Ownable, ChainlinkClient, IOrderAPIConsumer, IOrderAPIConsumerAdmin {
     using Address for address;
 
+    address internal _authorizedRequestor;
     IOrderAPICallback private _callback;
     bytes32 private _jobId;
     uint256 private _fee;
 
+    event AuthorizedRequestorUpdated(address oldRequestor, address newRequestor);
     event CallbackUpdated(address previous, address current);
     event JobIdUpdated(bytes32 previous, bytes32 current);
     event FeeUpdated(uint256 previous, uint256 current);
@@ -62,12 +66,14 @@ contract OrderAPIConsumer is Ownable, ChainlinkClient, IOrderAPIConsumer, IOrder
     constructor(
         address link,
         address oracle,
+        address authorizedRequestor,
         address callback,
         string memory jobId,
         uint256 fee
     ) public Ownable() {
         setChainlinkToken(link);
         setChainlinkOracle(oracle);
+        setAuthorizedRequestor(authorizedRequestor);
 
         if (callback != address(0)) {
             _callback = IOrderAPICallback(callback);
@@ -83,9 +89,8 @@ contract OrderAPIConsumer is Ownable, ChainlinkClient, IOrderAPIConsumer, IOrder
         uint256 tokenId,
         uint256 recipeId
     ) public override returns (bytes32 requestId) {
-        // TODO: prevent other folks from calling this besides our contract
-        // possibly: set the fee arbitrarily high
-        // possibly, verify the calling contract is the callback?
+        // if the callback address is set, then
+        require(msg.sender == _authorizedRequestor, 'caller not callback');
 
         Chainlink.Request memory request = buildChainlinkRequest(_jobId, address(this), this.fulfillResponse.selector);
         request.add('address', toString(uint256(uint160(address(msg.sender)))));
@@ -110,6 +115,12 @@ contract OrderAPIConsumer is Ownable, ChainlinkClient, IOrderAPIConsumer, IOrder
     }
 
     // IOrderAPIConsumerAdmin
+
+    function setAuthorizedRequestor(address requestor) public override onlyOwner {
+        address old = _authorizedRequestor;
+        _authorizedRequestor = requestor;
+        emit AuthorizedRequestorUpdated(old, _authorizedRequestor);
+    }
 
     function setCallback(address callback) public override onlyOwner {
         address previous = address(_callback);

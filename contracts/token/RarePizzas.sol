@@ -77,14 +77,12 @@ contract RarePizzas is
             _rarePizzasBoxContract = IRarePizzasBox(rarePizzasBoxContract);
         }
 
-        // TODO: update with real value
         _contractURI = 'https://raw.githubusercontent.com/PizzaDAO/pizza-smartcontract/master/data/opensea_pizza_metadata.mainnet.json';
     }
 
     // IOpenSeaCompatible
 
     function contractURI() public view virtual override returns (string memory) {
-        // Metadata provided via github link so that it can be updated or modified
         return _contractURI;
     }
 
@@ -225,7 +223,14 @@ contract RarePizzas is
         uint256 boxTokenId,
         uint256 recipeId
     ) internal virtual {
-        bytes32 requestId = _orderAPIClient.executeRequest(requestor, boxTokenId, recipeId);
+        (bool success, bytes memory data) = address(_orderAPIClient).call(
+            abi.encodeWithSignature('executeRequest(address,uint256,uint256)', requestor, boxTokenId, recipeId)
+        );
+
+        require(success == true, 'external call failed');
+
+        bytes32 requestId = bytes32(data);
+
         _renderRequests[requestId] = requestor;
         _renderTokenIds[requestId] = boxTokenId;
     }
