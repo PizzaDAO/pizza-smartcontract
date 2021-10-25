@@ -11,7 +11,7 @@ async function main() {
     const wallet = new ethers.Wallet(utils.getDeploymentKey(config), provider)
 
     const consumerAddress = utils.getRandomConsumerAddress(config)
-    const newOwner = utils.getProxyAdminAddress(config)
+    const newOwner = utils.getBoxProxyAdminAddress(config)
 
     console.log('Connecting to instance')
 

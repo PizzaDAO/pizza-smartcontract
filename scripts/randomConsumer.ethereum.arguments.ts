@@ -7,5 +7,5 @@ module.exports = [
     utils.getChainlinkToken(config),
     utils.getChainlinkVRFKeyHash(config),
     utils.getChainlinkVRFFee(config),
-    utils.getProxyAddress(config)
+    utils.getBoxProxyAddress(config)
 ];

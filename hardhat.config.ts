@@ -23,17 +23,17 @@ const networks: NetworksUserConfig = {
     accounts: [`0x${config.MAINNET_PRIVATE_KEY}`],
     gasPrice: 250000000000
   },
-  goerli: {
-    url: `https://eth-goerli.alchemyapi.io/v2/${config.ALCHEMY_GOERLI_KEY}`,
-    accounts: [`0x${config.GOERLI_PRIVATE_KEY}`],
-  },
   rinkeby: {
     url: `https://eth-rinkeby.alchemyapi.io/v2/${config.ALCHEMY_RINKEBY_KEY}`,
     accounts: [`0x${config.RINKEBY_PRIVATE_KEY}`],
   },
-  ropsten: {
-    url: `https://eth-ropsten.alchemyapi.io/v2/${config.ALCHEMY_ROPSTEN_KEY}`,
-    accounts: [`0x${config.ROPSTEN_PRIVATE_KEY}`],
+  matic: {
+    url: `https://polygon-mainnet.g.alchemy.com/v2/${config.ALCHEMY_MATIC_KEY}`,
+    accounts: [`0x${config.MATIC_PRIVATE_KEY}`],
+  },
+  maticmum: {
+    url: `https://polygon-mumbai.g.alchemy.com/v2/${config.ALCHEMY_MUMBAI_KEY}`,
+    accounts: [`0x${config.MATIC_MUMBAI_PRIVATE_KEY}`],
   },
 }
 
@@ -47,14 +47,6 @@ const getNetworks = (config: NetworkConfig) => {
   }
 }
 
-// You need to export an object to set up your config
-// Go to https://hardhat.org/config/ to learn more
-/**
- *  rinkeby: {
-      url:  'http://127.0.0.1:8555', //specify ethereum node endpoint
-      accounts: ['0xc87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3'] //specify privateKey of account
-    }
- */
 const hardhatConfig: HardhatUserConfig = {
   defaultNetwork: 'hardhat',
   networks: getNetworks(config),
@@ -63,7 +55,31 @@ const hardhatConfig: HardhatUserConfig = {
   },
   solidity: {
     compilers: [{
+      version: "0.8.6", settings: {
+        optimizer: {
+          enabled: true,
+          runs: 200,
+        }
+      }
+    },
+    {
+    version: "0.8.4", settings: {
+        optimizer: {
+          enabled: true,
+          runs: 200,
+        }
+      }
+    },
+    {
       version: "0.8.0", settings: {
+        optimizer: {
+          enabled: true,
+          runs: 200,
+        }
+      }
+    },
+    {
+      version: "0.6.12", settings: {
         optimizer: {
           enabled: true,
           runs: 200,
@@ -85,7 +101,7 @@ const hardhatConfig: HardhatUserConfig = {
   },
   gasReporter: {
     currency: 'USD',
-    gasPrice: 150,
+    gasPrice: 50,
   },
 }
 

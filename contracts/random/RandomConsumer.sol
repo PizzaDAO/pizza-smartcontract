@@ -1,20 +1,13 @@
+// SPDX-License-Identifier: MIT
+
 pragma solidity ^0.6.6;
 
 import '@chainlink/contracts/src/v0.6/VRFConsumerBase.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
+import '../interfaces/IChainlinkVRFCallback.0.6.6.sol';
 import '../interfaces/IChainlinkVRFAdmin.sol';
-
-/**
- * Public interface for interacting with rare pizzas box V2
- */
-interface IChainlinkVRFCallback {
-    /**
-     * Callback function called by the VRF consumer with random response
-     */
-    function fulfillRandomness(bytes32 request, uint256 random) external;
-}
 
 /**
  * Random Consumer contract interacts with chainlink VRF.
@@ -61,9 +54,7 @@ contract RandomConsumer is VRFConsumerBase, Ownable, IChainlinkVRFAdmin {
         require(_callbackContract != address(0), 'Callback must be set');
         require(msg.sender == _callbackContract, 'Sender must be callback');
         require(LINK.balanceOf(address(this)) >= _fee, 'Not enough LINK');
-        // no seed param necessary
-        // https://github.com/smartcontractkit/chainlink/blob/0964ca290565587963cc4ad8f770274f5e0d9e9d/evm-contracts/src/v0.6/VRFConsumerBase.sol#L134
-        return requestRandomness(_keyHash, _fee, 0);
+        return requestRandomness(_keyHash, _fee);
     }
 
     /**
