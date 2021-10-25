@@ -25,6 +25,8 @@ const defaultGasLimit: number = 300000
 const ethSymbol = 'Ξ'
 const btcSymbol = '₿'
 
+const mafiaBoxCount = 1250
+
 type TokenSupply = {
     existingBoxes: number
     existingPizzas: number
@@ -45,8 +47,7 @@ type BoxToken = {
 type AppContext = {
     app: {
         countTotal: TokenSupply
-        price: number
-        btcPrice: number
+        btcExchangeRate: number
         ethPrice: number
         boxSaleIsActive: boolean
         pizzaSaleIsActive: boolean
@@ -72,8 +73,7 @@ type AppContext = {
 
 let state: AppContext = {
     app: {
-        price: 0,
-        btcPrice: 0,
+        btcExchangeRate: 0,
         ethPrice: 0,
         boxSaleIsActive: true,
         pizzaSaleIsActive: false,
@@ -128,6 +128,8 @@ const DOM = {
         connectLabel: document.querySelector('#connect-button-label'),
         remainingBoxes: document.querySelector('#amountAvail'),
         redeemedPizzas: document.querySelector('#pizza-quantity'),
+        btcPriceLabel: document.querySelector('#pizza-quantity'),
+        ethPriceLabel: document.querySelector('#pizza-quantity'),
         redeemPizzaTextLabel: document.querySelector('#quantity-subheader'),
         errorLabel: document.querySelector('#errorText'),
         buyLabel: document.querySelector('#mint-button-header'),
@@ -156,6 +158,13 @@ const DOM = {
             DOM.labels.connectLabel.innerHTML = "Connect Wallet:"
             DOM.buttons.connect.innerHTML = "CONNECT"
         }
+
+        // BTC price
+        const btcPrice = state.app.ethPrice / state.app.btcExchangeRate
+        DOM.labels.btcPriceLabel.innerHTML = `${btcPrice} ${btcSymbol}`
+
+        // ETH price
+        DOM.labels.ethPriceLabel.innerHTML = `${state.app.ethPrice} ${ethSymbol}`
 
         // Box availability
         if (context.app.countTotal.totalBoxes === 0) {
@@ -271,9 +280,9 @@ const actions = {
 
             console.log(`purchase: purchase box`)
             const price = await state.contract?.getPrice()
-            state.app.price = price
+            state.app.ethPrice = price
 
-            const quantity = 1;//DOM
+            const quantity = 1.2;//DOM
 
             const amount = price.mul(quantity)
 
@@ -386,14 +395,19 @@ const actions = {
         },
         refreshPrice: async () => {
             if (!actions.contract.isConnected()) {
-                BigNumber.from(state.app.price)
+                BigNumber.from(state.app.ethPrice)
             }
-            // TODO: fixme
+            // Get the price off the bonding curve (in wei)
             const price = await state.contract?.price()
-            state.app.price = price
+            state.app.ethPrice = price
             console.log(`refreshPrice: ${price}`)
+
+            // Get the bitcoin price
+            const bitcoinPrice = await state.contract?.getBitcoinPriceInWei()
+            state.app.btcExchangeRate = bitcoinPrice
+
             DOM.refreshState(state)
-            return BigNumber.from(state.app.price)
+            return BigNumber.from(state.app.ethPrice)
         },
         refreshSupply: async () => {
             if (!actions.contract.isConnected()) {
@@ -516,17 +530,34 @@ const actions = {
             // seems we only have boxTokenBalance available
             // I don't know if this 'balance' is a count of tokens or some other measure
             // The contract code says 'Get the box balance of a user' — is that a $ value or a cardinal value?
-            const boxTokenBalance = await state.wallet.contract?.boxBalanceOf(state.wallet.address)
-            const pizzaTokenBalance = await state.wallet.contract?.balanceOf(state.wallet.address)
+            const boxTokenBalance: BigNumber = await state.wallet.contract?.boxBalanceOf(state.wallet.address)
+            const pizzaTokenBalance: BigNumber = await state.wallet.contract?.balanceOf(state.wallet.address)
             console.log(`boxTokenBalance: ${boxTokenBalance}`)
             console.log(`pizzaTokenBalance: ${pizzaTokenBalance}`)
-            state.user.balance = {
-                boxTokenCount: boxTokenBalance,
-                pizzaTokenCount: pizzaTokenBalance
-                //tokenCount: token_balance,
+        
+            let boxTokens: BoxToken[] = []
+            let pizzaTokens: number[] = []
+
+            // iterate through the collections and get the user's id's
+            for(let i = 0; i < boxTokenBalance.toNumber(); i++) {
+                const id = await state.wallet.contract?.boxTokenOfOwnerByIndex(state.wallet.address, i)
+                const isRedeemed = await state.wallet.contract?.isRedeemed(id)
+                boxTokens.push({
+                    id, isRedeemed
+                })
+            }
+            for(let i = 0; i < pizzaTokenBalance.toNumber(); i++) {
+                const id = await state.wallet.contract?.tokenOfOwnerByIndex(state.wallet.address, i)
+                pizzaTokens.push(id)
             }
 
-            // TODO: iterate through the collections and get the user's id's
+            state.user.balance = {
+                boxTokenCount: boxTokenBalance.toNumber(),
+                pizzaTokenCount: pizzaTokenBalance.toNumber()
+            }
+
+            state.user.boxTokens = boxTokens
+            state.user.pizzaTokens = pizzaTokens
 
             DOM.refreshState(state)
         },
