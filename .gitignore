@@ -23,4 +23,4 @@ node_modules
 npm-debug.log*
 
 # Openzeppelin
-.openzeppelin/unknown-*.json
+.openzeppelin/unknown-31337.json

@@ -16,6 +16,7 @@ type TestContext = {
   userWallet: Wallet
 }
 
+const oneEth = BigNumber.from("1000000000000000000")
 const MAX_NUMBER_OF_BOXES = 10 * 1000
 let testContext: TestContext
 
@@ -45,9 +46,9 @@ describe('Box Purchase Tests', function () {
       const soldTokens = await box.totalSupply()
       const btcPriceInWei = await box.getBitcoinPriceInWei()
 
-      expect(utils.formatUnits(price, 'wei')).to.equal(
-        utils.formatEther(bc.bondingCurve(soldTokens + 1).mul(btcPriceInWei)),
-      )
+      const expected = bc.bondingCurve(soldTokens + 1).mul(btcPriceInWei)
+
+      expect(price.mul(oneEth)).to.equal(expected)
     })
 
     it('Should return max supply', async () => {

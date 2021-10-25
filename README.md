@@ -1,13 +1,11 @@
 # RarePizzas
+
 For Laszlo!
 
-# Instructions
+In a world beset by hunger, we present to you Rare Pizzas - a collaborative art project that demonstrates the world's first art-to-pizza pipeline.
 
-- Clone Repository
+## Build
 
-```
-git clone https://github.com/PizzaDAO/pizza-smartcontract.git && cd pizza-smartcontract
-```
 - Install dependencies
 
 ```
@@ -20,33 +18,7 @@ npm install
 npx hardhat compile
 ```
 
-- run local node
-
-```
-npx hardhat node
-```
-
-- deploy contracts locally (in a different terminal)
-
-```
-npx hardhat run --network localhost scripts/box.deploy.ts
-```
-
-- deploy contracts remotely
-
-copy .env.example to .env and fill in your keys
-
-```
-npx hardhat run --network rinkeby scripts/box.deploy.ts
-```
-
-then go to etherscan and get the implementation address (under the contract source, theres a `more options` dropdown menu and select `is this a proxy?`)
-
-```
-$ npx hardhat verify --contract contracts/token/RarePizzasBox.sol:RarePizzasBox --network rinkeby 0x_THE_IMPLEMENTATION_ADDRESS
-```
-
-## Run unit tests
+## Test
 
 - run chai tests
 
@@ -60,29 +32,22 @@ npx hardhat test
 npx hardhat test --watch
 ```
 
-## Upgrading
+## Deploy
 
-Basically do this:
+Check out the DeployXXXX.md files for more
 
-https://forum.openzeppelin.com/t/openzeppelin-upgrades-step-by-step-tutorial-for-hardhat/3580
+## architecture
 
+This repository works in conjunction with an API project that hosts a chainlink node to respond to blockchain requrests for pizzas and generates a pizza. This proejct also bridges functionality between ethereum and polygon networks. There are several components:
 
-```bash
-# transfer ownership if you havent already
-npx hardhat run --network rinkeby scripts/box.transfer.proxy.ts
-```
+- Rare Pizzas Box - a reservation NFT that has a claim against a Rare Pizza
+- Rare Pizza - a generative NFT powered by chainlink
+- Random Consumer - a contract for interacting with chainlink VRF (deployed on mainnet and polygon)
+- Seed Storage - a storage contract deployed on polygon that queries chainlink VRF for random numbers
+- Order API Oracle - an oracle contract that brokers requests to the API to get a pizza
 
-```bash
-# deploy the upgraded contract with your current signing key
-npx hardhat run --network rinkeby scripts/box.upgrade.V2.prepare.ts
-```
-
-then, go to gnosis and open the openzepplin app and put in the proxy and new implementation and send a request
-
+Check out the `PizzaMintSequence.md` file for more info (requires [mermaid-js](https://mermaid-js.github.io/mermaid/#/))
 
 ## dev
 
-we use goerli as a developer test network and we use rinkeby for UAT.
-
-opensea doesnt currently work with goerli
-neither does gnosis
+we use rinkeby and mumbai for testnets.

@@ -4,11 +4,11 @@ import { ethers, upgrades } from 'hardhat'
 
 import config, { NetworkConfig } from '../config'
 
-// deploy the random consumer
+// deploy the mainnet random consumer
 async function main() {
     const [deployer] = await ethers.getSigners()
-    const proxy = utils.getProxyAddress(config)
-    const proxyOwner = utils.getProxyAdminAddress(config)
+    const proxy = utils.getBoxProxyAddress(config)
+    const proxyOwner = utils.getBoxProxyAdminAddress(config)
 
     console.log('Preparing RandomConsumer with the account:', deployer.address)
     console.log('Account balance:', (await deployer.getBalance()).toString())

@@ -29,13 +29,13 @@ describe('Box V2 Purchase Tests', function () {
         const Box = await ethers.getContractFactory('RarePizzasBoxV2')
         const box = await Box.deploy()
 
-        // use KOVAN contract info for out tests so its clear whats happening
+        // use rinkeby contract info for out tests so its clear whats happening
         // and add our V2 callback contract
         const random = await RandomConsumer.deploy(
-            config.CHAINLINK_KOVAN_VRF_COORD,
-            config.CHAINLINK_KOVAN_TOKEN,
-            config.CHAINLINK_KOVAN_VRF_KEY_HASH,
-            config.CHAINLINK_KOVAN_VRF_FEE,
+            config.CHAINLINK_RINKEBY_VRF_COORD,
+            config.CHAINLINK_RINKEBY_TOKEN,
+            config.CHAINLINK_RINKEBY_VRF_KEY_HASH,
+            config.CHAINLINK_RINKEBY_VRF_FEE,
             box.address)
 
         // Initialize to set owner, since not deployed via proxy
@@ -64,7 +64,7 @@ describe('Box V2 Purchase Tests', function () {
             const { random } = testContext
             const fee: BigNumber = await random.getFee()
 
-            // it's the kovan price set in the beforeEach
+            // it's the rinkeby price set in the beforeEach
             expect(fee).to.equal(
                 BigNumber.from('100000000000000000')
             )

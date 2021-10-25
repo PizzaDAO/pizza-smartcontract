@@ -8,7 +8,7 @@ import config, { NetworkConfig } from '../config'
 // This only works if you are the owner of the proxy
 async function main() {
   const [deployer] = await ethers.getSigners()
-  const proxy = utils.getProxyAddress(config)
+  const proxy = utils.getBoxProxyAddress(config)
   const proxyOwner = deployer.address
 
   console.log('Preparing upgrade contracts with the account:', deployer.address)
