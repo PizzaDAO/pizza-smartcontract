@@ -35,4 +35,4 @@ toggle-rarepizzas-saleisactive-rinkeby:
 	npx hardhat run --network rinkeby scripts/rarePizzas.toggle.saleIsActive.v1.ts
 
 verify-rarepizzas-rinkeby:
-	npx hardhat verify --contract contracts/token/RarePizzas.sol:RarePizzas --network rinkeby 0xce218f39db452967607ece41085a7079a492f52d
+	npx hardhat verify --contract contracts/token/RarePizzas.sol:RarePizzas --network rinkeby 0xe5516529aec6feecd79ff3bf9225d78846f6768a
