@@ -18,12 +18,8 @@ const mainnetAddress = ''
 const boxRinkebyAddress = "0x8f5AE25105C3c03Bce89aE3b5ed1E30456755fAb"
 const boxMainnetAddress = "0x4ae57798AEF4aF99eD03818f83d2d8AcA89952c7"
 
-// This dapp connects primarily to the pizza contract
-// and brokers most read values through there since some
-// box methods are passed through, but for certain things
-// like subscribing to events it uses the box contract directly
-// the distinction is wether or not a user context is needed.
-// all user context events happen through the pizza contract.
+// This dapp connects both to the pizza contract
+// and to the box contract
 
 const defaultGasLimit: number = 300000
 
@@ -83,6 +79,7 @@ type AppContext = {
     }
 }
 
+// list of recipes by index
 let recipes: Tuple[] = [
     {key: "Random Pie", value: "0"},
     {key: "Cheeze Pie", value: "1"},
@@ -103,6 +100,8 @@ let recipes: Tuple[] = [
     {key: "Seafood Delight", value: "16"}
 ]
 
+// a context to pass around
+// a very poor state manager
 let state: AppContext = {
     app: {
         btcExchangeRate: BigNumber.from('600000000000000000'),
@@ -181,10 +180,12 @@ const DOM = {
         boxSelector: document.querySelector('#selectBox'),
         recipeSelector: document.querySelector('#selectRecipe'),
     },
+    // set things that only need to be set once
     setStaticState: () => {
         helpers.selectorRemoveAll(DOM.selectors.recipeSelector)
         helpers.selectorAdd(DOM.selectors.recipeSelector, recipes)
     },
+    // update the query selector out of band of everything else
     refreshBoxTokenQuerySelector: (context: AppContext) => {
         // redeem query selector
         const redeemOptions: Tuple[] = []
@@ -197,6 +198,7 @@ const DOM = {
         helpers.selectorRemoveAll(DOM.selectors.boxSelector)
         helpers.selectorAdd(DOM.selectors.boxSelector, redeemOptions)
     },
+    // run a refresh loop on the entire ui (except the query selectors)
     refreshState: (context: AppContext) => {
         console.log("refresh state")
 
@@ -303,7 +305,7 @@ const DOM = {
     }
 }
 
-// functions
+// helper functions
 
 const helpers = {
     sleep: (ms: number) => {
@@ -326,7 +328,9 @@ const helpers = {
     }
 }
 
+// actions that can be taken
 const actions = {
+    // application actions (that query state based on input or mutate state)
     app: {
         // is a box redeemed
         isRedeemed: async (tokenId: number) => {
@@ -418,6 +422,7 @@ const actions = {
             await actions.contract.refreshContract()
         }
     },
+    // generic contract actions and properties
     contract: {
         isConnected: () => {
             const contract = state.contract
@@ -531,6 +536,7 @@ const actions = {
         },
         
     },
+    // event handlers
     events: {
         handlers: {
             accountsChanged: async (accounts: string[]) => {
@@ -614,6 +620,7 @@ const actions = {
             state.provider = provider
         }
     },
+    // user functions related to the application (like token balance lookup)
     user: {
         refreshAccounts: async () => {
             try {
@@ -679,6 +686,7 @@ const actions = {
             await actions.contract.refreshContract()
         }
     },
+    // user functions related to their wallet like eth balance and connection state
     wallet: {
         isConnected: () => {
             const contract = state.wallet.contract
