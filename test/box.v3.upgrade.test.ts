@@ -15,13 +15,13 @@ type TestContext = {
 
 let testContext: TestContext
 
-let getKovanRandomConsumer = async (box: Contract) => {
+let getRinkebyRandomConsumer = async (box: Contract) => {
     const RandomConsumer = await ethers.getContractFactory('FakeRandomConsumer')
     return await RandomConsumer.deploy(
-        config.CHAINLINK_KOVAN_VRF_COORD,
-        config.CHAINLINK_KOVAN_TOKEN,
+        config.CHAINLINK_RINKEBY_VRF_COORD,
+        config.CHAINLINK_RINKEBY_TOKEN,
         '0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4',
-        config.CHAINLINK_KOVAN_VRF_FEE,
+        config.CHAINLINK_RINKEBY_VRF_FEE,
         box.address)
 }
 
@@ -41,7 +41,7 @@ describe('Box V3 Real Upgrade Tests', function () {
         await box.purchase({ value: price })
 
         expect(await box.totalSupply()).to.equal(1)
-        const random = await getKovanRandomConsumer(box)
+        const random = await getRinkebyRandomConsumer(box)
 
         // run the upgrade
         const BoxV2 = await ethers.getContractFactory('RarePizzasBoxV2')

@@ -9,7 +9,7 @@ import { getAddress } from '@ethersproject/address'
 
 import config, { NetworkConfig } from '../config'
 
-use(solidity)
+//use(solidity)
 
 type TestContext = {
     box: Contract
@@ -21,72 +21,45 @@ type TestContext = {
 
 const MAX_NUMBER_OF_BOXES = 10 * 1000
 let testContext: TestContext
+
 const accountList =
-    ["0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+    [
+        "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
         "0x70997970c51812dc3a010c7d01b50e0d17dc79c8",
-
         "0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc",
-
-
         "0x90f79bf6eb2c4f870365e785982e1f101e93b906",
-
-
         "0x15d34aaf54267db7d7c367839aaf71a00a2c6a65",
-
-
         "0x9965507d1a55bcc2695c58ba16fb37d819b0a4dc",
-
-
         "0x976ea74026e726554db657fa54763abd0c3a0aa9",
-
         "0x14dc79964da2c08b23698b3d3cc7ca32193d9955",
         "0x23618e81e3f5cdf7f54c3d65f7fbc0abf5b21e8f",
-
         "0xa0ee7a142d267c1f36714e4a8f75612f20a79720",
-
-
         "0xbcd4042de499d14e55001ccbb24a551f3b954096",
-
-
         "0x71be63f3384f5fb98995898a86b02fb2426c5788",
-
-
         "0xfabb0ac9d68b0b445fb7357272ff202c5651694a",
-
-
         "0x1cbd3b2770909d4e10f157cabc84c7264073c9ec",
-
-
         "0xdf3e18d64bc6a983f673ab319ccae4f1a57c7097",
-
-
         "0xcd3b766ccdd6ae721141f452c550ca635964ce71",
-
-
         "0x2546bcd3c84621e976d8185a91a922ae77ecec30",
-
-
         "0xbda5747bfd65f08deb54cb465eb87d40e51b197e",
-
-
         "0xdd2fd4581271e230360230f9337d5c0430bf44c0",
+        "0x8626f6940e2eb28930efb4cef49b2d1f2c9c1199"
+    ]
 
-
-        "0x8626f6940e2eb28930efb4cef49b2d1f2c9c1199"]
-describe('Box V2 Purchase Tests', function () {
+describe('Box V3 Purchase Tests', function () {
     beforeEach(async () => {
         const [wallet, userWallet] = new MockProvider().getWallets()
         const RandomConsumer = await ethers.getContractFactory('FakeRandomConsumer')
         const Box = await ethers.getContractFactory('RarePizzasBoxV3')
         const box = await Box.deploy()
 
-        // use KOVAN contract info for out tests so its clear whats happening
+        // use RINKEBY contract info for out tests so its clear whats happening
         // and add our V2 callback contract
         const random = await RandomConsumer.deploy(
-            config.CHAINLINK_KOVAN_VRF_COORD,
-            config.CHAINLINK_KOVAN_TOKEN,
+            config.CHAINLINK_RINKEBY_VRF_COORD,
+            config.CHAINLINK_RINKEBY_TOKEN,
             '0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4',
-            config.CHAINLINK_KOVAN_VRF_FEE,
+            config.CHAINLINK_RINKEBY_VRF_FEE,
             box.address)
 
         // Initialize to set owner, since not deployed via proxy
@@ -207,29 +180,50 @@ describe('Box V2 Purchase Tests', function () {
     })
     describe('Batch Mint a box', () => {
         describe('Meh flow', () => {
-            it.only('Can batchmint a box', async () => {
+            it('Can batchmint a box', async () => {
                 const { box, random, testHash } = testContext
-                await box.startBatchMint(accountList)
-                await expect(box.startBatchMint(accountList)).to.be.revertedWith('minting has been queued')
-                await expect(box.finishBatchMint()).to.be.revertedWith('random number must be fetched')
+
+                await box.startBatchMint(accountList, 1)
+
+                await expect(box.startBatchMint(accountList, 1)).to.be.revertedWith('minting has been queued')
+                await expect(box.finishBatchMint()).to.be.revertedWith('vrf must be fetched')
+
                 await random.fulfillRandomnessWrapper(testHash, randomNumber('31', 256, 512))
 
                 await box.finishBatchMint()
                 for (let i = 0; i < accountList.length; i++) {
                     expect(await box.balanceOf(accountList[i])).to.be.equal(1)
                 }
+
                 expect(await box.status()).to.be.equal(0)
-                await box.startBatchMint(accountList)
+
+                await box.startBatchMint(accountList, 2)
                 await random.fulfillRandomnessWrapper(testHash, randomNumber('33', 256, 512))
                 await box.finishBatchMint()
-                await box.startBatchMint(accountList)
+
+                await box.startBatchMint(accountList, 3)
                 await random.fulfillRandomnessWrapper(testHash, randomNumber('34', 256, 512))
                 await box.finishBatchMint()
+
                 for (let i = 0; i < accountList.length; i++) {
-                    expect(await box.balanceOf(accountList[i])).to.be.equal(3)
+                    expect(await box.balanceOf(accountList[i])).to.be.equal(6)
                 }
             })
 
+            it('Can batchmint stress test', async () => {
+                const { box, random, testHash } = testContext
+
+                // 20 users * 10 each basically fills the block
+                const quantity = 10
+                await box.startBatchMint(accountList, quantity)
+
+                await random.fulfillRandomnessWrapper(testHash, randomNumber('31', 256, 512))
+
+                await box.finishBatchMint({gasLimit: 30_000_000})
+                for (let i = 0; i < accountList.length; i++) {
+                    expect(await box.balanceOf(accountList[i])).to.be.equal(quantity)
+                }
+            })
         })
     })
 
