@@ -36,3 +36,6 @@ toggle-rarepizzas-saleisactive-rinkeby:
 
 verify-rarepizzas-rinkeby:
 	npx hardhat verify --contract contracts/token/RarePizzas.sol:RarePizzas --network rinkeby 0xe5516529aec6feecd79ff3bf9225d78846f6768a
+
+withdraw-box-rinkeby:
+	npx hardhat run --network rinkeby scripts/box.withdraw.ts
