@@ -16,9 +16,9 @@ async function main() {
     const contract = new ethers.Contract(instanceAddress, Contract.abi, wallet);
 
     console.log(`setOrderAPIClient: ${utils.getOrderAPIConsumerContractAddress(config)}`)
-    await contract.setOrderAPIClient(utils.getOrderAPIConsumerContractAddress(config), {type: 0, gasLimit: 120000})
+    const tx = await contract.setOrderAPIClient(utils.getOrderAPIConsumerContractAddress(config), {type: 0, gasLimit: 120000})
 
-    console.log('complete')
+    console.log(tx)
 }
 
 main()
