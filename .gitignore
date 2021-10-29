@@ -24,3 +24,5 @@ npm-debug.log*
 
 # Openzeppelin
 .openzeppelin/unknown-31337.json
+
+dist/dapp.js
