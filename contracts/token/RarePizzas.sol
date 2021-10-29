@@ -40,7 +40,7 @@ contract RarePizzas is
 
     // V1 Variables (do not modify this section when upgrading)
 
-    bool private saleIsActive;
+    bool public saleIsActive;
 
     bytes constant sha256MultiHash = hex'1220';
     bytes constant ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
@@ -91,9 +91,6 @@ contract RarePizzas is
     }
 
     // IRarePizzas
-    function isSaleActive() external view override returns (bool) {
-        return saleIsActive;
-    }
 
     function isRedeemed(uint256 boxTokenId) public view override returns (bool) {
         return _redeemedBoxTokenAddress[boxTokenId] != address(0);
@@ -107,44 +104,6 @@ contract RarePizzas is
         require(saleIsActive == true, 'redeem not active');
         require(_msgSender() == _rarePizzasBoxContract.ownerOf(boxTokenId), 'caller must own box');
         _redeemRarePizzasBox(_msgSender(), boxTokenId, recipeId);
-    }
-
-    // Box ERC-721 redirects
-
-    function boxTotalSupply() external view override returns (uint256) {
-        return _rarePizzasBoxContract.totalSupply();
-    }
-
-    function boxTokenOfOwnerByIndex(address owner, uint256 index) external view override returns (uint256 tokenId) {
-        return _rarePizzasBoxContract.tokenOfOwnerByIndex(owner, index);
-    }
-
-    function boxBalanceOf(address owner) external view override returns (uint256 balance) {
-        return _rarePizzasBoxContract.balanceOf(owner);
-    }
-
-    // IRarePizzasBox overrides
-
-    // redirect to the box contract
-
-    function getBitcoinPriceInWei() public view virtual override returns (uint256) {
-        return _rarePizzasBoxContract.getBitcoinPriceInWei();
-    }
-
-    function getPrice() public view virtual override returns (uint256) {
-        return _rarePizzasBoxContract.getPriceInWei();
-    }
-
-    function getPriceInWei() public view virtual override returns (uint256) {
-        return _rarePizzasBoxContract.getPriceInWei();
-    }
-
-    function maxSupply() public view virtual override returns (uint256) {
-        return _rarePizzasBoxContract.maxSupply();
-    }
-
-    function purchase() public payable virtual override nonReentrant {
-        _rarePizzasBoxContract.purchase();
     }
 
     // IOrderAPICallback
