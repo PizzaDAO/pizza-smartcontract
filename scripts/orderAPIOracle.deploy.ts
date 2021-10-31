@@ -21,11 +21,16 @@ async function main() {
 
     console.log('OrderAPIOracle: ', contract)
 
+    const receipt = await contract.deployTransaction.wait()
+    console.log(receipt)
+
     // set the fulfillment address
     console.log(`setFulfillmentPermission for: ${utils.getOrderAPIOracleNodeAddress(config)}`)
 
     const instance = new ethers.Contract(contract.address, abi, wallet);
-    await instance.setFulfillmentPermission(utils.getOrderAPIOracleNodeAddress(config), true, { gasLimit: 200000 })
+    const tx = await instance.setFulfillmentPermission(
+        utils.getOrderAPIOracleNodeAddress(config), true, { gasPrice: 200000000000,  gasLimit: 200000 })
+    const result = await tx.wait()
 
     const status = await instance.getAuthorizationStatus(utils.getOrderAPIOracleNodeAddress(config))
     console.log(`status: ${status}`)
