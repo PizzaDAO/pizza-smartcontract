@@ -21,7 +21,7 @@ const networks: NetworksUserConfig = {
   mainnet: {
     url: `https://eth-mainnet.alchemyapi.io/v2/${config.ALCHEMY_MAINNET_KEY}`,
     accounts: [`0x${config.MAINNET_PRIVATE_KEY}`],
-    gasPrice: 250000000000
+    gasPrice: 200000000000
   },
   rinkeby: {
     url: `https://eth-rinkeby.alchemyapi.io/v2/${config.ALCHEMY_RINKEBY_KEY}`,
