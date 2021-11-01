@@ -13,7 +13,7 @@ This is the run script for deploying the RarePizzas.sol contract with all depend
 
 - [] ensure the rarepizzas polygon MATIC_PRIVATE_KEY eenvironment variable is set
 
-`npx hardhat run --network polygon scripts/pizza.storagte.deploy.ts`
+`npx hardhat run --network polygon scripts/pizza.storage.deploy.ts`
 
 - [] set the polygon RAREPIZZAS_SEEDSTORAGE_MATIC_PROXY_ADDRESS environment variable in the .env file
 
