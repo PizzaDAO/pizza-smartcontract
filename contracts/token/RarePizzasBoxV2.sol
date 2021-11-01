@@ -32,7 +32,7 @@ contract RarePizzasBoxV2 is RarePizzasBox, IChainlinkVRFCallback, IRarePizzasBox
 
     // IChainlinkVRFCallback
 
-    function fulfillRandomness(bytes32 request, uint256 random) external override {
+    function fulfillRandomness(bytes32 request, uint256 random) external virtual override {
         require(msg.sender == _chainlinkVRFConsumer, 'caller not VRF');
         address to = _purchaseID[request];
 
@@ -89,8 +89,9 @@ contract RarePizzasBoxV2 is RarePizzasBox, IChainlinkVRFCallback, IRarePizzasBox
      * override replaces the previous block hash with the difficulty
      */
     function _assignBoxArtwork(uint256 tokenId) internal override {
-        uint256 pseudoRandom =
-            uint256(keccak256(abi.encodePacked(blockhash(block.difficulty - 1), tokenId, msg.sender))) % BOX_LENGTH;
+        uint256 pseudoRandom = uint256(
+            keccak256(abi.encodePacked(blockhash(block.difficulty - 1), tokenId, msg.sender))
+        ) % BOX_LENGTH;
         _tokenBoxArtworkURIs[tokenId] = pseudoRandom;
         // this function should only be called from owner or as a fallback
         // so emit an event whenever it is called

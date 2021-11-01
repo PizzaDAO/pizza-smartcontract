@@ -37,7 +37,7 @@ async function main() {
 
     console.log('Random Consumer: setCallbackContract', utils.getStorageProxyAddress(config))
 
-    // fund with link
+    // fund with link (1 link)
     const linkInstance = new ethers.Contract(utils.getChainlinkToken(config), linkToken.abi, wallet);
     const success = await linkInstance.transfer(
         contract.address, ethers.BigNumber.from('1000000000000000000'), {type: 0, gasLimit: 120000}
