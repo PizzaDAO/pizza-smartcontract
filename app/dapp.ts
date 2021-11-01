@@ -12,7 +12,7 @@ declare var window: any;
 const multisigAddress = '0xBA5E28a2D1C8cF67Ac9E0dfc850DC8b7b21A4DE2'
 
 // Addresses for the pizza contract
-const rinkebyAddress = '0x237f5C52f685015426386D32f441b8909d0D4937'
+const rinkebyAddress = '0x983122EA6E33F06BbF94bA8303cC220Edde83d90'
 const mainnetAddress = '0xE6616436Ff001Fe827e37C7FaD100f531D0935f0'
 // Addresses for the box contract
 const boxRinkebyAddress = "0x8f5AE25105C3c03Bce89aE3b5ed1E30456755fAb"

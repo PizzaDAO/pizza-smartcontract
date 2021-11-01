@@ -5,7 +5,7 @@ import config, { NetworkConfig } from '../config'
 
 import boxContract from '../artifacts/contracts/token/RarePizzasBox.sol/RarePizzasBox.json'
 import boxContractV2 from '../artifacts/contracts/token/RarePizzasBoxV2.sol/RarePizzasBoxV2.json'
-import boxContractV3 from '../artifacts/contracts/token/RarePizzasBoxV3.sol/RarePizzasBoxV3.json'
+import boxContractV3 from '../artifacts/contracts/token/RarePizzaBoxV3.sol/RarePizzasBoxV3.json'
 import randomConsumer from '../artifacts/contracts/random/RandomConsumer.sol/RandomConsumer.json'
 import seedStorage from '../artifacts/contracts/data/RarePizzasSeedStorage.sol/RarePizzasSeedStorage.json'
 import rarePizzas from '../artifacts/contracts/token/RarePizzas.sol/RarePizzas.json'

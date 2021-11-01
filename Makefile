@@ -10,6 +10,12 @@ build:
 test:
 	npx hardhat test
 
+deploy-box-v3-mainnet:
+	npx hardhat run --network mainnet scripts/box.upgrade.v3.prepare.ts
+
+verify-box-mainnet:
+	npx hardhat verify --contract contracts/token/RarePizzaBoxV3.sol:RarePizzasBoxV3 --network mainnet 0x0F754c7E6fdDE99B3BD16eC559587BD8A7DE4dCc
+
 deploy-storage-mumbai:
 	npx hardhat run --network maticmum scripts/pizza.storage.deploy.ts
 
