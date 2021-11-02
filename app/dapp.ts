@@ -12,7 +12,7 @@ declare var window: any;
 const multisigAddress = '0xBA5E28a2D1C8cF67Ac9E0dfc850DC8b7b21A4DE2'
 
 // Addresses for the pizza contract
-const rinkebyAddress = '0x983122EA6E33F06BbF94bA8303cC220Edde83d90'
+const rinkebyAddress = '0xDfcB120fD7d076a884Aba8A4916D43291513e4D9'
 const mainnetAddress = '0xE6616436Ff001Fe827e37C7FaD100f531D0935f0'
 // Addresses for the box contract
 const boxRinkebyAddress = "0x8f5AE25105C3c03Bce89aE3b5ed1E30456755fAb"
@@ -81,23 +81,15 @@ type AppContext = {
 
 // list of recipes by index
 let recipes: Tuple[] = [
-    {key: "Random Pie", value: "0"},
-    {key: "Cheeze Pie", value: "1"},
-    {key: "Pepperoni", value: "2"},
-    {key: "Hawaiian", value: "3"},
-    {key: "Moon Pie", value: "4"},
-    {key: "Crypto Pie", value: "5"},
-    {key: "Horror Pie", value: "6"},
-    {key: "80's Pie", value: "7"},
-    {key: "Trippy-Shrooms Pie", value: "8"},
-    {key: "Shrooms Pie", value: "9"},
-    {key: "Green Salad Pie", value: "10"},
-    {key: "Flower Bloom Pie", value: "11"},
-    {key: "Vegan Pie", value: "12"},
-    {key: "Apple Pie", value: "13"},
-    {key: "Mixed Fruit Pie", value: "14"},
-    {key: "Meat Lover's", value: "15"},
-    {key: "Seafood Delight", value: "16"}
+    {key: "Rare", value: "0"},
+    {key: "Old School", value: "1"},
+    {key: "New School", value: "2"},
+    {key: "Veggie", value: "3"},
+    {key: "Meat Lover's", value: "4"},
+    {key: "Seafood Delight", value: "5"},
+    {key: "Sweet", value: "6"},
+    {key: "Horror", value: "7"},
+    {key: "Moon", value: "8"}
 ]
 
 // a context to pass around
@@ -147,7 +139,7 @@ const DOM = {
     buttons: {
         connect: document.querySelector('#walletButton'),
         buy: document.querySelector('#buyButton'),
-        redeem: document.querySelector('#bakePizza'),
+        redeem: document.querySelector('#bakePie'),
         checkBoxIsRedeemed: document.querySelector('#checkPie'),
     },
     contract: {
@@ -167,8 +159,8 @@ const DOM = {
         remainingBoxesCount: document.querySelector('#pizzasLabel'),
         redeemedPizzasCount: document.querySelector('#pizzasRedeemed'),
 
-        btcPriceLabel: document.querySelector('#btcPriceLabel'),
-        ethPriceLabel: document.querySelector('#ethPriceLabel'),
+        btcPriceLabel: document.querySelector('#ethPriceLabel'),
+        ethPriceLabel: document.querySelector('#btcPriceLabel'),
 
         errorLabel: document.querySelector('#errorMsg2'),
 
@@ -203,10 +195,12 @@ const DOM = {
         console.log("refresh state")
 
         // Header
-        if (context.app.pizzaSaleIsActive) {
-            DOM.labels.dappHeader.innerHTML = "Bake Your Rare Pizza!"
-        }  else {
-            DOM.labels.dappHeader.innerHTML = "Kitchen Is Closed :-("
+        if (!helpers.isNullOrUndefined(DOM.labels.dappHeader)) {
+            if (context.app.pizzaSaleIsActive) {
+                DOM.labels.dappHeader.innerHTML = "Bake Your Rare Pizza!"
+            }  else {
+                DOM.labels.dappHeader.innerHTML = "Kitchen Is Closed :-("
+            }
         }
         
         // connect button
@@ -254,23 +248,31 @@ const DOM = {
         }
 
         // Pizza availability
-        if (context.app.countTotal.totalBoxes === 0) {
-            DOM.labels.redeemedPizzasCount.innerHTML = "--"
-        } else {
-            const existing = context.app.countTotal.existingPizzas
-            DOM.labels.redeemedPizzasCount.innerHTML = `${existing}`
+        if (!helpers.isNullOrUndefined(DOM.labels.redeemedPizzasCount)) {
+            if (context.app.countTotal.totalBoxes === 0) {
+                DOM.labels.redeemedPizzasCount.innerHTML = "--"
+            } else {
+                const existing = context.app.countTotal.existingPizzas
+                DOM.labels.redeemedPizzasCount.innerHTML = `${existing}`
+            }
         }
 
         // Pizzas redeemed
         const unclaimedBoxes = context.user.unredeemedBoxTokens().length
-        DOM.labels.userUnredeemedBoxCount.innerHTML = `${unclaimedBoxes}`
-        DOM.labels.userPizzaCount.innerHTML = context.user.balance.pizzaTokenCount
+        if (!helpers.isNullOrUndefined(DOM.labels.userUnredeemedBoxCount)) {
+            DOM.labels.userUnredeemedBoxCount.innerHTML = `${unclaimedBoxes}`
+        }
+        if (!helpers.isNullOrUndefined(DOM.labels.userPizzaCount)) {
+            DOM.labels.userPizzaCount.innerHTML = context.user.balance.pizzaTokenCount
+        }
 
         // error
-        if (context.app.statusMessage != "") {
-            DOM.labels.errorLabel.innerHTML = context.app.statusMessage
-        } else {
-            DOM.labels.errorLabel.innerHTML = ""
+        if (!helpers.isNullOrUndefined(DOM.labels.errorLabel)) {
+            if (context.app.statusMessage != "") {
+                DOM.labels.errorLabel.innerHTML = context.app.statusMessage
+            } else {
+                DOM.labels.errorLabel.innerHTML = ""
+            }
         }
 
         // buy button
@@ -288,11 +290,15 @@ const DOM = {
         }
 
         // contract
-        if (context.contract === undefined) {
-            console.log("refresh no contract")
-            DOM.contract.address.innerHTML = "Not Connected"
-        } else {
-            DOM.contract.address.textContent = context.contract.address
+        if (!helpers.isNullOrUndefined(DOM.contract.address)) {
+            if (context.contract === undefined) {
+                console.log("refresh no contract")
+                
+                DOM.contract.address.innerHTML = "Not Connected"
+                
+            } else {
+                DOM.contract.address.textContent = context.contract.address
+            }
         }
 
         // box contract
@@ -325,7 +331,10 @@ const helpers = {
     },
     bigNumberAddPercent: (bigNum: BigNumber, pct: number) => {
         return bigNum.mul(pct).div(100)
-    }
+    },
+    isNullOrUndefined: (value: any | null | undefined): value is null | undefined => {
+        return value === null || value === undefined;
+      }
 }
 
 // actions that can be taken
@@ -783,51 +792,63 @@ const actions = {
 }
 
 // events
+if (!helpers.isNullOrUndefined(DOM.contract.address)) {
+    DOM.contract.address.addEventListener('click', async () => {
+        state.app.statusMessage = ""
+        DOM.refreshState(state)
 
-DOM.contract.address.addEventListener('click', async () => {
-    state.app.statusMessage = ""
-    DOM.refreshState(state)
+        if (state.contract !== undefined) {
+            const contract = state.contract?.address
+            const subdomain = contract === rinkebyAddress ? "rinkeby" : "www"
+            window.open(`https://${subdomain}.etherscan.io/address/${contract}`, "_blank");
+        }
+    })
+}
 
-    if (state.contract !== undefined) {
-        const contract = state.contract?.address
-        const subdomain = contract === rinkebyAddress ? "rinkeby" : "www"
-        window.open(`https://${subdomain}.etherscan.io/address/${contract}`, "_blank");
-    }
-})
+if (!helpers.isNullOrUndefined(DOM.contract.boxAddress)) {
+    DOM.contract.boxAddress.addEventListener('click', async () => {
+        state.app.statusMessage = ""
+        DOM.refreshState(state)
 
-DOM.contract.boxAddress.addEventListener('click', async () => {
-    state.app.statusMessage = ""
-    DOM.refreshState(state)
+        if (state.contract !== undefined) {
+            const contract = state.boxContract?.address
+            const subdomain = contract === boxRinkebyAddress ? "rinkeby" : "www"
+            window.open(`https://${subdomain}.etherscan.io/address/${contract}`, "_blank");
+        }
+    })
+}
 
-    if (state.contract !== undefined) {
-        const contract = state.boxContract?.address
-        const subdomain = contract === boxRinkebyAddress ? "rinkeby" : "www"
-        window.open(`https://${subdomain}.etherscan.io/address/${contract}`, "_blank");
-    }
-})
+if (!helpers.isNullOrUndefined(DOM.buttons.connect)) {
+    DOM.buttons.connect.addEventListener('click', async () => {
+        state.app.statusMessage = ""
+        DOM.refreshState(state)
 
-DOM.buttons.connect.addEventListener('click', async () => {
-    state.app.statusMessage = ""
-    DOM.refreshState(state)
+        if (actions.wallet.isConnected()) {
+            actions.wallet.resetWallet()
+        } else {
+            console.log("requesting access")
+            actions.wallet.requestAccess()
+        }
+    })
+}
 
-    if (actions.wallet.isConnected()) {
-        actions.wallet.resetWallet()
-    } else {
-        console.log("requesting access")
-        actions.wallet.requestAccess()
-    }
-})
+if (!helpers.isNullOrUndefined(DOM.buttons.checkBoxIsRedeemed)) {
+    DOM.buttons.checkBoxIsRedeemed.addEventListener('click', async () => {
+        state.app.statusMessage = ""
+        DOM.refreshState(state)
 
-DOM.buttons.checkBoxIsRedeemed.addEventListener('click', async () => {
-    state.app.statusMessage = ""
-    DOM.refreshState(state)
+        const tokenId = DOM.fields.bakedPiecheck.value
 
-    const tokenId = DOM.fields.bakedPiecheck.value
-
-    const redeemed = await actions.app.isRedeemed(parseInt(tokenId))
-    // TODO: update DOM in the right place
-    DOM.labels.errorLabel.innerHTML = `token: ${tokenId} isRedeemed: ${redeemed}`
-})
+        const redeemed = await actions.app.isRedeemed(parseInt(tokenId))
+        // TODO: update DOM in the right place
+        if (redeemed) {
+            DOM.labels.errorLabel.innerHTML = `token ${tokenId} is already redeemed`
+        } else {
+            DOM.labels.errorLabel.innerHTML = `token ${tokenId} has not yet been redeemed`
+        }
+        
+    })
+}
 
 DOM.buttons.buy.addEventListener('click', async () => {
     state.app.statusMessage = ""
@@ -843,6 +864,15 @@ DOM.buttons.buy.addEventListener('click', async () => {
 DOM.buttons.redeem.addEventListener('click', async () => {
     state.app.statusMessage = ""
     DOM.refreshState(state)
+
+    const isActive = await actions.contract.isSaleActive()
+
+    if (!isActive) {
+        console.log("sale is not active")
+        state.app.statusMessage = "sale is not active"
+        DOM.refreshState(state)
+        return
+    }
 
     const boxTokenId = DOM.selectors.boxSelector.value
     const desiredRecipe = DOM.selectors.recipeSelector.value

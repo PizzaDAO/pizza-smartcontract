@@ -10,7 +10,13 @@ build:
 test:
 	npx hardhat test
 
-deploy-box-v3-mainnet:
+box-transfer-ownable:
+	npx hardhat run --network rinkeby scripts/box.upgrade.v3.prepare.ts
+
+prepare-box-v3-rinkeby:
+	npx hardhat run --network rinkeby scripts/box.upgrade.v3.prepare.ts
+
+prepare-box-v3-mainnet:
 	npx hardhat run --network mainnet scripts/box.upgrade.v3.prepare.ts
 
 verify-box-mainnet:
