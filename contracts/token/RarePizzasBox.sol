@@ -228,8 +228,8 @@ contract RarePizzasBox is
     // Internal Stuff
 
     function _assignBoxArtwork(uint256 tokenId) internal virtual {
-        uint256 pseudoRandom =
-            uint256(keccak256(abi.encodePacked(blockhash(block.number - 1), tokenId, msg.sender))) % MAX_BOX_INDEX;
+        uint256 pseudoRandom = uint256(keccak256(abi.encodePacked(blockhash(block.number - 1), tokenId, msg.sender))) %
+            MAX_BOX_INDEX;
         _tokenBoxArtworkURIs[tokenId] = pseudoRandom;
     }
 

@@ -7,7 +7,7 @@ import '@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol';
 import '../libraries/MerkleProof.sol';
 import { RarePizzasBoxV3 } from './RarePizzasBoxV3.sol';
-import 'hardhat/console.sol';
+
 import '../interfaces/IChainlinkVRFRandomConsumer.0.8.0.sol';
 import '../interfaces/IRarePizzasBoxV3Admin.sol';
 
