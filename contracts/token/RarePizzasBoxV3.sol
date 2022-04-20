@@ -88,4 +88,5 @@ contract RarePizzasBoxV3 is RarePizzasBoxV2, IRarePizzasBoxV3Admin {
         batchMintRequest = requestId;
         status = batchMintStatus.QUEUED;
     }
+    
 }

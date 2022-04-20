@@ -54,7 +54,7 @@ contract RandomConsumer is VRFConsumerBase, Ownable, IChainlinkVRFAdmin {
         require(_callbackContract != address(0), 'Callback must be set');
         require(msg.sender == _callbackContract, 'Sender must be callback');
         require(LINK.balanceOf(address(this)) >= _fee, 'Not enough LINK');
-        return requestRandomness(_keyHash, _fee);
+        return requestRandomness(_keyHash, _fee, 42069);
     }
 
     /**
