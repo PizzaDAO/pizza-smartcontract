@@ -6,10 +6,10 @@ import '@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol';
 
-import { RarePizzasBoxV3 } from './RarePizzasBoxV3.sol';
+import { RarePizzasBoxV3Fix } from './RarePizzasBoxV3.sol';
 import 'hardhat/console.sol';
 
-contract RarePizzasBoxV4 is RarePizzasBoxV3 {
+contract RarePizzasBoxV42 is RarePizzasBoxV3Fix {
     using AddressUpgradeable for address;
     using CountersUpgradeable for CountersUpgradeable.Counter;
     using SafeMathUpgradeable for uint256;

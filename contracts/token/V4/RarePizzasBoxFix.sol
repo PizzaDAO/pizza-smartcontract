@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
@@ -8,22 +10,21 @@ import '@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol';
 
-import '@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol';
+//import '@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol';
 
-import '../math/BondingCurve.sol';
-import '../interfaces/IOpenSeaCompatible.sol';
-import '../interfaces/IRarePizzasBox.sol';
-import '../interfaces/IRarePizzasBoxAdmin.sol';
-import '../data/BoxArt.sol';
+//import '../math/BondingCurve.sol';
+import '../../interfaces/IOpenSeaCompatible.sol';
+import '../../interfaces/IRarePizzasBox.sol';
+import '../../interfaces/IRarePizzasBoxAdmin.sol';
+import '../../data/BoxArt.sol';
 
 /**
  * @dev Rare Pizzas Box mints pizza box token for callers who call the purchase function.
  */
-contract RarePizzasBox is
+contract RarePizzasBoxFix is
     OwnableUpgradeable,
     ERC721EnumerableUpgradeable,
     BoxArt,
-    BondingCurve,
     IRarePizzasBox,
     IRarePizzasBoxAdmin,
     IOpenSeaCompatible
@@ -96,7 +97,7 @@ contract RarePizzasBox is
     }
 
     function getPriceInWei() public view virtual override returns (uint256) {
-        return ((super.curve(_purchased_pizza_count.current() + 1) * bitcoinPriceInWei) / oneEth);
+        return 1;
     }
 
     function maxSupply() public view virtual override returns (uint256) {
@@ -188,7 +189,7 @@ contract RarePizzasBox is
     }
 
     function updateBitcoinPriceInWei(uint256 fallbackValue) public virtual override onlyOwner {
-        if (_chainlinkBTCETHFeed != address(0)) {
+        /* if (_chainlinkBTCETHFeed != address(0)) {
             try AggregatorV3Interface(_chainlinkBTCETHFeed).latestRoundData() returns (
                 uint80, // roundId,
                 int256 answer,
@@ -216,6 +217,7 @@ contract RarePizzasBox is
             emit BTCETHPriceUpdated(old, bitcoinPriceInWei);
         }
         // nothing got updated.  The miners thank you for your contribution.
+        **/
     }
 
     function withdraw() public virtual override onlyOwner {
