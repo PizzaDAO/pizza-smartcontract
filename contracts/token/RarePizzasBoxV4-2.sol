@@ -13,12 +13,17 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3 {
     using AddressUpgradeable for address;
     using CountersUpgradeable for CountersUpgradeable.Counter;
     using SafeMathUpgradeable for uint256;
-    address minter;
+    //address minter;
+    mapping(address => bool) public isMinter;
 
     function mint(address to, uint256 random) external virtual {
-        require(msg.sender == minter, 'only can be called minted by authorized contract');
+        require(isMinter[msg.sender] == true, 'only can be called minted by authorized contract');
         uint256 id = _getNextPizzaTokenId();
         _safeMint(to, id);
         _assignBoxArtwork(id, random);
+    }
+
+    function toggleMinter(address a) public onlyOwner {
+        isMinter[a] = !isMinter[a];
     }
 }
