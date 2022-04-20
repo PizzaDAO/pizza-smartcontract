@@ -60,6 +60,14 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
         }
     }
 
+    function setSaleWhitelist(bytes32 b) public {
+        preSaleWhitelist = b;
+    }
+
+    function setclaimWhiteList(bytes32 b) public {
+        claimWhiteList = b;
+    }
+
     function purchase() public payable virtual override {
         require(
             block.timestamp >= publicSaleStart_timestampInS ||
