@@ -60,11 +60,11 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
         }
     }
 
-    function setSaleWhitelist(bytes32 b) public {
+    function setSaleWhitelist(bytes32 b) public onlyOwner {
         preSaleWhitelist = b;
     }
 
-    function setclaimWhiteList(bytes32 b) public {
+    function setclaimWhiteList(bytes32 b) public onlyOwner {
         claimWhiteList = b;
     }
 
