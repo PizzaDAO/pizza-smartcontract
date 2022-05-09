@@ -78,7 +78,20 @@ describe('Box V3 Real Upgrade Tests', function () {
         console.log(await r.wait())
 
     })
+    it('can set merkle roots and make a prepurchase', async () => {
+        const { boxV4, accounts, random } = testContext
+        let Tree = utils.merkleTree
+        await boxV4.setSaleWhitelist(Tree.root)
+        await boxV4.setclaimWhiteList(Tree.root2)
+        let proof = Tree.tree.getProof(Tree.elements[1])
+        proof = proof.map((item: any) => '0x' + item.data.toString('hex'))
+        await boxV4.connect(accounts[1]).prePurchase(proof, { value: ethers.utils.parseEther('0.08') })
 
+        await random.fulfillRandomnessWrapper('0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4', 234324)
+        
+
+
+    })
     /**  it('Should not modify ownable when upgrading', async () => {
             const { box, wallet, signer } = testContext
     
