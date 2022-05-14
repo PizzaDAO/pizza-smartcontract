@@ -97,7 +97,7 @@ contract RarePizzasBoxFix is
     }
 
     function getPriceInWei() public view virtual override returns (uint256) {
-        return 1;
+        return 0;
     }
 
     function maxSupply() public view virtual override returns (uint256) {
