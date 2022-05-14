@@ -1,3 +1,5 @@
+
+
 import { expect } from 'chai'
 import { BigNumber, Contract, Signer, Wallet } from 'ethers'
 import { ethers, upgrades } from 'hardhat'
@@ -40,6 +42,8 @@ describe('Box V3 Real Upgrade Tests', function () {
     const price: BigNumber = await box.getPrice()
     await box.purchase({ value: price })
 
+    //price should be 0.1 eth
+
     expect(await box.totalSupply()).to.equal(1)
     const random = await getRinkebyRandomConsumer(box)
 
@@ -70,22 +74,22 @@ describe('Box V3 Real Upgrade Tests', function () {
 
   /**  it('Should not modify ownable when upgrading', async () => {
           const { box, wallet, signer } = testContext
-  
+
           expect(await box.owner()).to.equal(signer.address);
-  
+
           // transfer ownership of the proxy
           await upgrades.admin.transferProxyAdminOwnership(wallet.address)
           expect(await box.owner()).to.equal(signer.address); // the signer is still the owner
-  
+
           // transfer ownership of the contract logic to another wallet
           await box.connect(signer).transferOwnership(wallet.address)
           expect(await box.owner()).to.equal(wallet.address)
-  
+
           // run the upgrade (using the new owner)
           const BoxV2 = await ethers.getContractFactory('RarePizzasBoxV2', wallet)
           const BoxV2Address = await upgrades.prepareUpgrade(box.address, BoxV2)
           await upgrades.upgradeProxy(box.address, BoxV2)
-  
+
           // validate the owner is not changed
           expect(await box.owner()).to.equal(wallet.address)
       })
