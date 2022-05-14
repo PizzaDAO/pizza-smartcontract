@@ -16,8 +16,10 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
     using CountersUpgradeable for CountersUpgradeable.Counter;
     using SafeMathUpgradeable for uint256;
     using MerkleProof for bytes32;
-    uint256 public constant price = 0.0125 ether;
-    uint256 public constant presalePrice = 0.08 ether;
+    uint256 public constant price = 0.08 ether;
+
+    uint256 public maxNewPurchases;
+    uint256 public totalNewPurchases;
     bytes32 public preSaleWhitelist;
     bytes32 public claimWhiteList;
 
@@ -67,7 +69,9 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
     function setclaimWhiteList(bytes32 b) public onlyOwner {
         claimWhiteList = b;
     }
-
+    function setMaxNewPurchases(uint n) public onlyOwner{
+        maxNewPurchases=n;
+    }
     function purchase() public payable virtual override {
         require(
             block.timestamp >= publicSaleStart_timestampInS ||
@@ -75,7 +79,7 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
             "sale hasn't started"
         );
         require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY, 'exceeds supply.');
-
+        require(totalNewPurchases < maxNewPurchases, 'new purchase must be less than max');
         require(msg.value >= price, 'price too low');
         payable(msg.sender).transfer(msg.value - price);
 
@@ -83,7 +87,7 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
         _presalePurchaseCount[msg.sender] += 1;
         _purchased_pizza_count.increment();
         _externalMintWithArtwork(msg.sender); // V2: mint using external randomness
-
+        totalNewPurchases += 1;
         // BUY ONE GET ONE FREE!
         if (_purchased_pizza_count.current().add(1) == MAX_PURCHASABLE_SUPPLY) {
             _presalePurchaseCount[msg.sender] += 1;
@@ -121,15 +125,15 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
         validateUser(proof, preSaleWhitelist, msg.sender);
 
         require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY, 'exceeds supply.');
-
-        require(msg.value >= presalePrice, 'price too low');
+        require(totalNewPurchases < maxNewPurchases, 'new purchase must be less than max');
+        require(msg.value >= price, 'price too low');
         payable(msg.sender).transfer(msg.value - price);
 
         // Presale addresses can purchase up to X total
         _presalePurchaseCount[msg.sender] += 1;
         _purchased_pizza_count.increment();
         _externalMintWithArtwork(msg.sender); // V2: mint using external randomness
-
+        totalNewPurchases += 1;
         // BUY ONE GET ONE FREE!
         if (_purchased_pizza_count.current().add(1) == MAX_PURCHASABLE_SUPPLY) {
             _presalePurchaseCount[msg.sender] += 1;

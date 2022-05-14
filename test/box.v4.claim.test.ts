@@ -81,6 +81,7 @@ describe('Box V3 Real Upgrade Tests', function () {
     it('can set merkle roots and make a prepurchase', async () => {
         const { boxV4, accounts, random } = testContext
         let Tree = utils.merkleTree
+        await boxV4.setMaxNewPurchases(1)
         await boxV4.setSaleWhitelist(Tree.root)
         await boxV4.setclaimWhiteList(Tree.root2)
         let proof = Tree.tree.getProof(Tree.elements[1])
@@ -88,9 +89,19 @@ describe('Box V3 Real Upgrade Tests', function () {
         await boxV4.connect(accounts[1]).prePurchase(proof, { value: ethers.utils.parseEther('0.08') })
 
         await random.fulfillRandomnessWrapper('0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4', 234324)
-        
+
+    })
+    it('user can purchase for new flat price', async () => {
+        const { boxV4, accounts, random } = testContext
+        await boxV4.setMaxNewPurchases(100)
 
 
+        expect(await boxV4.maxNewPurchases()).to.equal(100)
+        for (let i = 0; i < 10; i++) {
+            await boxV4.connect(accounts[i]).purchase({ value: ethers.utils.parseEther('.08') })
+        }
+        expect(await boxV4.totalNewPurchases()).to.equal(10)
+        //await expect(boxV4.connect(accounts[0]).purchase({ value: ethers.utils.parseEther('.08') })).to.be.reverted
     })
     /**  it('Should not modify ownable when upgrading', async () => {
             const { box, wallet, signer } = testContext
