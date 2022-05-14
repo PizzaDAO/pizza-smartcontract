@@ -49,7 +49,9 @@ const accountList =
 describe('Box V3 Purchase Tests', function () {
     beforeEach(async () => {
         const [wallet, userWallet] = new MockProvider().getWallets()
-        const RandomConsumer = await ethers.getContractFactory('FakeRandomConsumer')
+        const
+
+        Consumer = await ethers.getContractFactory('FakeRandomConsumer')
         const Box = await ethers.getContractFactory('RarePizzasBoxV3')
         const box = await Box.deploy()
 
@@ -129,8 +131,8 @@ describe('Box V3 Purchase Tests', function () {
                     const price: BigNumber = await box.getPrice()
                     await box.purchase({ value: price })
 
-                    // fulfilling randomness should fail 
-                    // since the random contract is 
+                    // fulfilling randomness should fail
+                    // since the random contract is
                     // no longer the VRF consumer address
                     // note in the actual implementation this doesnt get called
                     // since the purchase function will have already

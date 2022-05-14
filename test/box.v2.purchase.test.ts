@@ -115,8 +115,8 @@ describe('Box V2 Purchase Tests', function () {
                     const price: BigNumber = await box.getPrice()
                     await box.purchase({ value: price })
 
-                    // fulfilling randomness should fail 
-                    // since the random contract is 
+                    // fulfilling randomness should fail
+                    // since the random contract is
                     // no longer the VRF consumer address
                     // note in the actual implementation this doesnt get called
                     // since the purchase function will have already

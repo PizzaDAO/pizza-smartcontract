@@ -74,6 +74,7 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
                 (_presalePurchaseCount[msg.sender] < _presaleAllowed[msg.sender]),
             "sale hasn't started"
         );
+        
         require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY, 'exceeds supply.');
 
         require(msg.value >= price, 'price too low');
