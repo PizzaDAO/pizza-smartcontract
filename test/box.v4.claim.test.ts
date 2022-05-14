@@ -93,15 +93,15 @@ describe('Box V3 Real Upgrade Tests', function () {
     })
     it('user can purchase for new flat price', async () => {
         const { boxV4, accounts, random } = testContext
-        await boxV4.setMaxNewPurchases(100)
+        await boxV4.setMaxNewPurchases(10)
 
 
-        expect(await boxV4.maxNewPurchases()).to.equal(100)
+        expect(await boxV4.maxNewPurchases()).to.equal(10)
         for (let i = 0; i < 10; i++) {
             await boxV4.connect(accounts[i]).purchase({ value: ethers.utils.parseEther('.08') })
         }
         expect(await boxV4.totalNewPurchases()).to.equal(10)
-        //await expect(boxV4.connect(accounts[0]).purchase({ value: ethers.utils.parseEther('.08') })).to.be.reverted
+        await expect(boxV4.connect(accounts[0]).purchase({ value: ethers.utils.parseEther('.08') })).to.be.revertedWith('new purchase must be less than max')
     })
     /**  it('Should not modify ownable when upgrading', async () => {
             const { box, wallet, signer } = testContext

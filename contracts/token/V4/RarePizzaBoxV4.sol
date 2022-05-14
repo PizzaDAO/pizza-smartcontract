@@ -72,6 +72,9 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
     function setMaxNewPurchases(uint n) public onlyOwner{
         maxNewPurchases=n;
     }
+    function getPrice() public view virtual override returns (uint256) {
+        return price;
+    }
     function purchase() public payable virtual override {
         require(
             block.timestamp >= publicSaleStart_timestampInS ||

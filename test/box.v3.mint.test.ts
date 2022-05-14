@@ -219,7 +219,7 @@ describe('Box V3 Purchase Tests', function () {
 
                 await random.fulfillRandomnessWrapper(testHash, randomNumber('31', 256, 512))
 
-                await box.finishBatchMint({gasLimit: 30_000_000})
+                await box.finishBatchMint({ gasLimit: 30_000_000 })
                 for (let i = 0; i < accountList.length; i++) {
                     expect(await box.balanceOf(accountList[i])).to.be.equal(quantity)
                 }
