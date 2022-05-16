@@ -83,9 +83,22 @@ describe('Box V3 Real Upgrade Tests', function () {
     await boxV4.setclaimWhiteList(Tree.root2)
     let proof = Tree.tree.getProof(Tree.elements[1])
     proof = proof.map((item: any) => '0x' + item.data.toString('hex'))
-    await boxV4.connect(accounts[1]).prePurchase(proof, { value: ethers.utils.parseEther('0.08') })
+    await boxV4.connect(accounts[1]).prePurchase(proof, 1, { value: ethers.utils.parseEther('0.08') })
 
     await random.fulfillRandomnessWrapper('0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4', 234324)
+  })
+  it('can set merkle roots and make a multiprepurchase', async () => {
+    const { boxV4, accounts, random } = testContext
+    let Tree = utils.merkleTree
+    await boxV4.setMaxNewPurchases(11)
+    await boxV4.setSaleWhitelist(Tree.root)
+    await boxV4.setclaimWhiteList(Tree.root2)
+    let proof = Tree.tree.getProof(Tree.elements[1])
+    proof = proof.map((item: any) => '0x' + item.data.toString('hex'))
+    await boxV4.connect(accounts[1]).prePurchase(proof, 10, { value: ethers.utils.parseEther('0.80') })
+
+    await random.fulfillRandomnessWrapper('0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4', 234324)
+    await boxV4.completeClaim('0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4')
   })
   it('user can purchase for new flat price', async () => {
     const { boxV4, accounts, random } = testContext
@@ -100,7 +113,7 @@ describe('Box V3 Real Upgrade Tests', function () {
       'new purchase must be less than max',
     )
   })
-  it.only('user can multi purchase for new flat price', async () => {
+  it('user can multi purchase for new flat price', async () => {
     const { boxV4, accounts, random } = testContext
     await boxV4.setMaxNewPurchases(10)
 

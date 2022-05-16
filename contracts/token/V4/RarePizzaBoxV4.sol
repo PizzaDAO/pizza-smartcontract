@@ -108,12 +108,16 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
                 (_presalePurchaseCount[msg.sender] < _presaleAllowed[msg.sender]),
             "sale hasn't started"
         );
-        require(n < 20, 'max purchase of 20 boxes');
+        require(msg.value >= n.mul(price), 'price too low');
+        payable(msg.sender).transfer(msg.value.sub(n.mul(price)));
+        _multiPurchase(n);
+    }
+
+    function _multiPurchase(uint256 n) internal virtual {
+        require(n < 21 && n > 0, 'max purchase of 20 boxes');
         require(totalNewPurchases.add(n) < maxNewPurchases, 'new purchase must be less than max');
         require(totalSupply().add(n) <= MAX_TOKEN_SUPPLY, 'exceeds supply.');
         totalNewPurchases += n;
-        require(msg.value >= n.mul(price), 'price too low');
-        payable(msg.sender).transfer(msg.value.sub(n.mul(price)));
 
         // Presale addresses can purchase up to X total
         _presalePurchaseCount[msg.sender] += n;
@@ -131,24 +135,29 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
         }
     }
 
-    function prePurchase(bytes32[] memory proof) public payable virtual {
+    function prePurchase(bytes32[] memory proof, uint256 n) public payable virtual {
         validateUser(proof, preSaleWhitelist, msg.sender);
+        if (n > 1) {
+            require(msg.value >= n.mul(price), 'price too low');
+            payable(msg.sender).transfer(msg.value.sub(n.mul(price)));
+            _multiPurchase(n);
+        } else {
+            require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY, 'exceeds supply.');
+            require(totalNewPurchases < maxNewPurchases, 'new purchase must be less than max');
+            require(msg.value >= price, 'price too low');
+            payable(msg.sender).transfer(msg.value - price);
 
-        require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY, 'exceeds supply.');
-        require(totalNewPurchases < maxNewPurchases, 'new purchase must be less than max');
-        require(msg.value >= price, 'price too low');
-        payable(msg.sender).transfer(msg.value - price);
-
-        // Presale addresses can purchase up to X total
-        _presalePurchaseCount[msg.sender] += 1;
-        _purchased_pizza_count.increment();
-        _externalMintWithArtwork(msg.sender); // V2: mint using external randomness
-        totalNewPurchases += 1;
-        // BUY ONE GET ONE FREE!
-        if (_purchased_pizza_count.current().add(1) == MAX_PURCHASABLE_SUPPLY) {
+            // Presale addresses can purchase up to X total
             _presalePurchaseCount[msg.sender] += 1;
             _purchased_pizza_count.increment();
             _externalMintWithArtwork(msg.sender); // V2: mint using external randomness
+            totalNewPurchases += 1;
+            // BUY ONE GET ONE FREE!
+            if (_purchased_pizza_count.current().add(1) == MAX_PURCHASABLE_SUPPLY) {
+                _presalePurchaseCount[msg.sender] += 1;
+                _purchased_pizza_count.increment();
+                _externalMintWithArtwork(msg.sender); // V2: mint using external randomness
+            }
         }
     }
 
