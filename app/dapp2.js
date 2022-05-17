@@ -1,3 +1,4 @@
+import Web3 from 'web3';
 import keccak256 from 'keccak256';
 import { MerkleTree }  from 'merkletreejs';
 
