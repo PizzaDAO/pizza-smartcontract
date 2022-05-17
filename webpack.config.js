@@ -7,7 +7,7 @@ module.exports = {
     mode: 'development',
 
     // entry files
-    entry: './app/dapp.ts',
+    entry: './app/dapp2.js',
 
     // output bundles (location)
     output: {
@@ -18,7 +18,7 @@ module.exports = {
     // file resolutions
     resolve: {
         extensions: [ '.ts', '.js' ],
-        fallback: { 
+        fallback: {
             "stream": require.resolve("stream-browserify"),
             "buffer": require.resolve("buffer/")
         }
@@ -39,7 +39,7 @@ module.exports = {
                 test: /\.tsx?/,
                 use: 'ts-loader',
                 exclude: [
-                    /node_modules/, 
+                    /node_modules/,
 
                 ]
             }
