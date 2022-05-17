@@ -17,7 +17,7 @@ type TestContext = {
 let testContext: TestContext
 
 let getRinkebyRandomConsumer = async (box: Contract) => {
-  const RandomConsumer = await ethers.getContractFactory('FakeRandomConsumer')
+  const RandomConsumer = await ethers.getContractFactory('FakeRandomV2')
   return await RandomConsumer.deploy(
     config.CHAINLINK_RINKEBY_VRF_COORD,
     config.CHAINLINK_RINKEBY_TOKEN,
@@ -27,7 +27,7 @@ let getRinkebyRandomConsumer = async (box: Contract) => {
   )
 }
 
-describe('Box V3 Real Upgrade Tests', function () {
+describe('Box V4  Tests', function () {
   beforeEach(async () => {
     // Deploy the original contract
     const accounts = await ethers.getSigners()
@@ -100,20 +100,8 @@ describe('Box V3 Real Upgrade Tests', function () {
     await random.fulfillRandomnessWrapper('0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4', 234324)
     await boxV4.completeClaim('0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4')
   })
-  it('user can purchase for new flat price', async () => {
-    const { boxV4, accounts, random } = testContext
-    await boxV4.setMaxNewPurchases(10)
 
-    expect(await boxV4.maxNewPurchases()).to.equal(10)
-    for (let i = 0; i < 10; i++) {
-      await boxV4.connect(accounts[i]).purchase({ value: ethers.utils.parseEther('.08') })
-    }
-    expect(await boxV4.totalNewPurchases()).to.equal(10)
-    await expect(boxV4.connect(accounts[0]).purchase({ value: ethers.utils.parseEther('.08') })).to.be.revertedWith(
-      'new purchase must be less than max',
-    )
-  })
-  it('user can multi purchase for new flat price', async () => {
+  it.only('user can multi purchase for new flat price', async () => {
     const { boxV4, accounts, random } = testContext
     await boxV4.setMaxNewPurchases(10)
 
@@ -127,18 +115,15 @@ describe('Box V3 Real Upgrade Tests', function () {
     //claimStarted(bytes32 id, address to, uint256 amount);
     await expect(boxV4.connect(accounts[1]).multiPurchase(9, { value: ethers.utils.parseEther('.82') }))
       .to.emit(boxV4, 'claimStarted')
-      .withArgs('0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4', accounts[1].address, 9)
-    let claim = await boxV4.claims('0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4')
+      .withArgs(7777, accounts[1].address, 9)
+    let claim = await boxV4.claims(7777)
     expect(claim.amount).to.equal(9)
     expect(claim.to).to.equal(accounts[1].address)
-    expect(claim.random).to.equal(0)
-    await random.fulfillRandomnessWrapper('0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4', 234324)
-    claim = await boxV4.claims('0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4')
-    expect(claim.random).to.equal(234324)
-    await expect(boxV4.completeClaim('0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4'))
-      .to.emit(boxV4, 'claimCompleted')
-      .withArgs('0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4', accounts[1].address, 9)
+
+    await random.fulfillRandomWordsWrapper(7777, [234324])
+
     expect(await boxV4.totalNewPurchases()).to.equal(9)
+    expect(await boxV4.balanceOf(accounts[1].address)).to.equal(9)
     // expect(await boxV4.totalNewPurchases()).to.equal(10)
     /*await expect(boxV4.connect(accounts[0]).purchase({ value: ethers.utils.parseEther('.08') })).to.be.revertedWith(
       'new purchase must be less than max',
