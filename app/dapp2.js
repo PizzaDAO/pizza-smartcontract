@@ -1,4 +1,5 @@
 import Web3 from 'web3';
+import { ethers } from 'ethers';
 import keccak256 from 'keccak256';
 import { MerkleTree }  from 'merkletreejs';
 
@@ -2599,7 +2600,7 @@ const onLoadHandler = () => {
 
       console.log("proof: ", proof)
       console.log("Trying to buy box - presale")
-      BoxInstance.methods.prePurchase(proof).send({
+      BoxInstance.methods.prePurchase(proof.data).send({
         from: walletAddress,
         value: priceInWei
       })
