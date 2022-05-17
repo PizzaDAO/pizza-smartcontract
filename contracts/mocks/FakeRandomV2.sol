@@ -1,6 +1,6 @@
 import '../random/RandomConsumerV2.sol';
 
-contract FakeRandomConsumer is RandomConsumerV2 {
+contract FakeRandomV2 is RandomConsumerV2 {
     bytes32 public testHash = 0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4;
     uint256 public testID = 7777;
 
@@ -22,7 +22,7 @@ contract FakeRandomConsumer is RandomConsumerV2 {
 
     // Testing functtion
 
-    function fulfillRandomnWords(uint256 requestId, uint256[] memory randomness) public {
+    function fulfillRandomWordsWrapper(uint256 requestId, uint256[] memory randomness) public {
         super.fulfillRandomWords(requestId, randomness);
     }
 }
