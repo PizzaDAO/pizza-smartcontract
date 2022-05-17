@@ -61,5 +61,8 @@
   },
   "directories": {
     "test": "test"
+  },
+  "dependencies": {
+    "web3": "^1.7.3"
   }
 }
