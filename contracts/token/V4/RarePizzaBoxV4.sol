@@ -11,6 +11,10 @@ import { RarePizzasBoxV3Fix } from './RarePizzasBoxV3.sol';
 import '../../interfaces/IChainlinkVRFRandomConsumer.0.8.0.sol';
 import '../../interfaces/IRarePizzasBoxV3Admin.sol';
 
+interface randomV2 {
+    function requestRandomWords() external returns (bytes32);
+}
+
 contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
     using AddressUpgradeable for address;
     using CountersUpgradeable for CountersUpgradeable.Counter;
@@ -34,33 +38,27 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
     struct Claim {
         address to;
         uint256 amount;
-        uint256 random;
-        claimStatus status;
     }
     event claimStarted(bytes32 id, address to, uint256 amount);
     event claimCompleted(bytes32 id, address to, uint256 amount);
 
-    function fulfillRandomness(bytes32 request, uint256 random) external virtual override {
+    function fulfillRandomWords(bytes32 request, uint256[] memory random) external {
         require(msg.sender == _chainlinkVRFConsumer, 'caller not VRF');
 
-        if (request == batchMintRequest) {
-            // The batch mint workflow
-            batchMintRandom = random;
-            status = batchMintStatus.FETCHED;
-        } else {
-            if (claims[request].status == claimStatus.QUEUED && claims[request].amount > 0) {
-                claims[request].random = random;
-                claims[request].status = claimStatus.FETCHED;
-            } else {
-                address to = _purchaseID[request];
+        address to = claims[request].to;
 
-                require(to != address(0), 'purchase must exist');
+        require(to != address(0), 'purchase must exist');
 
-                uint256 id = _getNextPizzaTokenId();
-                _safeMint(to, id);
-                _assignBoxArtwork(id, random);
-            }
+        for (uint256 i = 0; i < claims[request].amount; i++) {
+            // iterate over the count
+
+            uint256 id = _getNextPizzaTokenId();
+            _minted_pizza_count.increment();
+
+            _safeMint(to, id);
+            _assignBoxArtwork(id, (uint256(keccak256(abi.encode(random[0] + i)))) % BOX_LENGTH);
         }
+        emit claimCompleted(request, claims[request].to, claims[request].amount);
     }
 
     function setSaleWhitelist(bytes32 b) public onlyOwner {
@@ -79,43 +77,19 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
         return price;
     }
 
-    function purchase() public payable virtual override {
-        require(
-            block.timestamp >= publicSaleStart_timestampInS ||
-                (_presalePurchaseCount[msg.sender] < _presaleAllowed[msg.sender]),
-            "sale hasn't started"
-        );
-        require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY, 'exceeds supply.');
-        require(totalNewPurchases < maxNewPurchases, 'new purchase must be less than max');
-        require(msg.value >= price, 'price too low');
-        payable(msg.sender).transfer(msg.value - price);
-
-        // Presale addresses can purchase up to X total
-        _presalePurchaseCount[msg.sender] += 1;
-        _purchased_pizza_count.increment();
-        _externalMintWithArtwork(msg.sender); // V2: mint using external randomness
-        totalNewPurchases += 1;
-        // BUY ONE GET ONE FREE!
-        if (_purchased_pizza_count.current().add(1) == MAX_PURCHASABLE_SUPPLY) {
-            _presalePurchaseCount[msg.sender] += 1;
-            _purchased_pizza_count.increment();
-            _externalMintWithArtwork(msg.sender); // V2: mint using external randomness
-        }
-    }
-
     function multiPurchase(uint256 n) public payable virtual {
         require(
             block.timestamp >= publicSaleStart_timestampInS ||
                 (_presalePurchaseCount[msg.sender] < _presaleAllowed[msg.sender]),
             "sale hasn't started"
         );
+        require(n <= 15 && n >= 0, 'max purchase of 15 boxes');
         require(msg.value >= n.mul(price), 'price too low');
         payable(msg.sender).transfer(msg.value.sub(n.mul(price)));
         _multiPurchase(n);
     }
 
     function _multiPurchase(uint256 n) internal virtual {
-        require(n < 21 && n > 0, 'max purchase of 20 boxes');
         require(totalNewPurchases.add(n) < maxNewPurchases, 'new purchase must be less than max');
         require(totalSupply().add(n) <= MAX_TOKEN_SUPPLY, 'exceeds supply.');
         totalNewPurchases += n;
@@ -138,48 +112,15 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
 
     function prePurchase(bytes32[] memory proof, uint256 n) public payable virtual {
         validateUser(proof, preSaleWhitelist, msg.sender);
-        if (n > 1) {
-            require(msg.value >= n.mul(price), 'price too low');
-            payable(msg.sender).transfer(msg.value.sub(n.mul(price)));
-            _multiPurchase(n);
-        } else {
-            require(totalSupply().add(1) <= MAX_TOKEN_SUPPLY, 'exceeds supply.');
-            require(totalNewPurchases < maxNewPurchases, 'new purchase must be less than max');
-            require(msg.value >= price, 'price too low');
-            payable(msg.sender).transfer(msg.value - price);
 
-            // Presale addresses can purchase up to X total
-            _presalePurchaseCount[msg.sender] += 1;
-            _purchased_pizza_count.increment();
-            _externalMintWithArtwork(msg.sender); // V2: mint using external randomness
-            totalNewPurchases += 1;
-            // BUY ONE GET ONE FREE!
-            if (_purchased_pizza_count.current().add(1) == MAX_PURCHASABLE_SUPPLY) {
-                _presalePurchaseCount[msg.sender] += 1;
-                _purchased_pizza_count.increment();
-                _externalMintWithArtwork(msg.sender); // V2: mint using external randomness
-            }
-        }
+        require(msg.value >= n.mul(price), 'price too low');
+        payable(msg.sender).transfer(msg.value.sub(n.mul(price)));
+        _multiPurchase(n);
     }
 
     function claim(bytes32[] memory proof, uint256 amount) public virtual {
         validateUserAmount(proof, claimWhiteList, msg.sender, amount);
         _queryForClaim(msg.sender, amount);
-    }
-
-    function completeClaim(bytes32 _id) external virtual {
-        require(claims[_id].status == claimStatus.FETCHED, 'random must be fetched');
-        claims[_id].status = claimStatus.COMPLETED;
-        for (uint256 i = 0; i < claims[_id].amount; i++) {
-            // iterate over the count
-
-            uint256 id = _getNextPizzaTokenId();
-            _minted_pizza_count.increment();
-
-            _safeMint(claims[_id].to, id);
-            _assignBoxArtwork(id, (uint256(keccak256(abi.encode(claims[_id].random + i)))) % BOX_LENGTH);
-            emit claimCompleted(_id, claims[_id].to, claims[_id].amount);
-        }
     }
 
     function validateUserAmount(
@@ -209,8 +150,8 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
 
     function _queryForClaim(address a, uint256 c) internal virtual {
         require(_chainlinkVRFConsumer != address(0), 'vrf not set');
-        bytes32 requestId = IChainlinkVRFRandomConsumer(_chainlinkVRFConsumer).getRandomNumber();
-        claims[requestId] = Claim(a, c, 0, claimStatus.QUEUED);
+        bytes32 requestId = randomV2(_chainlinkVRFConsumer).requestRandomWords();
+        claims[requestId] = Claim(a, c);
         emit claimStarted(requestId, a, c);
     }
 }
