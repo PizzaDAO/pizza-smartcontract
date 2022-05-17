@@ -12,7 +12,7 @@ import '../../interfaces/IChainlinkVRFRandomConsumer.0.8.0.sol';
 import '../../interfaces/IRarePizzasBoxV3Admin.sol';
 
 interface randomV2 {
-    function requestRandomWords() external returns (bytes32);
+    function requestRandomWords() external returns (uint256);
 }
 
 contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
@@ -28,7 +28,7 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
     bytes32 public claimWhiteList;
 
     mapping(address => bool) public claimed;
-    mapping(bytes32 => Claim) public claims;
+    mapping(uint256 => Claim) public claims;
     enum claimStatus {
         UNINITIALIZED,
         QUEUED,
@@ -39,10 +39,10 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
         address to;
         uint256 amount;
     }
-    event claimStarted(bytes32 id, address to, uint256 amount);
-    event claimCompleted(bytes32 id, address to, uint256 amount);
+    event claimStarted(uint256 id, address to, uint256 amount);
+    event claimCompleted(uint256 id, address to, uint256 amount);
 
-    function fulfillRandomWords(bytes32 request, uint256[] memory random) external {
+    function fulfillRandomWords(uint256 request, uint256[] memory random) external {
         require(msg.sender == _chainlinkVRFConsumer, 'caller not VRF');
 
         address to = claims[request].to;
@@ -105,7 +105,7 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
         // BUY ONE GET ONE FREE!
         if (_purchased_pizza_count.current().add(n) == MAX_PURCHASABLE_SUPPLY) {
             _presalePurchaseCount[msg.sender] += 1;
-            _purchased_pizza_count.increment();
+            // _purchased_pizza_count.increment();
             _externalMintWithArtwork(msg.sender); // V2: mint using external randomness
         }
     }
@@ -150,7 +150,7 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
 
     function _queryForClaim(address a, uint256 c) internal virtual {
         require(_chainlinkVRFConsumer != address(0), 'vrf not set');
-        bytes32 requestId = randomV2(_chainlinkVRFConsumer).requestRandomWords();
+        uint256 requestId = randomV2(_chainlinkVRFConsumer).requestRandomWords();
         claims[requestId] = Claim(a, c);
         emit claimStarted(requestId, a, c);
     }
