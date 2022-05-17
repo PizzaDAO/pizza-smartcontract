@@ -38,6 +38,7 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
         claimStatus status;
     }
     event claimStarted(bytes32 id, address to, uint256 amount);
+    event claimCompleted(bytes32 id, address to, uint256 amount);
 
     function fulfillRandomness(bytes32 request, uint256 random) external virtual override {
         require(msg.sender == _chainlinkVRFConsumer, 'caller not VRF');
@@ -177,6 +178,7 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
 
             _safeMint(claims[_id].to, id);
             _assignBoxArtwork(id, (uint256(keccak256(abi.encode(claims[_id].random + i)))) % BOX_LENGTH);
+            emit claimCompleted(_id, claims[_id].to, claims[_id].amount);
         }
     }
 
@@ -209,5 +211,6 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
         require(_chainlinkVRFConsumer != address(0), 'vrf not set');
         bytes32 requestId = IChainlinkVRFRandomConsumer(_chainlinkVRFConsumer).getRandomNumber();
         claims[requestId] = Claim(a, c, 0, claimStatus.QUEUED);
+        emit claimStarted(requestId, a, c);
     }
 }
