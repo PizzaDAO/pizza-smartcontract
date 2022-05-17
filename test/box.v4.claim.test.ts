@@ -124,7 +124,10 @@ describe('Box V3 Real Upgrade Tests', function () {
     await expect(
       boxV4.connect(accounts[1]).multiPurchase(9, { value: ethers.utils.parseEther('.71') }),
     ).to.be.revertedWith('price too low')
-    let r = await boxV4.connect(accounts[1]).multiPurchase(9, { value: ethers.utils.parseEther('.82') })
+    //claimStarted(bytes32 id, address to, uint256 amount);
+    await expect(boxV4.connect(accounts[1]).multiPurchase(9, { value: ethers.utils.parseEther('.82') }))
+      .to.emit(boxV4, 'claimStarted')
+      .withArgs('0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4', accounts[1].address, 9)
     let claim = await boxV4.claims('0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4')
     expect(claim.amount).to.equal(9)
     expect(claim.to).to.equal(accounts[1].address)
@@ -132,7 +135,9 @@ describe('Box V3 Real Upgrade Tests', function () {
     await random.fulfillRandomnessWrapper('0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4', 234324)
     claim = await boxV4.claims('0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4')
     expect(claim.random).to.equal(234324)
-    await boxV4.completeClaim('0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4')
+    await expect(boxV4.completeClaim('0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4'))
+      .to.emit(boxV4, 'claimCompleted')
+      .withArgs('0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4', accounts[1].address, 9)
     expect(await boxV4.totalNewPurchases()).to.equal(9)
     // expect(await boxV4.totalNewPurchases()).to.equal(10)
     /*await expect(boxV4.connect(accounts[0]).purchase({ value: ethers.utils.parseEther('.08') })).to.be.revertedWith(

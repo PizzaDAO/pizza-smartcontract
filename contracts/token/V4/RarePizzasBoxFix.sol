@@ -105,7 +105,7 @@ contract RarePizzasBoxFix is
     }
 
     function purchase() public payable virtual override {
-        require(
+        /*require(
             block.timestamp >= publicSaleStart_timestampInS ||
                 (_presalePurchaseCount[msg.sender] < _presaleAllowed[msg.sender]),
             "sale hasn't started"
@@ -127,6 +127,7 @@ contract RarePizzasBoxFix is
             _purchased_pizza_count.increment();
             _internalMintWithArtwork(msg.sender);
         }
+        */
     }
 
     // IERC721 Overrides
@@ -173,12 +174,13 @@ contract RarePizzasBoxFix is
     }
 
     function setPresaleAllowed(uint8 count, address[] memory toPaisanos) public virtual override onlyOwner {
-        for (uint256 i = 0; i < toPaisanos.length; i++) {
+        /** * for (uint256 i = 0; i < toPaisanos.length; i++) {
             require(toPaisanos[i] != address(0), 'dont be silly');
             _presaleAllowed[toPaisanos[i]] = count;
         }
 
         emit PresaleAllowedUpdated();
+        **/
     }
 
     function setSaleStartTimestamp(uint256 epochSeconds) public virtual override onlyOwner {
