@@ -46,11 +46,11 @@ contract RandomConsumerV2 is VRFConsumerBaseV2, Ownable {
         _s_subscriptionId = s_subscriptionId;
     }
 
-    function requestRandomWords() external returns (uint256 requestId) {
+    function requestRandomWords() external virtual returns (uint256 requestId) {
         // Will revert if subscription is not set and funded.
         require(_callbackContract != address(0), 'Callback must be set');
         require(msg.sender == _callbackContract, 'Sender must be callback');
-
+        require(IERC20(_linkToken).balanceOf(address(this)) > _fee, 'must tokens to cover fee');
         requestId = VRFCoordinatorV2Interface(vrfCoordinator).requestRandomWords(
             _keyHash,
             _s_subscriptionId,
@@ -82,6 +82,10 @@ contract RandomConsumerV2 is VRFConsumerBaseV2, Ownable {
         uint256 oldFee = _fee;
         _fee = fee;
         emit FeeUpdated(oldFee, _fee);
+    }
+
+    function setSubscription(uint64 sub) public onlyOwner {
+        _s_subscriptionId = sub;
     }
 
     function setKeyHash(bytes32 keyHash) public onlyOwner {
