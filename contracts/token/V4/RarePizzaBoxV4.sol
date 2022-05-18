@@ -12,7 +12,7 @@ import '../../interfaces/IChainlinkVRFRandomConsumer.0.8.0.sol';
 import '../../interfaces/IRarePizzasBoxV3Admin.sol';
 
 interface randomV2 {
-    function requestRandomWords() external returns (uint256);
+    function requestRandomWords() external returns (uint256 requestId);
 }
 
 contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
@@ -42,6 +42,7 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
     event claimStarted(uint256 id, address to, uint256 amount);
     event claimCompleted(uint256 id, address to, uint256 amount);
 
+    //fulfillRandomWords
     function fulfillRandomWords(uint256 request, uint256[] memory random) external {
         require(msg.sender == _chainlinkVRFConsumer, 'caller not VRF');
 
@@ -56,7 +57,7 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
             _minted_pizza_count.increment();
 
             _safeMint(to, id);
-            _assignBoxArtwork(id, (uint256(keccak256(abi.encode(random[0] + i)))) % BOX_LENGTH);
+            _assignBoxArtwork(id, (uint256(keccak256(abi.encode(random[0], i)))) % BOX_LENGTH);
         }
         emit claimCompleted(request, claims[request].to, claims[request].amount);
     }
@@ -83,7 +84,7 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
                 (_presalePurchaseCount[msg.sender] < _presaleAllowed[msg.sender]),
             "sale hasn't started"
         );
-        require(n <= 15 && n >= 0, 'max purchase of 15 boxes');
+        require(n <= 15 && n >= 1, 'max purchase of 15 boxes');
         require(msg.value >= n.mul(price), 'price too low');
         payable(msg.sender).transfer(msg.value.sub(n.mul(price)));
         _multiPurchase(n);
