@@ -86,10 +86,10 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
         );
         require(n <= 15 && n >= 1, 'max purchase of 15 boxes');
         require(msg.value >= n.mul(price), 'price too low');
-        if (msg.value > (n * price)){
+        if (msg.value > (n * price)) {
             payable(msg.sender).transfer(msg.value - (n * price));
         }
-        
+
         _multiPurchase(n);
     }
 
@@ -100,28 +100,22 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
 
         // Presale addresses can purchase up to X total
         _presalePurchaseCount[msg.sender] += n;
+
         for (uint256 i = 0; i < n; i++) {
             _purchased_pizza_count.increment();
         }
 
         _queryForClaim(msg.sender, n);
-
-        // BUY ONE GET ONE FREE!
-        if (_purchased_pizza_count.current().add(n) == MAX_PURCHASABLE_SUPPLY) {
-            _presalePurchaseCount[msg.sender] += 1;
-            // _purchased_pizza_count.increment();
-            _externalMintWithArtwork(msg.sender); // V2: mint using external randomness
-        }
     }
 
     function prePurchase(bytes32[] memory proof, uint256 n) public payable virtual {
         validateUser(proof, preSaleWhitelist, msg.sender);
 
         require(msg.value >= n.mul(price), 'price too low');
-        if (msg.value > (n * price)){
+        if (msg.value > (n * price)) {
             payable(msg.sender).transfer(msg.value - (n * price));
         }
-        
+
         _multiPurchase(n);
     }
 
