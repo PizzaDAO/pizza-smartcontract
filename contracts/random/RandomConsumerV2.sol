@@ -6,7 +6,6 @@ import './VRFCoordinatorV2Interface.sol';
 import './VRFConsumerBaseV2.sol';
 
 import './Ownable.sol';
-import './IERC20.sol';
 
 /**
  * Random Consumer contract interacts with chainlink VRF.
@@ -22,26 +21,31 @@ contract RandomConsumerV2 is VRFConsumerBaseV2, Ownable {
     event CallbackContractUpdated(address callback);
     event FeeUpdated(uint256 oldFee, uint256 newFee);
     event KeyHashUpdated(bytes32 oldKeyHash, bytes32 newKeyHash);
+    VRFCoordinatorV2Interface COORDINATOR;
+    bytes32 public _keyHash;
 
-    bytes32 internal _keyHash;
-    uint256 internal _fee;
-
-    address internal _linkToken;
     address internal _callbackContract;
-    uint64 internal _s_subscriptionId;
-    address internal vrfCoordinator;
+    address public vrfCoordinator;
+    uint64 public _s_subscriptionId;
+
+    uint32 public callbackGasLimit = 2500000;
+
+    // The default is 3, but you can set this higher.
+    uint16 public requestConfirmations = 3;
+
+    // For this example, retrieve 2 random values in one request.
+    // Cannot exceed VRFCoordinatorV2.MAX_NUM_WORDS.
+    uint32 public numWords = 2;
 
     constructor(
         address vrfCoordinator,
-        address linkToken,
         bytes32 keyHash,
-        uint256 fee,
         address callbackContract,
         uint64 s_subscriptionId
     ) public VRFConsumerBaseV2(vrfCoordinator) {
+        COORDINATOR = VRFCoordinatorV2Interface(vrfCoordinator);
         _keyHash = keyHash;
-        _fee = fee;
-        _linkToken = linkToken;
+
         _callbackContract = callbackContract;
         _s_subscriptionId = s_subscriptionId;
     }
@@ -50,13 +54,13 @@ contract RandomConsumerV2 is VRFConsumerBaseV2, Ownable {
         // Will revert if subscription is not set and funded.
         require(_callbackContract != address(0), 'Callback must be set');
         require(msg.sender == _callbackContract, 'Sender must be callback');
-        require(IERC20(_linkToken).balanceOf(address(this)) > _fee, 'must tokens to cover fee');
-        requestId = VRFCoordinatorV2Interface(vrfCoordinator).requestRandomWords(
+
+        requestId = COORDINATOR.requestRandomWords(
             _keyHash,
             _s_subscriptionId,
-            3,
-            2500000,
-            3
+            requestConfirmations,
+            callbackGasLimit,
+            numWords
         );
     }
 
@@ -67,21 +71,22 @@ contract RandomConsumerV2 is VRFConsumerBaseV2, Ownable {
         IChainlinkVRFCallback2(_callbackContract).fulfillRandomWords(requestId, randomness);
     }
 
-    function getFee() public view returns (uint256) {
-        return _fee;
+    // IChainlinkVRFAdmin
+    function setNumWords(uint16 n) public onlyOwner {
+        numWords = 2;
     }
 
-    // IChainlinkVRFAdmin
+    function setRequestConfirmation(uint16 r) public onlyOwner {
+        requestConfirmations = r;
+    }
+
+    function setCallbackGasLimit(uint32 l) public onlyOwner {
+        callbackGasLimit = l;
+    }
 
     function setCallbackContract(address callback) public onlyOwner {
         _callbackContract = callback;
         emit CallbackContractUpdated(callback);
-    }
-
-    function setFee(uint256 fee) public onlyOwner {
-        uint256 oldFee = _fee;
-        _fee = fee;
-        emit FeeUpdated(oldFee, _fee);
     }
 
     function setSubscription(uint64 sub) public onlyOwner {
@@ -92,11 +97,6 @@ contract RandomConsumerV2 is VRFConsumerBaseV2, Ownable {
         bytes32 oldHash = _keyHash;
         _keyHash = keyHash;
         emit KeyHashUpdated(oldHash, _keyHash);
-    }
-
-    function withdrawLink() public onlyOwner {
-        uint256 balance = IERC20(_linkToken).balanceOf(address(this));
-        IERC20(_linkToken).transfer(msg.sender, balance);
     }
 
     function withdraw() public onlyOwner {
