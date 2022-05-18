@@ -24,7 +24,22 @@ let getRinkebyRandomConsumer = async (box: Contract) => {
     box.address,
   )
 }
-
+const accountList = [
+  '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
+  '0x70997970c51812dc3a010c7d01b50e0d17dc79c8',
+  '0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc',
+  '0x90f79bf6eb2c4f870365e785982e1f101e93b906',
+  '0x15d34aaf54267db7d7c367839aaf71a00a2c6a65',
+  '0x9965507d1a55bcc2695c58ba16fb37d819b0a4dc',
+  '0x976ea74026e726554db657fa54763abd0c3a0aa9',
+  '0x14dc79964da2c08b23698b3d3cc7ca32193d9955',
+  '0x23618e81e3f5cdf7f54c3d65f7fbc0abf5b21e8f',
+  '0xa0ee7a142d267c1f36714e4a8f75612f20a79720',
+  '0xbcd4042de499d14e55001ccbb24a551f3b954096',
+  '0x71be63f3384f5fb98995898a86b02fb2426c5788',
+  '0xfabb0ac9d68b0b445fb7357272ff202c5651694a',
+  '0x1cbd3b2770909d4e10f157cabc84c7264073c9ec',
+]
 describe('Box V4  Tests', function () {
   beforeEach(async () => {
     // Deploy the original contract
@@ -61,7 +76,7 @@ describe('Box V4  Tests', function () {
     }
   })
 
-  it.only('can set merkle roots and make a claim', async () => {
+  it('can set merkle roots and make a claim', async () => {
     const { boxV4, accounts, random } = testContext
     let Tree = utils.merkleTree
     await boxV4.setSaleWhitelist(Tree.root)
@@ -74,7 +89,7 @@ describe('Box V4  Tests', function () {
     expect(await boxV4.balanceOf(accounts[1].address)).to.equal(5)
   })
 
-  it.only('can set merkle roots and make a multiprepurchase', async () => {
+  it('can set merkle roots and make a multiprepurchase', async () => {
     const { boxV4, accounts, random } = testContext
     let Tree = utils.merkleTree
     await boxV4.setMaxNewPurchases(20)
@@ -88,7 +103,7 @@ describe('Box V4  Tests', function () {
     expect(await boxV4.balanceOf(accounts[1].address)).to.equal(10)
   })
 
-  it.only('user can multi purchase for new flat price', async () => {
+  it('user can multi purchase for new flat price', async () => {
     const { boxV4, accounts, random } = testContext
     await boxV4.setMaxNewPurchases(11)
 
@@ -96,27 +111,40 @@ describe('Box V4  Tests', function () {
     await expect(
       boxV4.connect(accounts[1]).multiPurchase(12, { value: ethers.utils.parseEther('1.2') }),
     ).to.be.revertedWith('new purchase must be less than max')
-    await boxV4.setMaxNewPurchases(20)
+    await boxV4.setMaxNewPurchases(25)
     await expect(
       boxV4.connect(accounts[1]).multiPurchase(14, { value: ethers.utils.parseEther('.71') }),
     ).to.be.revertedWith('price too low')
     //claimStarted(bytes32 id, address to, uint256 amount);
-    await expect(boxV4.connect(accounts[1]).multiPurchase(15, { value: ethers.utils.parseEther('1.2') }))
+    await expect(boxV4.connect(accounts[1]).multiPurchase(16, { value: ethers.utils.parseEther('1.6') }))
       .to.emit(boxV4, 'claimStarted')
-      .withArgs(7777, accounts[1].address, 15)
+      .withArgs(7777, accounts[1].address, 16)
     let claim = await boxV4.claims(7777)
-    expect(claim.amount).to.equal(15)
-    expect(claim.to).to.equal(accounts[1].address)
 
     await random.fulfillRandomWordsWrapper(7777, [234324])
+    /**expect(claim.amount).to.equal(16)
+    expect(claim.to).to.equal(accounts[1].address)
 
-    expect(await boxV4.totalNewPurchases()).to.equal(15)
-    expect(await boxV4.balanceOf(accounts[1].address)).to.equal(15)
+
+    expect(await boxV4.totalNewPurchases()).to.equal(16)
+    expect(await boxV4.balanceOf(accounts[1].address)).to.equal(16)
     // expect(await boxV4.totalNewPurchases()).to.equal(10)
     /*await expect(boxV4.connect(accounts[0]).purchase({ value: ethers.utils.parseEther('.08') })).to.be.revertedWith(
       'new purchase must be less than max',
     )
     */
+  })
+  it.only('can still batch mint', async () => {
+    const { boxV4, accounts, random } = testContext
+    await boxV4.startBatchMint(accountList, 1)
+    await random.fulfillRandomWordsWrapper(7777, [234324])
+    for (let i = 1; i < accountList.length; i++) {
+      expect(await boxV4.balanceOf(accountList[i])).to.equal(1)
+    }
+  })
+  it.only('can gift', async () => {
+    const { boxV4, accounts, random } = testContext
+    await expect(boxV4.gift(accounts[4].address, 5)).to.emit(boxV4, 'Gift').withArgs(accounts[4].address, 5)
   })
   /**  it('Should not modify ownable when upgrading', async () => {
             const { box, wallet, signer } = testContext
