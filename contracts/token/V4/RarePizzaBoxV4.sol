@@ -86,7 +86,10 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
         );
         require(n <= 15 && n >= 1, 'max purchase of 15 boxes');
         require(msg.value >= n.mul(price), 'price too low');
-        payable(msg.sender).transfer(msg.value.sub(n.mul(price)));
+        if (msg.value > (n * price)){
+            payable(msg.sender).transfer(msg.value - (n * price));
+        }
+        
         _multiPurchase(n);
     }
 
@@ -115,7 +118,10 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
         validateUser(proof, preSaleWhitelist, msg.sender);
 
         require(msg.value >= n.mul(price), 'price too low');
-        payable(msg.sender).transfer(msg.value.sub(n.mul(price)));
+        if (msg.value > (n * price)){
+            payable(msg.sender).transfer(msg.value - (n * price));
+        }
+        
         _multiPurchase(n);
     }
 
