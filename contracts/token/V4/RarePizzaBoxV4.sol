@@ -94,7 +94,7 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
     }
 
     function _multiPurchase(uint256 n) internal virtual {
-        require(totalNewPurchases.add(n) < maxNewPurchases, 'new purchase must be less than max');
+        require(totalNewPurchases.add(n) <= maxNewPurchases, 'new purchase must be less than max');
         require(totalSupply().add(n) <= MAX_TOKEN_SUPPLY, 'exceeds supply.');
         totalNewPurchases += n;
 
