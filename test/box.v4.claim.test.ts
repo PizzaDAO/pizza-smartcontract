@@ -20,9 +20,7 @@ let getRinkebyRandomConsumer = async (box: Contract) => {
   const RandomConsumer = await ethers.getContractFactory('FakeRandomV2')
   return await RandomConsumer.deploy(
     config.CHAINLINK_RINKEBY_VRF_COORD,
-    config.CHAINLINK_RINKEBY_TOKEN,
     '0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4',
-    config.CHAINLINK_RINKEBY_VRF_FEE,
     box.address,
   )
 }
@@ -31,6 +29,7 @@ describe('Box V4  Tests', function () {
   beforeEach(async () => {
     // Deploy the original contract
     const accounts = await ethers.getSigners()
+
     const Box = await ethers.getContractFactory('RarePizzasBox')
     const box = await upgrades.deployProxy(Box, ['0x0000000000000000000000000000000000000000'])
     console.log(upgrades)
@@ -62,68 +61,57 @@ describe('Box V4  Tests', function () {
     }
   })
 
-  it('can set merkle roots and make a claim', async () => {
+  it.only('can set merkle roots and make a claim', async () => {
     const { boxV4, accounts, random } = testContext
     let Tree = utils.merkleTree
     await boxV4.setSaleWhitelist(Tree.root)
     await boxV4.setclaimWhiteList(Tree.root2)
     let proof = Tree.tree2.getProof(Tree.elements2[1])
     proof = proof.map((item: any) => '0x' + item.data.toString('hex'))
-    await boxV4.connect(accounts[1]).claim(proof, 2)
+    await boxV4.connect(accounts[1]).claim(proof, 5)
 
-    await random.fulfillRandomnessWrapper('0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4', 234324)
-    let r = await boxV4.completeClaim('0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4')
-    console.log(await r.wait())
+    await random.fulfillRandomWordsWrapper(7777, [234324])
+    expect(await boxV4.balanceOf(accounts[1].address)).to.equal(5)
   })
-  it('can set merkle roots and make a prepurchase', async () => {
+
+  it.only('can set merkle roots and make a multiprepurchase', async () => {
     const { boxV4, accounts, random } = testContext
     let Tree = utils.merkleTree
-    await boxV4.setMaxNewPurchases(1)
-    await boxV4.setSaleWhitelist(Tree.root)
-    await boxV4.setclaimWhiteList(Tree.root2)
-    let proof = Tree.tree.getProof(Tree.elements[1])
-    proof = proof.map((item: any) => '0x' + item.data.toString('hex'))
-    await boxV4.connect(accounts[1]).prePurchase(proof, 1, { value: ethers.utils.parseEther('0.08') })
-
-    await random.fulfillRandomnessWrapper('0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4', 234324)
-  })
-  it('can set merkle roots and make a multiprepurchase', async () => {
-    const { boxV4, accounts, random } = testContext
-    let Tree = utils.merkleTree
-    await boxV4.setMaxNewPurchases(11)
+    await boxV4.setMaxNewPurchases(20)
     await boxV4.setSaleWhitelist(Tree.root)
     await boxV4.setclaimWhiteList(Tree.root2)
     let proof = Tree.tree.getProof(Tree.elements[1])
     proof = proof.map((item: any) => '0x' + item.data.toString('hex'))
     await boxV4.connect(accounts[1]).prePurchase(proof, 10, { value: ethers.utils.parseEther('0.80') })
 
-    await random.fulfillRandomnessWrapper('0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4', 234324)
-    await boxV4.completeClaim('0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4')
+    await random.fulfillRandomWordsWrapper(7777, [234324])
+    expect(await boxV4.balanceOf(accounts[1].address)).to.equal(10)
   })
 
   it.only('user can multi purchase for new flat price', async () => {
     const { boxV4, accounts, random } = testContext
-    await boxV4.setMaxNewPurchases(10)
+    await boxV4.setMaxNewPurchases(11)
 
-    expect(await boxV4.maxNewPurchases()).to.equal(10)
+    expect(await boxV4.maxNewPurchases()).to.equal(11)
     await expect(
-      boxV4.connect(accounts[1]).multiPurchase(10, { value: ethers.utils.parseEther('.9') }),
+      boxV4.connect(accounts[1]).multiPurchase(12, { value: ethers.utils.parseEther('1.2') }),
     ).to.be.revertedWith('new purchase must be less than max')
+    await boxV4.setMaxNewPurchases(20)
     await expect(
-      boxV4.connect(accounts[1]).multiPurchase(9, { value: ethers.utils.parseEther('.71') }),
+      boxV4.connect(accounts[1]).multiPurchase(14, { value: ethers.utils.parseEther('.71') }),
     ).to.be.revertedWith('price too low')
     //claimStarted(bytes32 id, address to, uint256 amount);
-    await expect(boxV4.connect(accounts[1]).multiPurchase(9, { value: ethers.utils.parseEther('.82') }))
+    await expect(boxV4.connect(accounts[1]).multiPurchase(15, { value: ethers.utils.parseEther('1.2') }))
       .to.emit(boxV4, 'claimStarted')
-      .withArgs(7777, accounts[1].address, 9)
+      .withArgs(7777, accounts[1].address, 15)
     let claim = await boxV4.claims(7777)
-    expect(claim.amount).to.equal(9)
+    expect(claim.amount).to.equal(15)
     expect(claim.to).to.equal(accounts[1].address)
 
     await random.fulfillRandomWordsWrapper(7777, [234324])
 
-    expect(await boxV4.totalNewPurchases()).to.equal(9)
-    expect(await boxV4.balanceOf(accounts[1].address)).to.equal(9)
+    expect(await boxV4.totalNewPurchases()).to.equal(15)
+    expect(await boxV4.balanceOf(accounts[1].address)).to.equal(15)
     // expect(await boxV4.totalNewPurchases()).to.equal(10)
     /*await expect(boxV4.connect(accounts[0]).purchase({ value: ethers.utils.parseEther('.08') })).to.be.revertedWith(
       'new purchase must be less than max',
