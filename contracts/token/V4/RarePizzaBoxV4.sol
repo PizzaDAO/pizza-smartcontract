@@ -29,12 +29,7 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
 
     mapping(address => bool) public claimed;
     mapping(uint256 => Claim) public claims;
-    enum claimStatus {
-        UNINITIALIZED,
-        QUEUED,
-        FETCHED,
-        COMPLETED
-    }
+
     struct Claim {
         address to;
         uint256 amount;
@@ -47,10 +42,10 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
         require(msg.sender == _chainlinkVRFConsumer, 'caller not VRF');
 
         address to = claims[request].to;
-
+        uint256 amount = claims[request].amount;
         require(to != address(0), 'purchase must exist');
 
-        for (uint256 i = 0; i < claims[request].amount; i++) {
+        for (uint256 i = 0; i < amount; i++) {
             // iterate over the count
 
             uint256 id = _getNextPizzaTokenId();
@@ -59,7 +54,9 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
             _safeMint(to, id);
             _assignBoxArtwork(id, (uint256(keccak256(abi.encode(random[0], i)))) % BOX_LENGTH);
         }
-        emit claimCompleted(request, claims[request].to, claims[request].amount);
+        claims[request].amount = 0;
+        claims[request].to = address(0);
+        emit claimCompleted(request, to, amount);
     }
 
     function setSaleWhitelist(bytes32 b) public onlyOwner {
@@ -84,7 +81,7 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
                 (_presalePurchaseCount[msg.sender] < _presaleAllowed[msg.sender]),
             "sale hasn't started"
         );
-        require(n <= 15 && n >= 1, 'max purchase of 15 boxes');
+        require(n <= 16 && n >= 1, 'max purchase of 15 boxes');
         require(msg.value >= n.mul(price), 'price too low');
         if (msg.value > (n * price)) {
             payable(msg.sender).transfer(msg.value - (n * price));
