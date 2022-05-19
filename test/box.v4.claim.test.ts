@@ -77,81 +77,88 @@ const setup = async () => {
 }
 
 describe('Box V4  Tests', async () => {
-  testContext = await setup()
-  context('merkle root tests', async () => {
-    it('can set merkle roots and make a claim', async () => {
-      const { boxV4, accounts, random } = testContext
-      let Tree = utils.merkleTree
+  beforeEach('merkle root tests', async () => {
+    testContext = await setup()
+  })
+  it('can set merkle roots and make a claim', async () => {
+    const { boxV4, accounts, random } = testContext
+    const [deployer, user] = accounts
 
-      await boxV4.setSaleWhitelist(Tree.root)
-      await boxV4.setclaimWhiteList(Tree.root2)
+    let Tree = utils.merkleTree
 
-      let proof = Tree.tree2.getProof(Tree.elements2[1])
-      proof = proof.map((item: any) => '0x' + item.data.toString('hex'))
+    await boxV4.setSaleWhitelist(Tree.rootWithAddresses)
+    await boxV4.setclaimWhiteList(Tree.rootWithClaim)
 
-      await boxV4.connect(accounts[1]).claim(proof, Tree.claimableAmount)
+    let proof = Tree.treeWithClaim.getProof(Tree.hasedClaimableAddresses[1])
+    proof = proof.map((item: any) => '0x' + item.data.toString('hex'))
 
-      await random.fulfillRandomWordsWrapper(7777, [234324])
+    await boxV4.connect(user).claim(proof, Tree.claimableAmount)
 
-      expect(await boxV4.balanceOf(accounts[1].address)).to.equal(5)
-    })
+    await random.fulfillRandomWordsWrapper(7777, [234324])
 
-    it('can set merkle roots and make a multiprepurchase', async () => {
-      const { boxV4, accounts, random } = testContext
-      let Tree = utils.merkleTree
-      await boxV4.setMaxNewPurchases(20)
-      await boxV4.setSaleWhitelist(Tree.root)
-      await boxV4.setclaimWhiteList(Tree.root2)
-      let proof = Tree.tree.getProof(Tree.elements[1])
-      proof = proof.map((item: any) => '0x' + item.data.toString('hex'))
-      await boxV4.connect(accounts[1]).prePurchase(proof, 10, { value: ethers.utils.parseEther('0.80') })
+    expect(await boxV4.balanceOf(user.address)).to.equal(Tree.claimableAmount)
+  })
 
-      await random.fulfillRandomWordsWrapper(7777, [234324])
-      expect(await boxV4.balanceOf(accounts[1].address)).to.equal(10)
-    })
+  it('can set merkle roots and make a multiprepurchase', async () => {
+    const { boxV4, accounts, random } = testContext
+    let Tree = utils.merkleTree
 
-    it('user can multi purchase for new flat price', async () => {
-      const { boxV4, accounts, random } = testContext
-      await boxV4.setMaxNewPurchases(11)
+    await boxV4.setMaxNewPurchases(20)
+    await boxV4.setSaleWhitelist(Tree.rootWithAddresses)
+    await boxV4.setclaimWhiteList(Tree.rootWithClaim)
 
-      expect(await boxV4.maxNewPurchases()).to.equal(11)
-      await expect(
-        boxV4.connect(accounts[1]).multiPurchase(12, { value: ethers.utils.parseEther('1.2') }),
-      ).to.be.revertedWith('new purchase must be less than max')
-      await boxV4.setMaxNewPurchases(25)
-      await expect(
-        boxV4.connect(accounts[1]).multiPurchase(14, { value: ethers.utils.parseEther('.71') }),
-      ).to.be.revertedWith('price too low')
-      //claimStarted(bytes32 id, address to, uint256 amount);
-      await expect(boxV4.connect(accounts[1]).multiPurchase(15, { value: ethers.utils.parseEther('1.6') }))
-        .to.emit(boxV4, 'claimStarted')
-        .withArgs(7777, accounts[1].address, 15)
-      let claim = await boxV4.claims(7777)
+    let proof = Tree.treeWithAddresses.getProof(Tree.hashedAddresses[1])
+    proof = proof.map((item: any) => '0x' + item.data.toString('hex'))
 
-      await random.fulfillRandomWordsWrapper(7777, [234324])
-      expect(claim.amount).to.equal(15)
-      expect(claim.to).to.equal(accounts[1].address)
+    const instance = boxV4.connect(accounts[1])
+    const prepurchase = await instance.prePurchase(proof, 10, { value: ethers.utils.parseEther('0.80') })
 
-      expect(await boxV4.totalNewPurchases()).to.equal(15)
-      expect(await boxV4.balanceOf(accounts[1].address)).to.equal(15)
+    await random.fulfillRandomWordsWrapper(7777, [234324])
 
-      /*await expect(boxV4.connect(accounts[0]).purchase({ value: ethers.utils.parseEther('.08') })).to.be.revertedWith(
+    expect(await boxV4.balanceOf(accounts[1].address)).to.equal(10)
+  })
+
+  it('user can multi purchase for new flat price', async () => {
+    const { boxV4, accounts, random } = testContext
+    await boxV4.setMaxNewPurchases(11)
+
+    expect(await boxV4.maxNewPurchases()).to.equal(11)
+    await expect(
+      boxV4.connect(accounts[1]).multiPurchase(12, { value: ethers.utils.parseEther('1.2') }),
+    ).to.be.revertedWith('new purchase must be less than max')
+    await boxV4.setMaxNewPurchases(25)
+    await expect(
+      boxV4.connect(accounts[1]).multiPurchase(14, { value: ethers.utils.parseEther('.71') }),
+    ).to.be.revertedWith('price too low')
+    //claimStarted(bytes32 id, address to, uint256 amount);
+    await expect(boxV4.connect(accounts[1]).multiPurchase(15, { value: ethers.utils.parseEther('1.6') }))
+      .to.emit(boxV4, 'claimStarted')
+      .withArgs(7777, accounts[1].address, 15)
+    let claim = await boxV4.claims(7777)
+
+    await random.fulfillRandomWordsWrapper(7777, [234324])
+    expect(claim.amount).to.equal(15)
+    expect(claim.to).to.equal(accounts[1].address)
+
+    expect(await boxV4.totalNewPurchases()).to.equal(15)
+    expect(await boxV4.balanceOf(accounts[1].address)).to.equal(15)
+
+    /*await expect(boxV4.connect(accounts[0]).purchase({ value: ethers.utils.parseEther('.08') })).to.be.revertedWith(
         'new purchase must be less than max',
       )
       */
-    })
-    it('can still batch mint', async () => {
-      const { boxV4, accounts, random } = testContext
-      await boxV4.startBatchMint(accountList, 1)
-      await random.fulfillRandomWordsWrapper(7777, [234324])
-      for (let i = 1; i < accountList.length; i++) {
-        expect(await boxV4.balanceOf(accountList[i])).to.equal(1)
-      }
-    })
-    it('can gift', async () => {
-      const { boxV4, accounts, random } = testContext
-      await expect(boxV4.gift(accounts[4].address, 5)).to.emit(boxV4, 'Gift').withArgs(accounts[4].address, 5)
-      expect(await boxV4.balanceOf(accounts[4].address)).to.equal(5)
-    })
+  })
+  it('can still batch mint', async () => {
+    const { boxV4, accounts, random } = testContext
+    await boxV4.startBatchMint(accountList, 1)
+    await random.fulfillRandomWordsWrapper(7777, [234324])
+    for (let i = 1; i < accountList.length; i++) {
+      expect(await boxV4.balanceOf(accountList[i])).to.equal(1)
+    }
+  })
+  it('can gift', async () => {
+    const { boxV4, accounts, random } = testContext
+    await expect(boxV4.gift(accounts[4].address, 5)).to.emit(boxV4, 'Gift').withArgs(accounts[4].address, 5)
+    expect(await boxV4.balanceOf(accounts[4].address)).to.equal(5)
   })
 })
