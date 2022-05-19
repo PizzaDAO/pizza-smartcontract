@@ -66,17 +66,19 @@ const users = [
 
 const claimableAmount = 2
 
-const elements = users.map((x) => ethers.utils.solidityKeccak256(['address'], [x.address]))
-const elements2 = users.map((x) => ethers.utils.solidityKeccak256(['address', 'uint256'], [x.address, claimableAmount]))
-const tree = new MerkleTree(elements, keccak256, { sort: true })
-const tree2 = new MerkleTree(elements2, keccak256, { sort: true })
+const hashedAddresses = users.map((x) => ethers.utils.solidityKeccak256(['address'], [x.address]))
+const hashedClaimableAddresses = users.map((x) =>
+  ethers.utils.solidityKeccak256(['address', 'uint256'], [x.address, claimableAmount]),
+)
+const treeWithAddresses = new MerkleTree(hashedAddresses, keccak256, { sort: true })
+const treeWithClaim = new MerkleTree(hashedClaimableAddresses, keccak256, { sort: true })
 export const merkleTree = {
-  tree: tree,
-  tree2: tree2,
-  root: tree.getHexRoot(),
-  root2: tree2.getHexRoot(),
-  elements: elements,
-  elements2: elements2,
+  treeWithAddresses: treeWithAddresses,
+  treeWithClaim: treeWithClaim,
+  rootWithAddresses: treeWithAddresses.getHexRoot(),
+  rootWithClaim: treeWithClaim.getHexRoot(),
+  hashedAddresses: hashedAddresses,
+  hasedClaimableAddresses: hashedClaimableAddresses,
   claimableAmount,
 }
 
