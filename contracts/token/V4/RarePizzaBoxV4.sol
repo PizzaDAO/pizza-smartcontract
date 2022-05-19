@@ -26,7 +26,7 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
     uint256 public totalNewPurchases;
     bytes32 public preSaleWhitelist;
     bytes32 public claimWhiteList;
-
+    uint256 public multiPurchaseLimit;
     mapping(address => bool) public claimed;
     mapping(uint256 => Claim) public claims;
 
@@ -88,6 +88,10 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
         emit Gift(toPizzaiolo, count);
     }
 
+    function setmultiPurchaseLimit(uint256 n) public onlyOwner {
+        multiPurchaseLimit = n;
+    }
+
     function setSaleWhitelist(bytes32 b) public onlyOwner {
         preSaleWhitelist = b;
     }
@@ -110,7 +114,7 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
                 (_presalePurchaseCount[msg.sender] < _presaleAllowed[msg.sender]),
             "sale hasn't started"
         );
-        require(n <= 16 && n >= 1, 'max purchase of 15 boxes');
+        require(n <= multiPurchaseLimit && n >= 1, 'max purchase of 15 boxes');
         require(msg.value >= n.mul(price), 'price too low');
         if (msg.value > (n * price)) {
             payable(msg.sender).transfer(msg.value - (n * price));
@@ -120,6 +124,7 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
     }
 
     function _multiPurchase(uint256 n) internal virtual {
+        require(n > 0, 'must purchase more than one box');
         require(totalNewPurchases.add(n) <= maxNewPurchases, 'new purchase must be less than max');
         require(totalSupply().add(n) <= MAX_TOKEN_SUPPLY, 'exceeds supply.');
         totalNewPurchases += n;
@@ -136,7 +141,7 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
 
     function prePurchase(bytes32[] memory proof, uint256 n) public payable virtual {
         validateUser(proof, preSaleWhitelist, msg.sender);
-
+        require(n <= multiPurchaseLimit && n >= 1, 'max purchase of 15 boxes');
         require(msg.value >= n.mul(price), 'price too low');
         if (msg.value > (n * price)) {
             payable(msg.sender).transfer(msg.value - (n * price));

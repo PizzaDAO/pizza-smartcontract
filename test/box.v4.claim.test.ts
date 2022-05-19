@@ -65,7 +65,7 @@ describe('Box V4  Tests', function () {
     const boxV2 = await upgrades.upgradeProxy(box.address, BoxV2)
     const boxV3 = await upgrades.upgradeProxy(boxV2.address, BoxV3)
     const boxV4 = await upgrades.upgradeProxy(boxV3.address, BoxV4)
-
+    await boxV4.setmultiPurchaseLimit(15)
     // set up the random consumer
     await boxV4.setVRFConsumer(random.address)
     testContext = {
@@ -116,25 +116,24 @@ describe('Box V4  Tests', function () {
       boxV4.connect(accounts[1]).multiPurchase(14, { value: ethers.utils.parseEther('.71') }),
     ).to.be.revertedWith('price too low')
     //claimStarted(bytes32 id, address to, uint256 amount);
-    await expect(boxV4.connect(accounts[1]).multiPurchase(16, { value: ethers.utils.parseEther('1.6') }))
+    await expect(boxV4.connect(accounts[1]).multiPurchase(15, { value: ethers.utils.parseEther('1.6') }))
       .to.emit(boxV4, 'claimStarted')
-      .withArgs(7777, accounts[1].address, 16)
+      .withArgs(7777, accounts[1].address, 15)
     let claim = await boxV4.claims(7777)
 
     await random.fulfillRandomWordsWrapper(7777, [234324])
-    /**expect(claim.amount).to.equal(16)
+    expect(claim.amount).to.equal(15)
     expect(claim.to).to.equal(accounts[1].address)
 
+    expect(await boxV4.totalNewPurchases()).to.equal(15)
+    expect(await boxV4.balanceOf(accounts[1].address)).to.equal(15)
 
-    expect(await boxV4.totalNewPurchases()).to.equal(16)
-    expect(await boxV4.balanceOf(accounts[1].address)).to.equal(16)
-    // expect(await boxV4.totalNewPurchases()).to.equal(10)
     /*await expect(boxV4.connect(accounts[0]).purchase({ value: ethers.utils.parseEther('.08') })).to.be.revertedWith(
       'new purchase must be less than max',
     )
     */
   })
-  it.only('can still batch mint', async () => {
+  it('can still batch mint', async () => {
     const { boxV4, accounts, random } = testContext
     await boxV4.startBatchMint(accountList, 1)
     await random.fulfillRandomWordsWrapper(7777, [234324])
@@ -142,9 +141,10 @@ describe('Box V4  Tests', function () {
       expect(await boxV4.balanceOf(accountList[i])).to.equal(1)
     }
   })
-  it.only('can gift', async () => {
+  it('can gift', async () => {
     const { boxV4, accounts, random } = testContext
     await expect(boxV4.gift(accounts[4].address, 5)).to.emit(boxV4, 'Gift').withArgs(accounts[4].address, 5)
+    expect(await boxV4.balanceOf(accounts[4].address)).to.equal(5)
   })
   /**  it('Should not modify ownable when upgrading', async () => {
             const { box, wallet, signer } = testContext
