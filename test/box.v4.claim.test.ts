@@ -82,13 +82,17 @@ describe('Box V4  Tests', async () => {
     it('can set merkle roots and make a claim', async () => {
       const { boxV4, accounts, random } = testContext
       let Tree = utils.merkleTree
+
       await boxV4.setSaleWhitelist(Tree.root)
       await boxV4.setclaimWhiteList(Tree.root2)
+
       let proof = Tree.tree2.getProof(Tree.elements2[1])
       proof = proof.map((item: any) => '0x' + item.data.toString('hex'))
-      await boxV4.connect(accounts[1]).claim(proof, 5)
+
+      await boxV4.connect(accounts[1]).claim(proof, Tree.claimableAmount)
 
       await random.fulfillRandomWordsWrapper(7777, [234324])
+
       expect(await boxV4.balanceOf(accounts[1].address)).to.equal(5)
     })
 
