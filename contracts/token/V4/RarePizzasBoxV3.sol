@@ -34,7 +34,7 @@ contract RarePizzasBoxV3Fix is RarePizzasBoxV2Fix, IRarePizzasBoxV3Admin {
     // END V3 Variables
 
     function fulfillRandomness(bytes32 request, uint256 random) external virtual override {
-        require(msg.sender == _chainlinkVRFConsumer, 'caller not VRF');
+        /* require(msg.sender == _chainlinkVRFConsumer, 'caller not VRF');
         if (request == batchMintRequest) {
             // The batch mint workflow
             batchMintRandom = random;
@@ -49,6 +49,7 @@ contract RarePizzasBoxV3Fix is RarePizzasBoxV2Fix, IRarePizzasBoxV3Admin {
             _safeMint(to, id);
             _assignBoxArtwork(id, random);
         }
+        **/
     }
 
     // IRarePizzasBoxV3Admin
@@ -63,7 +64,7 @@ contract RarePizzasBoxV3Fix is RarePizzasBoxV2Fix, IRarePizzasBoxV3Admin {
     }
 
     function finishBatchMint() external virtual override onlyOwner {
-        require(status == batchMintStatus.FETCHED, 'vrf must be fetched');
+        /**  require(status == batchMintStatus.FETCHED, 'vrf must be fetched');
 
         uint256 random = batchMintRandom;
 
@@ -80,6 +81,7 @@ contract RarePizzasBoxV3Fix is RarePizzasBoxV2Fix, IRarePizzasBoxV3Admin {
         }
         batchMintCount = 0;
         status = batchMintStatus.OPEN;
+        **/
     }
 
     function _queryForBatch() internal virtual {

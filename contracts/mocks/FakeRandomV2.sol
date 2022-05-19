@@ -6,11 +6,9 @@ contract FakeRandomV2 is RandomConsumerV2 {
 
     constructor(
         address vrfCoordinator,
-        address linkToken,
         bytes32 keyHash,
-        uint256 fee,
         address callbackContract
-    ) public RandomConsumerV2(vrfCoordinator, linkToken, keyHash, fee, callbackContract, 88) {}
+    ) public RandomConsumerV2(vrfCoordinator, keyHash, callbackContract, 88) {}
 
     // Mock Overrides
 
