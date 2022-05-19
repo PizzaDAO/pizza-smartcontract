@@ -1,4 +1,4 @@
-.PHONY: all environment start test deploy-storage-mumbai
+.PHONY: all build clean environment start test deploy-storage-mumbai
 
 environment:
 	npm install
@@ -6,6 +6,9 @@ environment:
 build:
 	npx hardhat compile
 	npx webpack
+
+clean:
+	npx hardhat clean
 
 test:
 	npx hardhat test
