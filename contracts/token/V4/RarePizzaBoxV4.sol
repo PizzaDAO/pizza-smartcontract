@@ -151,8 +151,7 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
     }
 
     function claim(bytes32[] memory proof, uint256 amount) public virtual {
-        validateUserAmount(proof, claimWhiteList, msg.sender, amount);
-        _queryForClaim(msg.sender, amount);
+        
     }
 
     function validateUserAmount(
@@ -161,12 +160,7 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
         address a,
         uint256 amount
     ) internal {
-        require(
-            MerkleProof.verify(merkleProof, root, keccak256(abi.encodePacked(a, amount))),
-            'Address does not exist in list'
-        );
-        require(claimed[a] == false, 'user cannot claim twice');
-        claimed[a] = true;
+       
     }
 
     function validateUser(

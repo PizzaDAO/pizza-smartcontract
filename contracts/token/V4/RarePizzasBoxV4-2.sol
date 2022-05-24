@@ -6,7 +6,7 @@ import '@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol';
 
-import { RarePizzasBoxV4 } from './RarePizzasBoxV4.sol';
+import { RarePizzasBoxV4 } from './RarePizzaBoxV4.sol';
 import 'hardhat/console.sol';
 
 contract RarePizzasBoxV42 is RarePizzasBoxV4 {
@@ -14,12 +14,13 @@ contract RarePizzasBoxV42 is RarePizzasBoxV4 {
     using CountersUpgradeable for CountersUpgradeable.Counter;
     using SafeMathUpgradeable for uint256;
     //address minter;
-    mapping(uint256 => bool) public claimed;
+    mapping(uint256 => bool) public isClaimed;
+    
     function claim(uint256 id) public virtual {
         require(ownerOf(id)==msg.sender,'sender must own for a box');
-        require(claimed[id]==false,'id has been claimed');
+        require(isClaimed[id]==false,'id has been claimed');
         require(id<1560,'invalid box for claim');
-        claimed[id]=true;
+        isClaimed[id]=true;
         _queryForClaim(msg.sender, 1);
 
     }
