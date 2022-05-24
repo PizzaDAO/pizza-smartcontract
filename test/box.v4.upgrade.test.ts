@@ -7,7 +7,7 @@ import config, { NetworkConfig } from '../config'
 
 type TestContext = {
   box: Contract
-  boxV2: Contract
+  boxV3: Contract
   wallet: SignerWithAddress
   signer: SignerWithAddress
 }
@@ -43,27 +43,29 @@ const setup = async () => {
 
   // run the upgrade
   const BoxV2 = await ethers.getContractFactory('RarePizzasBoxV2')
+  const BoxV3 = await ethers.getContractFactory('RarePizzasBoxV3')
   const boxV2 = await upgrades.upgradeProxy(box.address, BoxV2)
+  const boxV3 = await upgrades.upgradeProxy(box.address, BoxV3)
   console.log(boxV2.address)
 
   // set up the random consumer
   await boxV2.setVRFConsumer(random.address)
   return {
     box: box,
-    boxV2: boxV2,
+    boxV3: boxV3,
     wallet,
     signer,
   }
 }
 
-describe('Box V3 Real Upgrade Tests', function () {
-  context("prepare the V2 state", async () => {
-    testContext = await setup();
-    it('Should upgrade contract logic to v3', async () => {
-      const { box, boxV2 } = testContext
-      const BoxV3 = await ethers.getContractFactory('RarePizzasBoxV3')
-      const boxV3 = await upgrades.upgradeProxy(box.address, BoxV3)
-      expect(await boxV3.totalSupply()).to.equal(1)
+describe('Box V4 Real Upgrade Tests', function () {
+  context('prepare the V3 state', async () => {
+    testContext = await setup()
+    it('Should upgrade contract logic to v4', async () => {
+      const { box, boxV3 } = testContext
+      const BoxV4 = await ethers.getContractFactory('RarePizzasBoxV4')
+      const boxV4 = await upgrades.upgradeProxy(box.address, BoxV4)
+      expect(await boxV4.totalSupply()).to.equal(1)
       // deploy the upgraded contracts
     })
   })

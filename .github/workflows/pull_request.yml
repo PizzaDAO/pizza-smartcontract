@@ -1,0 +1,24 @@
+name: Validate Pull Request
+
+on:
+  pull_request:
+    branches:
+      - main
+  repository_dispatch:
+    types: [pull_request]
+
+jobs:
+  linux_check:
+    name: Linux Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Change Directory
+        run: cd ${{ github.workspace }}
+      - name: Setup Environment
+        run: make environment
+      - name: Build
+        run: make build
+      - name: Run Unit Tests
+        run: make test

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
@@ -8,22 +10,21 @@ import '@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol';
 
-import '@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol';
+//import '@chainlink/contracts/src/v0.6/interfaces/AggregatorV3Interface.sol';
 
-import '../math/BondingCurve.sol';
-import '../interfaces/IOpenSeaCompatible.sol';
-import '../interfaces/IRarePizzasBox.sol';
-import '../interfaces/IRarePizzasBoxAdmin.sol';
-import '../data/BoxArt.sol';
+//import '../math/BondingCurve.sol';
+import '../../interfaces/IOpenSeaCompatible.sol';
+import '../../interfaces/IRarePizzasBox.sol';
+import '../../interfaces/IRarePizzasBoxAdmin.sol';
+import '../../data/BoxArt.sol';
 
 /**
  * @dev Rare Pizzas Box mints pizza box token for callers who call the purchase function.
  */
-contract RarePizzasBox is
+contract RarePizzasBoxFix is
     OwnableUpgradeable,
     ERC721EnumerableUpgradeable,
     BoxArt,
-    BondingCurve,
     IRarePizzasBox,
     IRarePizzasBoxAdmin,
     IOpenSeaCompatible
@@ -96,7 +97,7 @@ contract RarePizzasBox is
     }
 
     function getPriceInWei() public view virtual override returns (uint256) {
-        return ((super.curve(_purchased_pizza_count.current() + 1) * bitcoinPriceInWei) / oneEth);
+        return 0;
     }
 
     function maxSupply() public view virtual override returns (uint256) {
@@ -104,7 +105,7 @@ contract RarePizzasBox is
     }
 
     function purchase() public payable virtual override {
-        require(
+        /*require(
             block.timestamp >= publicSaleStart_timestampInS ||
                 (_presalePurchaseCount[msg.sender] < _presaleAllowed[msg.sender]),
             "sale hasn't started"
@@ -126,6 +127,7 @@ contract RarePizzasBox is
             _purchased_pizza_count.increment();
             _internalMintWithArtwork(msg.sender);
         }
+        */
     }
 
     // IERC721 Overrides
@@ -172,12 +174,13 @@ contract RarePizzasBox is
     }
 
     function setPresaleAllowed(uint8 count, address[] memory toPaisanos) public virtual override onlyOwner {
-        for (uint256 i = 0; i < toPaisanos.length; i++) {
+        /** * for (uint256 i = 0; i < toPaisanos.length; i++) {
             require(toPaisanos[i] != address(0), 'dont be silly');
             _presaleAllowed[toPaisanos[i]] = count;
         }
 
         emit PresaleAllowedUpdated();
+        **/
     }
 
     function setSaleStartTimestamp(uint256 epochSeconds) public virtual override onlyOwner {
@@ -188,7 +191,7 @@ contract RarePizzasBox is
     }
 
     function updateBitcoinPriceInWei(uint256 fallbackValue) public virtual override onlyOwner {
-        if (_chainlinkBTCETHFeed != address(0)) {
+        /* if (_chainlinkBTCETHFeed != address(0)) {
             try AggregatorV3Interface(_chainlinkBTCETHFeed).latestRoundData() returns (
                 uint80, // roundId,
                 int256 answer,
@@ -216,6 +219,7 @@ contract RarePizzasBox is
             emit BTCETHPriceUpdated(old, bitcoinPriceInWei);
         }
         // nothing got updated.  The miners thank you for your contribution.
+        **/
     }
 
     function withdraw() public virtual override onlyOwner {

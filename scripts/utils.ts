@@ -5,7 +5,7 @@ import config, { NetworkConfig } from '../config'
 
 import boxContract from '../artifacts/contracts/token/RarePizzasBox.sol/RarePizzasBox.json'
 import boxContractV2 from '../artifacts/contracts/token/RarePizzasBoxV2.sol/RarePizzasBoxV2.json'
-import boxContractV3 from '../artifacts/contracts/token/RarePizzaBoxV3.sol/RarePizzasBoxV3.json'
+import boxContractV3 from '../artifacts/contracts/token/RarePizzasBoxV3.sol/RarePizzasBoxV3.json'
 import randomConsumer from '../artifacts/contracts/random/RandomConsumer.sol/RandomConsumer.json'
 import seedStorage from '../artifacts/contracts/data/RarePizzasSeedStorage.sol/RarePizzasSeedStorage.json'
 import rarePizzas from '../artifacts/contracts/token/RarePizzas.sol/RarePizzas.json'
@@ -226,7 +226,7 @@ const getBoxProxyAdminAddress = (config: NetworkConfig) => {
 
 /**
  * Get the contract address of the VRF random consumer.
- * 
+ *
  * Note: this contract is deployed on both ethereum and polygon networks
  */
 const getRandomConsumerAddress = (config: NetworkConfig) => {
@@ -274,7 +274,7 @@ const getRarePizzasProxyAdminAddress = (config: NetworkConfig) => {
 
 /**
  * Get the proxy address of the seed storage contract
- * 
+ *
  * note: this contract is deployed on polygon
  */
 const getStorageProxyAddress = (config: NetworkConfig) => {
@@ -407,15 +407,15 @@ const publishBoxWeb3V3AdminAbi = () => {
     contractName: boxContractV3.contractName,
     sourceName: boxContractV3.sourceName,
     abi: [
-      boxContractV3.abi.find((i) => i.name === 'mint'),
-      boxContractV3.abi.find((i) => i.name === 'purchaseTo'),
-      boxContractV3.abi.find((i) => i.name === 'setPresaleAllowed'),
-      boxContractV3.abi.find((i) => i.name === 'setSaleStartTimestamp'),
-      boxContractV3.abi.find((i) => i.name === 'updateBitcoinPriceInWei'),
-      boxContractV3.abi.find((i) => i.name === 'withdraw'),
-      boxContractV3.abi.find(i => i.name === 'setVRFConsumer'),
-      boxContractV3.abi.find(i => i.name === 'startBatchMint'),
-      boxContractV3.abi.find(i => i.name === 'finishBatchMint')
+      boxContractV3.abi.find((i: { name: string }) => i.name === 'mint'),
+      boxContractV3.abi.find((i: { name: string }) => i.name === 'purchaseTo'),
+      boxContractV3.abi.find((i: { name: string }) => i.name === 'setPresaleAllowed'),
+      boxContractV3.abi.find((i: { name: string }) => i.name === 'setSaleStartTimestamp'),
+      boxContractV3.abi.find((i: { name: string }) => i.name === 'updateBitcoinPriceInWei'),
+      boxContractV3.abi.find((i: { name: string }) => i.name === 'withdraw'),
+      boxContractV3.abi.find((i: { name: string }) => i.name === 'setVRFConsumer'),
+      boxContractV3.abi.find((i: { name: string }) => i.name === 'startBatchMint'),
+      boxContractV3.abi.find((i: { name: string }) => i.name === 'finishBatchMint')
     ],
   }
 
@@ -493,7 +493,7 @@ const publishRandomConsumerWeb3AdminAbi = () => {
 
 /**
  * Publish some deployment data.
- * 
+ *
  * This function should be called for all contract deployments
  */
 const publishDeploymentData = (name: string, proxy: Contract) => {
