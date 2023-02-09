@@ -5,6 +5,7 @@ import '@nomiclabs/hardhat-waffle'
 import '@openzeppelin/hardhat-upgrades'
 import 'hardhat-gas-reporter'
 import 'hardhat-contract-sizer'
+import 'ethers'
 import config, { NetworkConfig } from './config'
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -21,7 +22,7 @@ const networks: NetworksUserConfig = {
   mainnet: {
     url: `https://eth-mainnet.alchemyapi.io/v2/${config.ALCHEMY_MAINNET_KEY}`,
     accounts: [`0x${config.MAINNET_PRIVATE_KEY}`],
-    gasPrice: 220000000000
+    gasPrice: 220000000000,
   },
   rinkeby: {
     url: `https://eth-rinkeby.alchemyapi.io/v2/${config.ALCHEMY_RINKEBY_KEY}`,
@@ -54,45 +55,53 @@ const hardhatConfig: HardhatUserConfig = {
     apiKey: config.ETHERSCAN_API_KEY,
   },
   solidity: {
-    compilers: [{
-      version: "0.8.6", settings: {
-        optimizer: {
-          enabled: true,
-          runs: 200,
-        }
-      }
-    },
-    {
-    version: "0.8.4", settings: {
-        optimizer: {
-          enabled: true,
-          runs: 200,
-        }
-      }
-    },
-    {
-      version: "0.8.0", settings: {
-        optimizer: {
-          enabled: true,
-          runs: 200,
-        }
-      }
-    },
-    {
-      version: "0.6.12", settings: {
-        optimizer: {
-          enabled: true,
-          runs: 200,
-        }
-      }
-    }, {
-      version: "0.6.6", settings: {
-        optimizer: {
-          enabled: true,
-          runs: 200,
-        }
-      }
-    }],
+    compilers: [
+      {
+        version: '0.8.6',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      },
+      {
+        version: '0.8.4',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      },
+      {
+        version: '0.8.0',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      },
+      {
+        version: '0.6.12',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      },
+      {
+        version: '0.6.6',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      },
+    ],
   },
   contractSizer: {
     alphaSort: true,
