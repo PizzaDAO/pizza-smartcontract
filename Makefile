@@ -5,10 +5,13 @@ environment:
 
 build:
 	npx hardhat compile
-	npx webpack
+#	npx webpack
 
 test:
 	npx hardhat test
+
+pending-requests:
+	npx hardhat run --netwrok mainnet scritps/orderAPIConsumer.pendingRequests.ts
 
 box-transfer-ownable:
 	npx hardhat run --network rinkeby scripts/box.upgrade.v3.prepare.ts

@@ -3,9 +3,9 @@ import { NetworksUserConfig } from 'hardhat/types'
 import '@nomiclabs/hardhat-etherscan'
 import '@nomiclabs/hardhat-waffle'
 import '@openzeppelin/hardhat-upgrades'
+import '@nomiclabs/hardhat-ethers'
 import 'hardhat-gas-reporter'
 import 'hardhat-contract-sizer'
-import 'ethers'
 import config, { NetworkConfig } from './config'
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -19,7 +19,7 @@ task('accounts', 'Prints the list of accounts', async (args, hre) => {
 })
 
 const networks: NetworksUserConfig = {
-  mainnet: {
+  /* mainnet: {
     url: `https://eth-mainnet.alchemyapi.io/v2/${config.ALCHEMY_MAINNET_KEY}`,
     accounts: [`0x${config.MAINNET_PRIVATE_KEY}`],
     gasPrice: 220000000000,
@@ -35,7 +35,7 @@ const networks: NetworksUserConfig = {
   maticmum: {
     url: `https://polygon-mumbai.g.alchemy.com/v2/${config.ALCHEMY_MUMBAI_KEY}`,
     accounts: [`0x${config.MATIC_MUMBAI_PRIVATE_KEY}`],
-  },
+  }, */
 }
 
 const getNetworks = (config: NetworkConfig) => {

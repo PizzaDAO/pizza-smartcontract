@@ -13,10 +13,12 @@
     "strict": true,
     "target": "ES2018"
   },
-  "include": ["./app"],
+  "include": [
+    "./app", 
+    "scripts"
+  ],
   "exclude": [
     "node_modules", 
-    "scripts",
     "test", 
     "config", 
     "**/*.spec.ts",
