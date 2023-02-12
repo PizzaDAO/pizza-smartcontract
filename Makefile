@@ -11,7 +11,7 @@ test:
 	npx hardhat test
 
 pending-requests:
-	npx hardhat run --netwrok mainnet scritps/orderAPIConsumer.pendingRequests.ts
+	npx hardhat run --network mainnet scripts/orderAPIConsumer.pendingRequests.ts
 
 box-transfer-ownable:
 	npx hardhat run --network rinkeby scripts/box.upgrade.v3.prepare.ts
