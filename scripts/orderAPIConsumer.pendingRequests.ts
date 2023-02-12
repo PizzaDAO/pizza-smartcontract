@@ -1,28 +1,32 @@
 import { ethers } from "ethers";
-
 import config, { NetworkConfig } from "../config";
+import { abi } from "../artifacts/contracts/chainlink/OrderAPIConsumer.sol/OrderAPIConsumer.json";
+import utils from "./utils";
 
-async function findPendingRequestIds() {
-  const provider = new ethers.providers.JsonRpcProvider(
-    config.RPC_URL,
-    config.NETWORK
+async function main() {
+  const provider = new ethers.providers.AlchemyProvider(
+    config.NETWORK,
+    utils.getAlchemyAPIKey(config)
   );
-
-  const signer = provider.getSigner();
 
   const contract = new ethers.Contract(
-    config.ORDER_API_CONSUMER_CONTRACT_ADDRESS,
-    [
-      "function requestOrderAPI(uint256 _pizzaId) public returns (bytes32 requestId)",
-    ],
-    signer
+    config.RAREPIZZAS_ORDER_API_CONSUMER_MAINNET_CONTRACT_ADDRESS,
+    abi,
+    provider
   );
 
-  const tx = await contract.requestOrderAPI(1);
-  console.log("tx:", tx);
+  const events = await contract.queryFilter("ChainlinkRequested")// requestOrderAPI(1);
+  console.log(events);
 }
 
-async function findPendingRequests() {
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error) 
+    process.exit(1)
+  })
+
+/* async function findPendingRequests() {
   const provider = new ethers.providers.JsonRpcProvider(
     config.RPC_URL,
     config.NETWORK
@@ -75,4 +79,4 @@ async function getOutstandingRequestIds(contract) {
 
   // Print the collection of outstanding requestIds
   console.log(outstandingIds)
-}
+} */

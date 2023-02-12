@@ -19,14 +19,10 @@ task('accounts', 'Prints the list of accounts', async (args, hre) => {
 })
 
 const networks: NetworksUserConfig = {
-  /* mainnet: {
+  mainnet: {
     url: `https://eth-mainnet.alchemyapi.io/v2/${config.ALCHEMY_MAINNET_KEY}`,
     accounts: [`0x${config.MAINNET_PRIVATE_KEY}`],
     gasPrice: 220000000000,
-  },
-  rinkeby: {
-    url: `https://eth-rinkeby.alchemyapi.io/v2/${config.ALCHEMY_RINKEBY_KEY}`,
-    accounts: [`0x${config.RINKEBY_PRIVATE_KEY}`],
   },
   matic: {
     url: `https://polygon-mainnet.g.alchemy.com/v2/${config.ALCHEMY_MATIC_KEY}`,
@@ -35,7 +31,7 @@ const networks: NetworksUserConfig = {
   maticmum: {
     url: `https://polygon-mumbai.g.alchemy.com/v2/${config.ALCHEMY_MUMBAI_KEY}`,
     accounts: [`0x${config.MATIC_MUMBAI_PRIVATE_KEY}`],
-  }, */
+  },
 }
 
 const getNetworks = (config: NetworkConfig) => {
