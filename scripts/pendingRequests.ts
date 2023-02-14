@@ -1,8 +1,15 @@
 import 'dotenv/config';
 import { ethers } from "ethers";
+import * as cbor from 'cbor';
+import axios, { AxiosResponse } from 'axios';
+
+// Import the contract ABIs
 import { abi as consumerAbi } from "../artifacts/contracts/chainlink/OrderAPIConsumer.sol/OrderAPIConsumer.json";
 import { abi as oracleAbi } from "../artifacts/contracts/chainlink/OrderAPIOracle.sol/OrderAPIOracle.json";
-import * as cbor from 'cbor';
+
+// Set the API configuration
+const baseUrl = 'https://api.rarepizzas.app';
+const apiVersion = 'v1';
 
 interface IChainlinkFulfilledEventArgs {
   id: string;
@@ -79,10 +86,18 @@ const getOracleRequests = async (
   return matchedOracleRequests;
 }
 
+// The decoded oracle request data structure
+interface IOracleRequestData {
+  address: string,
+  requestor: string,
+  token_id: number,
+  recipe_id: number
+}
+
 // Decode the oracle request data
 const decodeOracleRequestData = (
   contract: ethers.Contract,
-  logs: ethers.Event[]) => {
+  logs: ethers.Event[]): IOracleRequestData[] => {
   const decodedEventsData = logs.map((log) => {
     const event = contract.interface.parseLog(log);
     const args = event.args as unknown as IOracleRequestEventArgs;
@@ -90,9 +105,33 @@ const decodeOracleRequestData = (
       Buffer.from(args.data.slice(2),
       'hex'
     ));
-    return decodedData;
+    let decodedObject: { [key: string]: any } = {};
+    for (let i = 0; i < decodedData.length; i += 2) {
+      decodedObject[decodedData[i]] = decodedData[i + 1];
+    }
+    return decodedObject as IOracleRequestData;
   })
   return decodedEventsData;
+}
+
+interface OrderData {
+  bridge: string,
+  address: string,
+  requestor: string,
+  token_id: number,
+  recipe_id: number
+}
+
+const postOrder = async (orderData: OrderData): Promise<AxiosResponse> => {
+  const endpoint = `${baseUrl}/api/${apiVersion}/orders`;
+  try {
+    const response = await axios.post(endpoint, orderData);
+    return response;
+  }
+  catch (error) {
+    console.log(error);
+    throw error;
+  }
 }
 
 const main = async () => {
@@ -119,14 +158,26 @@ const main = async () => {
   });
 
   const oracleRequests = await getOracleRequests(oracleContract, requestIds);
-  console.log(oracleRequests, `This many requests: ${oracleRequests.length}`);
 
   const decodedOracleRequestsData = decodeOracleRequestData(
     oracleContract,
     oracleRequests
   );
-  console.log(decodedOracleRequestsData, `This many requests: ${oracleRequests.length}`);
 
+  console.log(decodedOracleRequestsData);
+  
+  for (const request of decodedOracleRequestsData) {
+    const orderData: OrderData = {
+      bridge: 'orderpizzav1',
+      address: request.address,
+      requestor: request.requestor,
+      token_id: request.token_id,
+      recipe_id: request.recipe_id
+    };
+    const response = await postOrder(orderData);
+    console.log(response);
+  };
+  
   /* const eventAbi = consumerContract.filters.ChainlinkRequested();
 
   // Listen for new requests
