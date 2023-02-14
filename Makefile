@@ -10,8 +10,11 @@ build:
 test:
 	npx hardhat test
 
-pending-requests:
-	npx hardhat run --network mainnet scripts/pendingRequests.ts
+build-blockchain-listener:
+	npx tsc scripts/pendingRequests.ts --resolveJsonModule 
+
+start-blockchain-listener:
+	node scripts/pendingRequests.js
 
 box-transfer-ownable:
 	npx hardhat run --network rinkeby scripts/box.upgrade.v3.prepare.ts
