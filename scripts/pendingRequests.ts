@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { ethers } from "ethers";
 import { abi as consumerAbi } from "../artifacts/contracts/chainlink/OrderAPIConsumer.sol/OrderAPIConsumer.json";
 import { abi as oracleAbi } from "../artifacts/contracts/chainlink/OrderAPIOracle.sol/OrderAPIOracle.json";
+import * as cbor from 'cbor';
 
 interface IChainlinkFulfilledEventArgs {
   id: string;
@@ -39,7 +40,15 @@ const getPendingRequests = async (
 }
 
 interface IOracleRequestEventArgs {
+  specId: string;
+  requester: string;
   requestId: string;
+  payment: number;
+  callbackAddr: string;
+  callbackFunctionId: string;
+  cancelExpiration: number;
+  dataVersion: number;
+  data: string;
 }
 
 // Get the oracle request data from the OrderAPIOracle contract for the IDs of the given events
@@ -70,6 +79,22 @@ const getOracleRequests = async (
   return matchedOracleRequests;
 }
 
+// Decode the oracle request data
+const decodeOracleRequestData = (
+  contract: ethers.Contract,
+  logs: ethers.Event[]) => {
+  const decodedEventsData = logs.map((log) => {
+    const event = contract.interface.parseLog(log);
+    const args = event.args as unknown as IOracleRequestEventArgs;
+    const decodedData = cbor.decodeAllSync(
+      Buffer.from(args.data.slice(2),
+      'hex'
+    ));
+    return decodedData;
+  })
+  return decodedEventsData;
+}
+
 const main = async () => {
   const provider = new ethers.providers.AlchemyProvider(
     'mainnet',
@@ -94,8 +119,23 @@ const main = async () => {
   });
 
   const oracleRequests = await getOracleRequests(oracleContract, requestIds);
-  
   console.log(oracleRequests, `This many requests: ${oracleRequests.length}`);
+
+  const decodedOracleRequestsData = decodeOracleRequestData(
+    oracleContract,
+    oracleRequests
+  );
+  console.log(decodedOracleRequestsData, `This many requests: ${oracleRequests.length}`);
+
+  /* const eventAbi = consumerContract.filters.ChainlinkRequested();
+
+  // Listen for new requests
+  consumerContract.on(
+    eventAbi,
+    (id: string) => {
+
+    }
+  ) */
 }
 
 main()
