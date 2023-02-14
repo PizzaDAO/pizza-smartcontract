@@ -61,5 +61,8 @@
   },
   "directories": {
     "test": "test"
+  },
+  "dependencies": {
+    "cbor": "^8.1.0"
   }
 }
