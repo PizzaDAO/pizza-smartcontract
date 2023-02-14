@@ -1,32 +1,36 @@
+import 'dotenv/config';
 import { ethers } from "ethers";
-import config, { NetworkConfig } from "../config";
 import { abi as consumerAbi } from "../artifacts/contracts/chainlink/OrderAPIConsumer.sol/OrderAPIConsumer.json";
 import { abi as oracleAbi } from "../artifacts/contracts/chainlink/OrderAPIOracle.sol/OrderAPIOracle.json";
-import utils from "./utils";
 
+interface IChainlinkFulfilledEventArgs {
+  id: string;
+}
 
 // Get the pending requests from the OrderAPIConsumer contract
 const getPendingRequests = async (
-  provider: ethers.providers.AlchemyProvider
+  contract: ethers.Contract,
   ): Promise<ethers.Event[]> => {
-    
-  const contract = new ethers.Contract(
-    config.RAREPIZZAS_ORDER_API_CONSUMER_MAINNET_CONTRACT_ADDRESS,
-    consumerAbi,
-    provider
-  );
 
   // Get the requested and fulfilled events
-  const requestedEvents = await contract.queryFilter("ChainlinkRequested")
-  const fulfilledEvents = await contract.queryFilter("ChainlinkFulfilled")
+  const requestedFilter = contract.filters.ChainlinkRequested();
+  const requestedEvents = await contract.queryFilter(requestedFilter);
+
+  const fulfilledFilter = contract.filters.ChainlinkFulfilled();
+  const fulfilledLogs = await contract.queryFilter(fulfilledFilter);
+  
   let pendingRequests = []
 
   // Loop through the requested events and check if the requestId is in the fulfilled events
   for (let i = 0; i < requestedEvents.length; i++) {
-    const requestedEvent = requestedEvents[i]
-    const requestId = requestedEvents[i].topics[1]
-    const fulfilled = fulfilledEvents.find((event) => event.topics[1] === requestId)
-    if (!fulfilled) {
+    const requestedEvent = requestedEvents[i];
+    const requestId = requestedEvent.topics[1];
+    const fulfilledRequest = fulfilledLogs.find((log) => {
+      const event = contract.interface.parseLog(log);
+      const args = event.args as unknown as IChainlinkFulfilledEventArgs;
+      return args.id === requestId
+    })
+    if (!fulfilledRequest) {
       pendingRequests.push(requestedEvent)
     }
   }
@@ -34,46 +38,64 @@ const getPendingRequests = async (
   return pendingRequests;
 }
 
+interface IOracleRequestEventArgs {
+  requestId: string;
+}
+
 // Get the oracle request data from the OrderAPIOracle contract for the IDs of the given events
 const getOracleRequests = async (
-  provider: ethers.providers.AlchemyProvider,
-  requests: ethers.Event[]
+  contract: ethers.Contract,
+  requestIds: string[]
   ): Promise<ethers.Event[]> => {
 
-  const contract = new ethers.Contract(
-    config.RAREPIZZAS_ORDER_API_MAINNET_ORACLE_CONTRACT_ADDRESS,
-    oracleAbi,
-    provider
-  );
-
   // Get the oracle events data
-  const oracleRequests = await contract.queryFilter("OracleRequest")
-  const pendingOracleRequests = []
+  const requestFilter = contract.filters.OracleRequest();
+  const oracleRequests = await contract.queryFilter(requestFilter)
+ 
+  const matchedOracleRequests = []
 
   // Loop through the pending requests and check if the requestId is in the oracle requests
-  for (let i = 0; i < requests.length; i++) {
-    const requestId = requests[i].topics[1]
-    const oracleRequest = oracleRequests.find((event) => event.topics[1] === requestId)
+  for (let i = 0; i < requestIds.length; i++) {
+    const requestId = requestIds[i]
+    const oracleRequest = oracleRequests.find((log) =>  {
+      const event = contract.interface.parseLog(log);
+      const args = event.args as unknown as IOracleRequestEventArgs;
+      return args.requestId === requestId
+    })
     if (oracleRequest) {
-      pendingOracleRequests.push(oracleRequest)
+      matchedOracleRequests.push(oracleRequest)
     }
   }
-  //const foo: ethers.utils.Result = oracleRequests[0].args;
 
-  return oracleRequests;//pendingOracleRequests;
+  return matchedOracleRequests;
 }
 
 const main = async () => {
   const provider = new ethers.providers.AlchemyProvider(
-    config.NETWORK,
-    utils.getAlchemyAPIKey(config)
+    'mainnet',
+    process.env.ALCHEMY_MAINNET_KEY,
   );
 
-  const pendingRequests = await getPendingRequests(provider);
-  console.log(pendingRequests);
+  const consumerContract = new ethers.Contract(
+    process.env.RAREPIZZAS_ORDER_API_CONSUMER_MAINNET_CONTRACT_ADDRESS!,
+    consumerAbi,
+    provider
+  );
 
-  const oracleRequests = await getOracleRequests(provider, pendingRequests);
-  console.log(oracleRequests);
+  const oracleContract = new ethers.Contract(
+    process.env.RAREPIZZAS_ORDER_API_MAINNET_ORACLE_CONTRACT_ADDRESS!,
+    oracleAbi,
+    provider
+  );
+
+  const pendingRequests = await getPendingRequests(consumerContract);
+  const requestIds = pendingRequests.map((event) => {
+    return event.topics[1]
+  });
+
+  const oracleRequests = await getOracleRequests(oracleContract, requestIds);
+  
+  console.log(oracleRequests, `This many requests: ${oracleRequests.length}`);
 }
 
 main()
