@@ -11,7 +11,7 @@ test:
 	npx hardhat test
 
 start-blockchain-listener:
-	npx ts-node scripts/pendingRequests.ts
+	npx ts-node app/blockchain-listener/blistener.ts
 
 box-transfer-ownable:
 	npx hardhat run --network rinkeby scripts/box.upgrade.v3.prepare.ts
