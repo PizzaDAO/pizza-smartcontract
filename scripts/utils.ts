@@ -155,6 +155,20 @@ const getOrderAPIOracleNodeAddress = (config: NetworkConfig) => {
 }
 
 /**
+ * Get the private key of the EOA address that is loaded into the chainlink oracle node
+ */
+ const getOrderAPIOracleNodePrivateKey = (config: NetworkConfig) => {
+  const networkName = config.NETWORK.toLowerCase()
+  switch (networkName) {
+    case 'mainnet':
+      return config.RAREPIZZAS_ORDER_API_MAINNET_ORACLE_NODE_PRIVATE_KEY
+    case 'rinkeby':
+      return config.RAREPIZZAS_ORDER_API_RINKEBY_ORACLE_NODE_PRIVATE_KEY
+  }
+  return 'VALUE NOT FOUND'
+}
+
+/**
  * Get the contract address of the contact that will consume the OrderAPI result
  */
 const getOrderAPIConsumerContractAddress = (config: NetworkConfig) => {
@@ -551,6 +565,7 @@ const utils = {
   getChainlinkVRFFee: getChainlinkVRFFee,
   getOrderAPIOracleContractAddress: getOrderAPIOracleContractAddress,
   getOrderAPIOracleNodeAddress: getOrderAPIOracleNodeAddress,
+  getOrderAPIOracleNodePrivateKey: getOrderAPIOracleNodePrivateKey,
   getOrderAPIConsumerContractAddress: getOrderAPIConsumerContractAddress,
   getOrderAPIJobId: getOrderAPIJobId,
   getOrderAPIJobFee: getOrderAPIJobFee,
