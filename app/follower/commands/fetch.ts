@@ -55,7 +55,9 @@ export const getPendingRequests = async (
       return args.id === requestId
     })
     if (!fulfilledRequest) {
-      console.log(`Found pending request with requestId ${requestId} at block ${blockNumber}`)
+      console.log(
+        `Found pending request with requestId ${requestId} at block ${blockNumber}`,
+      )
       pendingRequests.push(requestedEvent)
     }
   }
@@ -63,7 +65,8 @@ export const getPendingRequests = async (
   return { pendingRequests, latestBlock }
 }
 
-// Get the oracle request data from the OrderAPIOracle contract for the IDs of the given events
+// Get the oracle request data from the OrderAPIOracle
+// contract for the IDs of the given events
 export const getOracleRequests = async (
   contract: Contract,
   requestIds: string[],
@@ -76,7 +79,8 @@ export const getOracleRequests = async (
 
   const matchedOracleRequests = []
 
-  // Loop through the pending requests and check if the requestId is in the oracle requests
+  // Loop through the pending requests and check
+  // if the requestId is in the oracle requests
   for (let i = 0; i < requestIds.length; i++) {
     const requestId = requestIds[i]
     const oracleRequest = oracleRequests.find((log) => {
@@ -92,7 +96,9 @@ export const getOracleRequests = async (
     }
   }
 
-  console.log(`Matched ${matchedOracleRequests.length} oracle requests to pending requests`)
+  console.log(
+    `Matched ${matchedOracleRequests.length} oracle requests to pending requests`,
+  )
   return matchedOracleRequests
 }
 
@@ -128,7 +134,10 @@ export interface FetchOptions {
 
 // Fetch unfulfilled requests from the given block to present
 // and save them to file
-export const fetchRequests = async ({ file, block }: FetchOptions): Promise<void> => {
+export const fetchRequests = async ({
+  file,
+  block,
+}: FetchOptions): Promise<void> => {
   console.log(`Fetching requests from block ${block} onwards...`)
   // Get the fromBlock value from the file or command line
   // Will default to 0 if neither are provided
@@ -138,7 +147,9 @@ export const fetchRequests = async ({ file, block }: FetchOptions): Promise<void
   // If the block option is not provided, it will default to 0
   if (file) {
     try {
-      const data = JSON.parse(fs.readFileSync(`${dataDirectory}/${file}`, 'utf8')).fromBlock
+      const data = JSON.parse(
+        fs.readFileSync(`${dataDirectory}/${file}`, 'utf8'),
+      ).fromBlock
       fromBlock = parseInt(data)
       console.log(`fromBlock value: ${fromBlock}
       retrieved from file: ${file}`)
@@ -167,9 +178,15 @@ export const fetchRequests = async ({ file, block }: FetchOptions): Promise<void
 
   if (requestIds.length !== 0) {
     console.log(`Found ${requestIds.length} pending requests`)
-    const oracleRequests = await getOracleRequests(contracts.orderApiOracle, requestIds, fromBlock)
+    const oracleRequests = await getOracleRequests(
+      contracts.orderApiOracle,
+      requestIds,
+      fromBlock,
+    )
 
-    const decodedOracleRequestsData = oracleRequests.map(decodeOracleRequestData)
+    const decodedOracleRequestsData = oracleRequests.map(
+      decodeOracleRequestData,
+    )
 
     // Save the decoded oracle requests data to file based on token_id
     console.log(`Writing decoded oracle requests data to ${pendingDirectory}`)
@@ -183,11 +200,16 @@ export const fetchRequests = async ({ file, block }: FetchOptions): Promise<void
     newFromBlock = fromBlock
   }
 
-  console.log(`saving latest block ${newFromBlock} to ${dataDirectory}/fromBlock.json`)
+  console.log(
+    `saving latest block ${newFromBlock} to ${dataDirectory}/fromBlock.json`,
+  )
   // Save the latest block to file. Based on latest ChainlinkRequested event, as
   // this is the first event in the sequence and guaranteed to be emitted
   // when a pizza box is redeemed
-  fs.writeFileSync(`${dataDirectory}/fromBlock.json`, JSON.stringify({ fromBlock: newFromBlock }))
+  fs.writeFileSync(
+    `${dataDirectory}/fromBlock.json`,
+    JSON.stringify({ fromBlock: newFromBlock }),
+  )
 }
 
 export default fetchRequests
