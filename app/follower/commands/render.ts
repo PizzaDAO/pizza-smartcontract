@@ -1,14 +1,20 @@
 import axios, { AxiosResponse } from 'axios'
 import { v4 as uuid } from 'uuid'
 import { OrderData } from '../types/OrderData'
-import { IOracleRequestData, RenderRequestOptions } from '../types'
+import { IOracleRequestData } from '../types'
 import { getPendingRequests, pendingDirectory } from '../utils'
 
-export const updateOrderStatus = async (
-  baseUrl: string,
-  apiVersion: string,
-  tokenId?: number,
-): Promise<AxiosResponse> => {
+export interface RenderRequestOptions {
+  baseUrl: string
+  apiVersion: string
+  tokenId?: number
+}
+
+export const updateOrderStatus = async ({
+  baseUrl,
+  apiVersion,
+  tokenId,
+}: RenderRequestOptions): Promise<AxiosResponse> => {
   const endpoint = `${baseUrl}/api/${apiVersion}/admin/render_task/find`
   try {
     const filter = {
@@ -26,7 +32,6 @@ export const updateOrderStatus = async (
   }
 }
 
-// TODO: deserialize response
 export const postOrder = async (
   baseUrl: string,
   apiVersion: string,
@@ -44,6 +49,7 @@ export const postOrder = async (
         Authorization: `Bearer ${callbackApiKey}`,
       },
     })
+    // TODO: deserialize response
     return response
   } catch (error) {
     console.log(error)
