@@ -65,7 +65,7 @@ deploy-orderapi-mainnet:
 	npx hardhat run --network mainnet scripts/orderAPIConsumer.deploy.ts
 
 follower-fetch:
-  npx ts-node app/follower fetch
+	npx ts-node app/follower fetch
 
 verify-orderapi-rinkeby:
 	npx hardhat verify --contract contracts/chainlink/OrderAPIConsumer.sol:OrderAPIConsumer --network rinkeby 0x3afD8Cc13fD8bc2B1F60F1e591a56EB4d0E1A3BD
