@@ -1,8 +1,8 @@
 import axios, { AxiosResponse } from 'axios'
 import { v4 as uuid } from 'uuid'
 import { OrderData } from '../types/OrderData'
-import { IOracleRequestData } from '../types'
-import { getPendingRequests, pendingDirectory } from '../utils'
+import { getPendingRequests, pendingDirectory, saveRenderTask } from '../utils'
+import { IRenderTask } from '../types/IRenderTask'
 
 export interface RenderRequestOptions {
   baseUrl: string
@@ -14,7 +14,7 @@ export const updateOrderStatus = async ({
   baseUrl,
   apiVersion,
   tokenId,
-}: RenderRequestOptions): Promise<AxiosResponse> => {
+}: RenderRequestOptions): Promise<IRenderTask[]> => {
   const endpoint = `${baseUrl}/api/${apiVersion}/admin/render_task/find`
   try {
     const filter = {
@@ -23,9 +23,9 @@ export const updateOrderStatus = async ({
       },
     }
     const response = await axios.post(endpoint, filter)
-
-    // TODO: cache out the tasks and return a deserilized response
-    return response
+    const tasks = response.data as IRenderTask[]
+    tasks.map(saveRenderTask)
+    return tasks
   } catch (error) {
     console.log(error)
     throw error
@@ -74,16 +74,24 @@ export const renderRequests = async ({
   console.log(`Parsing requests from ${pendingDirectory}`)
 
   // Read the requests from the data directory
-  const requests: IOracleRequestData[] = getPendingRequests(tokenId)
+  const requests = getPendingRequests(tokenId)
 
-  // TODO: check the renderer api if there is an existing job
+  if (requests.length === 0) {
+    console.log('No requests found.')
+    return
+  }
 
-  // TODO: if there is an existing job for the token_id,
-  // skip it and update the task status
+  // check the renderer api if there is an existing job
+  const tasks = await updateOrderStatus({ baseUrl, apiVersion, tokenId })
 
-  //
+  // if there is an existing job for the token_id, skip it
+  const filteredRequests = requests.filter(
+    (request) =>
+      !tasks.find((task) => task.request.data.token_id === request.token_id),
+  )
 
-  for (const request of requests) {
+  // Post the requests to the OrderAPI
+  for (const request of filteredRequests) {
     const taskId = uuid()
 
     const orderData: OrderData = {
@@ -99,6 +107,9 @@ export const renderRequests = async ({
     console.log(response)
     // TODO: save the task to a file
   }
+
+  // check the renderer api again to see if there are any new jobs
+  await updateOrderStatus({ baseUrl, apiVersion, tokenId })
 }
 
 export default renderRequests
