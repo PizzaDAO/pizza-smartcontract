@@ -25,7 +25,7 @@ basic usage includes 3 commands/modes:
 
 - listen (default)
 - fetch
-- push
+- render
 
 All options on commands provide default values, and if no command is given the
 script runs the listen command by default.
@@ -59,7 +59,7 @@ directory. Naming format is tokenId.json where the tokenId is the id of the pizz
 being minted against. Latest block visited is stored to avoid unnecessary re-processing
 of events.
 
-### push
+### render
 
 pushes json file/s stored in the output directory to the pizza oven's Order API
 
