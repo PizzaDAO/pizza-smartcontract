@@ -8,7 +8,7 @@ import {
   renderRequests,
   RenderRequestOptions,
   FetchOptions,
-  updateOrderStatus,
+  queryOrderStatus,
 } from './commands'
 
 //interface Program extends Command, Options {}
@@ -66,7 +66,7 @@ program
   })
 
 program
-  .command('render-status')
+  .command('status')
   .description('Checks the status of the order and updates it in the database.')
   .addOption(commonOptions.url)
   .addOption(commonOptions.apiVersion)
@@ -77,7 +77,7 @@ program
   )
   .action(async (options: RenderRequestOptions) => {
     console.log('Checking order status...')
-    await updateOrderStatus(options)
+    await queryOrderStatus(options)
   })
 
 program

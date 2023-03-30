@@ -1,11 +1,46 @@
+import axios from 'axios'
 import fs from 'fs'
 
 import { getOracleRequests, getOrderApiConsumerRequests } from '../contracts'
-import { dataDirectory, getFromBlock, saveRequest } from '../utils'
+import { IRenderTask } from '../types'
+import {
+  dataDirectory,
+  getFromBlock,
+  saveRenderTask,
+  saveRequest,
+} from '../utils'
 
 export interface FetchOptions {
   file: string
   block: number
+}
+
+export interface QueryOrderStatusOptions {
+  baseUrl: string
+  apiVersion: string
+  tokenId?: number
+}
+
+export const queryOrderStatus = async ({
+  baseUrl,
+  apiVersion,
+  tokenId,
+}: QueryOrderStatusOptions): Promise<IRenderTask[]> => {
+  const endpoint = `${baseUrl}/api/${apiVersion}/admin/render_task/find`
+  try {
+    const filter = {
+      filter: {
+        'request.data.token_id': tokenId,
+      },
+    }
+    const response = await axios.post(endpoint, filter)
+    const tasks = response.data as IRenderTask[]
+    tasks.map(saveRenderTask)
+    return tasks
+  } catch (error) {
+    console.log(error)
+    throw error
+  }
 }
 
 // Fetch unfulfilled requests from the given block to present
