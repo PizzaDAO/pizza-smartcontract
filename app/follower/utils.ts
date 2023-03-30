@@ -1,9 +1,10 @@
 import fs from 'fs'
 import path from 'path'
-import { IOracleRequestData } from './types/IOracleRequestData'
+import { IOracleRequestData, IRenderTask } from './types'
 
 export const dataDirectory = path.join(__dirname, 'data')
 export const pendingDirectory = path.join(dataDirectory, 'pending')
+export const tasksDirectory = path.join(dataDirectory, 'tasks')
 
 export const saveRequest = (request: IOracleRequestData): void => {
   // Check if the data directory exists
@@ -15,6 +16,34 @@ export const saveRequest = (request: IOracleRequestData): void => {
   console.log(`Saving request to file: ${request.token_id}.json`)
   const fileName = `${pendingDirectory}/${request.token_id}.json`
   fs.writeFileSync(fileName, JSON.stringify(request))
+}
+
+export const saveRenderTask = (task: IRenderTask): void => {
+  if (!fs.existsSync(tasksDirectory)) {
+    fs.mkdirSync(tasksDirectory)
+  }
+
+  console.log(`Saving request to file: ${task.request.data.token_id}.json`)
+  const fileName = `${tasksDirectory}/${task.request.data.token_id}.json`
+  fs.writeFileSync(fileName, JSON.stringify(task))
+}
+
+export const getRenderTasks = (tokenId: number | undefined): IRenderTask[] => {
+  const tasks: IRenderTask[] = []
+
+  // parse the file or files in the pending directory
+  if (typeof tokenId !== 'undefined') {
+    const data = fs.readFileSync(`${tasksDirectory}/${tokenId}.json`, 'utf8')
+    const request = JSON.parse(data)
+    tasks.push(request)
+  } else {
+    fs.readdirSync(`${pendingDirectory}`).map((file) => {
+      const data = fs.readFileSync(`${tasksDirectory}/${file}`, 'utf8')
+      const request = JSON.parse(data)
+      tasks.push(request)
+    })
+  }
+  return tasks
 }
 
 export const getPendingRequests = (
