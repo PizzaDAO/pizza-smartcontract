@@ -1,14 +1,13 @@
 import fs from 'fs'
-import path from 'path'
 import { Event, Contract } from 'ethers'
 import * as cbor from 'cbor'
 import contracts, { orderApiOracle } from '../contracts'
-import { IOracleRequestData } from '../types/IOracleRequestData'
-import { IOracleRequestEventArgs } from '../types/IOracleRequestEventArgs'
-import { IChainlinkFulfilledEventArgs } from '../types/IChainlinkFulfilledEventArgs'
-
-const dataDirectory = path.join(__dirname, '..', 'data')
-const pendingDirectory = path.join(dataDirectory, 'pending')
+import { dataDirectory, pendingDirectory, saveRequest } from '../utils'
+import {
+  IChainlinkFulfilledEventArgs,
+  IOracleRequestEventArgs,
+  IOracleRequestData,
+} from '../types'
 
 // Get the pending requests from the OrderAPIConsumer contract
 export const getPendingRequests = async (
@@ -23,11 +22,13 @@ export const getPendingRequests = async (
   // Get the requested and fulfilled events
   const requestedFilter = contract.filters.ChainlinkRequested()
   console.log(`Getting ChainlinkRequested events...`)
+
   const requestedEvents = await contract.queryFilter(requestedFilter, fromBlock)
   console.log(`Found ${requestedEvents.length} ChainlinkRequested events`)
 
   const fulfilledFilter = contract.filters.ChainlinkFulfilled()
   console.log(`Getting ChainlinkFulfilled events...`)
+
   const fulfilledLogs = await contract.queryFilter(fulfilledFilter, fromBlock)
   console.log(`Found ${fulfilledLogs.length} ChainlinkFulfilled events`)
 
@@ -113,18 +114,6 @@ export const decodeOracleRequestData = (log: Event): IOracleRequestData => {
   }
   console.log('decodeOracleRequestData', decodedObject)
   return decodedObject as IOracleRequestData
-}
-
-export const saveRequest = (request: IOracleRequestData): void => {
-  // Check if the data directory exists
-
-  if (!fs.existsSync(pendingDirectory)) {
-    fs.mkdirSync(pendingDirectory)
-  }
-  // Save the request to file
-  console.log(`Saving request to file: ${request.token_id}.json`)
-  const fileName = `${pendingDirectory}/${request.token_id}.json`
-  fs.writeFileSync(fileName, JSON.stringify(request))
 }
 
 export interface FetchOptions {
