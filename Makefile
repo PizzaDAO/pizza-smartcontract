@@ -37,6 +37,9 @@ deploy-random-mumbai:
 deploy-random-polygon:
 	npx hardhat run --network matic scripts/randomConsumer.polygon.deploy.ts
 
+set-orderapi-jobid:
+	npx hardhat run --network mainnet scripts/orderAPIConsumer.set.jobid.ts
+
 set-storage-random-mumbai:
 	npx hardhat run --network maticmum scripts/pizza.storage.setRandomConsumer.ts
 
