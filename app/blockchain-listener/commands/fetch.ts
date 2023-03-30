@@ -12,10 +12,10 @@ export interface IChainlinkFulfilledEventArgs {
 export const getPendingRequests = async (
   contract: Contract,
   fromBlock: number
-  ): Promise<{
-    pendingRequests: Event[], 
-    latestBlock: number | undefined
-  }> => {
+): Promise<{
+  pendingRequests: Event[],
+  latestBlock: number | undefined
+}> => {
 
   console.log(`Getting events from block ${fromBlock} onwards...`)
 
@@ -29,11 +29,11 @@ export const getPendingRequests = async (
   console.log(`Getting ChainlinkFulfilled events...`);
   const fulfilledLogs = await contract.queryFilter(fulfilledFilter, fromBlock);
   console.log(`Found ${fulfilledLogs.length} ChainlinkFulfilled events`);
-  
+
   console.log(`Cross-referencing ChainlinkRequested and ChainlinkFulfilled events to determine pending requests...`);
 
   let pendingRequests = []
-  let latestBlock: number = fromBlock; 
+  let latestBlock: number = fromBlock;
   // Loop through the requested events and check if the requestId is in the fulfilled events
   for (let i = 0; i < requestedEvents.length; i++) {
     const requestedEvent = requestedEvents[i];
@@ -57,7 +57,7 @@ export const getPendingRequests = async (
     }
   }
 
-  return {pendingRequests, latestBlock};
+  return { pendingRequests, latestBlock };
 }
 
 export interface IOracleRequestEventArgs {
@@ -77,19 +77,19 @@ export const getOracleRequests = async (
   contract: Contract,
   requestIds: string[],
   fromBlock: number
-  ): Promise<Event[]> => {
+): Promise<Event[]> => {
 
   // Get the oracle events data
   const requestFilter = contract.filters.OracleRequest();
   console.log(`Getting OracleRequest events...`);
   const oracleRequests = await contract.queryFilter(requestFilter, fromBlock)
- 
+
   const matchedOracleRequests = []
 
   // Loop through the pending requests and check if the requestId is in the oracle requests
   for (let i = 0; i < requestIds.length; i++) {
     const requestId = requestIds[i]
-    const oracleRequest = oracleRequests.find((log) =>  {
+    const oracleRequest = oracleRequests.find((log) => {
       const event = contract.interface.parseLog(log);
       const args = event.args as unknown as IOracleRequestEventArgs;
       return args.requestId === requestId
@@ -108,6 +108,7 @@ export const getOracleRequests = async (
 export interface IOracleRequestData {
   address: string,
   requestor: string,
+  requestId: string;
   token_id: number,
   recipe_id: number
 }
@@ -118,12 +119,13 @@ export const decodeOracleRequestData = (log: Event): IOracleRequestData => {
   const args = event.args as unknown as IOracleRequestEventArgs;
   const decodedData = cbor.decodeAllSync(
     Buffer.from(args.data.slice(2),
-    'hex'
-  ));
+      'hex'
+    ));
   let decodedObject: { [key: string]: any } = {};
   for (let i = 0; i < decodedData.length; i += 2) {
     decodedObject[decodedData[i]] = decodedData[i + 1];
   }
+  console.log("decodeOracleRequestData", decodedObject)
   return decodedObject as IOracleRequestData;
 }
 
@@ -154,7 +156,7 @@ export const fetchRequests = async (options: FetchOptions) => {
   // Tries to set the fromBlock value from the provided file option
   // If the file option is not provided, it will use the block option
   // If the block option is not provided, it will default to 0
-   if (options.file) {  
+  if (options.file) {
     try {
       const data = JSON.parse(
         fs.readFileSync(`${path.dirname(process.argv[1])}/${options.file}`, 'utf8')
@@ -174,7 +176,7 @@ export const fetchRequests = async (options: FetchOptions) => {
     console.log(`fromBlock value used: ${fromBlock}`);
   }
 
-  const { pendingRequests, latestBlock} = await getPendingRequests(
+  const { pendingRequests, latestBlock } = await getPendingRequests(
     contracts.orderApiConsumer, fromBlock!
   );
 
@@ -194,9 +196,9 @@ export const fetchRequests = async (options: FetchOptions) => {
 
     // Save the decoded oracle requests data to file based on token_id
     console.log(`Writing decoded oracle requests data to ${path.dirname(process.argv[1])}/data...`);
-    decodedOracleRequestsData.map(saveRequest); 
+    decodedOracleRequestsData.map(saveRequest);
 
-    newFromBlock = latestBlock!+1;
+    newFromBlock = latestBlock! + 1;
   } else {
     console.log(
       `No pending requests found from ${fromBlock} to ${latestBlock}. Abort fetching Oracle requests.`
@@ -210,7 +212,7 @@ export const fetchRequests = async (options: FetchOptions) => {
   // when a pizza box is redeemed
   fs.writeFileSync(
     `${path.dirname(process.argv[1])}/fromBlock.json`,
-    JSON.stringify({fromBlock: newFromBlock})
+    JSON.stringify({ fromBlock: newFromBlock })
   );
 };
 
