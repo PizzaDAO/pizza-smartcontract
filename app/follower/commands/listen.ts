@@ -1,27 +1,23 @@
-import { Event } from 'ethers';
-import { orderApiOracle } from './contracts';
-import { OrderData, postOrder, PushOptions } from './push';
-import {
-  decodeOracleRequestData,
-  FetchOptions,
-  saveRequest
-} from './fetch';
+import { Event } from 'ethers'
+import { orderApiOracle } from '../contracts'
+import { OrderData, postOrder, PushOptions } from './push'
+import { decodeOracleRequestData, FetchOptions, saveRequest } from './fetch'
 
-export interface ListenOptions extends PushOptions, FetchOptions { }
+export interface ListenOptions extends PushOptions, FetchOptions {}
 
 // Listen for new requests and post them to the OrderAPI
 export const listenRequests = ({ url, apiVersion }: ListenOptions) => {
   // Listen for new requests
   orderApiOracle.on('OracleRequest', async (log: Event) => {
-    const data = decodeOracleRequestData(log);
+    const data = decodeOracleRequestData(log)
     // Save the request data to file
-    saveRequest(data);
+    saveRequest(data)
     // Post the request data to the OrderAPI
     postOrder(url, apiVersion, {
       id: `manual test TODO update this string`,
-      data: data
-    });
-  });
+      data: data,
+    })
+  })
 }
 
-export default listenRequests;
+export default listenRequests
