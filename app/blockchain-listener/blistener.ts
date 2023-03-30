@@ -3,11 +3,11 @@ import 'dotenv/config';
 import { Command } from 'commander';
 import {
   ListenOptions,
-  listenRequests, 
+  listenRequests,
   fetchRequests,
-  FetchOptions, 
-  pushRequests, 
-  PushOptions 
+  FetchOptions,
+  pushRequests,
+  PushOptions
 } from './commands';
 
 //interface Program extends Command, Options {}
@@ -17,7 +17,7 @@ const program = new Command();// as Program;
 program
   .version('0.0.1', '-v --version', 'output the current version')
   .description(
-    'A blockchain event processor which fetchs events in batches and saves ' + 
+    'A blockchain event processor which fetchs events in batches and saves ' +
     'relevant data to file, post saved data to an API, or run as a service ' +
     'to process events as they are emitted and post them to an API live.'
   )
@@ -36,13 +36,13 @@ program
 program
   .command('push')
   .description(
-    'Pushes data in the data directory to the API.' + 
+    'Pushes data in the data directory to the API.' +
     ' Can push all data or a specific file.'
   )
   .option(
     '-u, --url [url]',
     'URL of the api to post request data to',
-    'http://localhost:8080'
+    'http://localhost:8000'
   )
   .option(
     '-a, --apiVersion <apiVersion>',
@@ -62,18 +62,18 @@ program
     'specified in the fromBlock.json file.'
   )
   .option(
-    '-f, --file [file]', 
-    'fromBlock value to be used, supplied by a file for persistance', 
+    '-f, --file [file]',
+    'fromBlock value to be used, supplied by a file for persistance',
     'fromBlock.json'
   )
   .option(
-      '-b, --block [block]', 
-      'fromBlock value if latestBlock.json not found, otherwise zero if neither value is provided',
+    '-b, --block [block]',
+    'fromBlock value if latestBlock.json not found, otherwise zero if neither value is provided',
     '0'
   )
   .action((options: FetchOptions) => {
     console.log('Fetching data from blockchain...');
     fetchRequests(options);
   });
-  
+
 program.parse();
