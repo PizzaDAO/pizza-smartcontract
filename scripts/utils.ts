@@ -18,7 +18,7 @@ const getAlchemyAPIKey = (config: NetworkConfig) => {
     case 'rinkeby':
       return config.ALCHEMY_RINKEBY_KEY
     case 'matic':
-        return config.ALCHEMY_MATIC_KEY
+      return config.ALCHEMY_MATIC_KEY
     case 'maticmum':
       return config.ALCHEMY_MUMBAI_KEY
   }
@@ -33,7 +33,7 @@ const getDeploymentKey = (config: NetworkConfig) => {
     case 'rinkeby':
       return config.RINKEBY_PRIVATE_KEY
     case 'matic':
-        return config.MATIC_PRIVATE_KEY
+      return config.MATIC_PRIVATE_KEY
     case 'maticmum':
       return config.MATIC_MUMBAI_PRIVATE_KEY
   }
@@ -65,7 +65,7 @@ const getChainlinkToken = (config: NetworkConfig) => {
     case 'rinkeby':
       return config.CHAINLINK_RINKEBY_TOKEN
     case 'matic':
-        return config.CHAINLINK_MATIC_TOKEN
+      return config.CHAINLINK_MATIC_TOKEN
     case 'maticmum':
       return config.CHAINLINK_MATIC_MUMBAI_TOKEN
   }
@@ -83,7 +83,7 @@ const getChainlinkVRFCoordinator = (config: NetworkConfig) => {
     case 'rinkeby':
       return config.CHAINLINK_RINKEBY_VRF_COORD
     case 'matic':
-        return config.CHAINLINK_MATIC_VRF_COORD
+      return config.CHAINLINK_MATIC_VRF_COORD
     case 'maticmum':
       return config.CHAINLINK_MATIC_MUMBAI_VRF_COORD
   }
@@ -101,7 +101,7 @@ const getChainlinkVRFKeyHash = (config: NetworkConfig) => {
     case 'rinkeby':
       return config.CHAINLINK_RINKEBY_VRF_KEY_HASH
     case 'matic':
-        return config.CHAINLINK_MATIC_VRF_KEY_HASH
+      return config.CHAINLINK_MATIC_VRF_KEY_HASH
     case 'maticmum':
       return config.CHAINLINK_MATIC_MUMBAI_VRF_KEY_HASH
   }
@@ -119,7 +119,7 @@ const getChainlinkVRFFee = (config: NetworkConfig) => {
     case 'rinkeby':
       return config.CHAINLINK_RINKEBY_VRF_FEE
     case 'matic':
-        return config.CHAINLINK_MATIC_VRF_FEE
+      return config.CHAINLINK_MATIC_VRF_FEE
     case 'maticmum':
       return config.CHAINLINK_MATIC_MUMBAI_VRF_FEE
   }
@@ -150,6 +150,20 @@ const getOrderAPIOracleNodeAddress = (config: NetworkConfig) => {
       return config.RAREPIZZAS_ORDER_API_MAINNET_ORACLE_NODE_ADDRESS
     case 'rinkeby':
       return config.RAREPIZZAS_ORDER_API_RINKEBY_ORACLE_NODE_ADDRESS
+  }
+  return 'VALUE NOT FOUND'
+}
+
+/**
+ * Get the private key of the EOA address that is loaded into the chainlink oracle node
+ */
+const getOrderAPIOracleNodePrivateKey = (config: NetworkConfig) => {
+  const networkName = config.NETWORK.toLowerCase()
+  switch (networkName) {
+    case 'mainnet':
+      return config.RAREPIZZAS_ORDER_API_MAINNET_ORACLE_NODE_PRIVATE_KEY
+    case 'rinkeby':
+      return config.RAREPIZZAS_ORDER_API_RINKEBY_ORACLE_NODE_PRIVATE_KEY
   }
   return 'VALUE NOT FOUND'
 }
@@ -226,7 +240,7 @@ const getBoxProxyAdminAddress = (config: NetworkConfig) => {
 
 /**
  * Get the contract address of the VRF random consumer.
- * 
+ *
  * Note: this contract is deployed on both ethereum and polygon networks
  */
 const getRandomConsumerAddress = (config: NetworkConfig) => {
@@ -237,7 +251,7 @@ const getRandomConsumerAddress = (config: NetworkConfig) => {
     case 'rinkeby':
       return config.RAREPIZZAS_BOX_RINKEBY_RANDOM_CONSUMER_ADDRESS
     case 'matic':
-        return config.RAREPIZZAS_MATIC_RANDOM_CONSUMER_ADDRESS
+      return config.RAREPIZZAS_MATIC_RANDOM_CONSUMER_ADDRESS
     case 'maticmum':
       return config.RAREPIZZAS_MUMBAI_RANDOM_CONSUMER_ADDRESS
   }
@@ -274,7 +288,7 @@ const getRarePizzasProxyAdminAddress = (config: NetworkConfig) => {
 
 /**
  * Get the proxy address of the seed storage contract
- * 
+ *
  * note: this contract is deployed on polygon
  */
 const getStorageProxyAddress = (config: NetworkConfig) => {
@@ -393,7 +407,7 @@ const publishBoxWeb3V2AdminAbi = () => {
       boxContractV2.abi.find((i) => i.name === 'setSaleStartTimestamp'),
       boxContractV2.abi.find((i) => i.name === 'updateBitcoinPriceInWei'),
       boxContractV2.abi.find((i) => i.name === 'withdraw'),
-      boxContractV2.abi.find(i => i.name === 'setVRFConsumer')
+      boxContractV2.abi.find((i) => i.name === 'setVRFConsumer'),
     ],
   }
 
@@ -413,9 +427,9 @@ const publishBoxWeb3V3AdminAbi = () => {
       boxContractV3.abi.find((i) => i.name === 'setSaleStartTimestamp'),
       boxContractV3.abi.find((i) => i.name === 'updateBitcoinPriceInWei'),
       boxContractV3.abi.find((i) => i.name === 'withdraw'),
-      boxContractV3.abi.find(i => i.name === 'setVRFConsumer'),
-      boxContractV3.abi.find(i => i.name === 'startBatchMint'),
-      boxContractV3.abi.find(i => i.name === 'finishBatchMint')
+      boxContractV3.abi.find((i) => i.name === 'setVRFConsumer'),
+      boxContractV3.abi.find((i) => i.name === 'startBatchMint'),
+      boxContractV3.abi.find((i) => i.name === 'finishBatchMint'),
     ],
   }
 
@@ -427,7 +441,7 @@ const publishBoxWeb3V3AdminAbi = () => {
 /**
  * Publish a truncated version of the RarePizzasSeedStorage ABI
  */
- const publishRarePizzasSeedStorageAbi = (proxy: Contract) => {
+const publishRarePizzasSeedStorageAbi = (proxy: Contract) => {
   const contractInterface = {
     contractName: seedStorage.contractName,
     sourceName: seedStorage.sourceName,
@@ -436,7 +450,7 @@ const publishBoxWeb3V3AdminAbi = () => {
       seedStorage.abi.find((i) => i.name === 'fulfillRandomness'),
       seedStorage.abi.find((i) => i.name === 'getPizzaSeed'),
       seedStorage.abi.find((i) => i.name === 'getRandomNumber'),
-      seedStorage.abi.find((i) => i.name === 'pizzaSeeds')
+      seedStorage.abi.find((i) => i.name === 'pizzaSeeds'),
     ],
   }
 
@@ -448,7 +462,7 @@ const publishBoxWeb3V3AdminAbi = () => {
 /**
  * Publish a truncated version of the RarePizzas ABI
  */
- const publishRarePizzasAbi = (proxy: Contract) => {
+const publishRarePizzasAbi = (proxy: Contract) => {
   const contractInterface = {
     contractName: rarePizzas.contractName,
     sourceName: rarePizzas.sourceName,
@@ -461,7 +475,7 @@ const publishBoxWeb3V3AdminAbi = () => {
       rarePizzas.abi.find((i) => i.name === 'purchase'),
       rarePizzas.abi.find((i) => i.name === 'redeemRarePizzasBox'),
       rarePizzas.abi.find((i) => i.name === 'redeemRarePizzasBoxForOwner'),
-      rarePizzas.abi.find((i) => i.name === 'totalSupply')
+      rarePizzas.abi.find((i) => i.name === 'totalSupply'),
     ],
   }
 
@@ -482,7 +496,7 @@ const publishRandomConsumerWeb3AdminAbi = () => {
       randomConsumer.abi.find((i) => i.name === 'setFee'),
       randomConsumer.abi.find((i) => i.name === 'setKeyHash'),
       randomConsumer.abi.find((i) => i.name === 'withdrawLink'),
-      randomConsumer.abi.find((i) => i.name === 'withdraw')
+      randomConsumer.abi.find((i) => i.name === 'withdraw'),
     ],
   }
 
@@ -493,7 +507,7 @@ const publishRandomConsumerWeb3AdminAbi = () => {
 
 /**
  * Publish some deployment data.
- * 
+ *
  * This function should be called for all contract deployments
  */
 const publishDeploymentData = (name: string, proxy: Contract) => {
@@ -514,7 +528,7 @@ const publishRandomConsumerDeploymentData = (name: string, proxy: string, random
     network: config.NETWORK,
     name: name,
     proxy: proxy,
-    randomConsumer: randomConsumer
+    randomConsumer: randomConsumer,
   }
   const json = JSON.stringify(deploymentData)
   console.log(deploymentData)
@@ -522,7 +536,7 @@ const publishRandomConsumerDeploymentData = (name: string, proxy: string, random
   writeFileSync(`./dist/deployment-${config.NETWORK}-${name}-${Date.now()}.json`, json)
 }
 
-const publishUpgradeData = (name: string, proxy: string, implementation: string,) => {
+const publishUpgradeData = (name: string, proxy: string, implementation: string) => {
   const deploymentData = {
     network: config.NETWORK,
     name: name,
@@ -536,9 +550,9 @@ const publishUpgradeData = (name: string, proxy: string, implementation: string,
 }
 
 const parseBoxUris = () => {
-  var text = readFileSync("./data/box_resources", "utf-8");
-  var textByLine = text.split("\n")
-  console.log(JSON.stringify(textByLine));
+  const text = readFileSync('./data/box_resources', 'utf-8')
+  const textByLine = text.split('\n')
+  console.log(JSON.stringify(textByLine))
 }
 
 const utils = {
@@ -551,6 +565,7 @@ const utils = {
   getChainlinkVRFFee: getChainlinkVRFFee,
   getOrderAPIOracleContractAddress: getOrderAPIOracleContractAddress,
   getOrderAPIOracleNodeAddress: getOrderAPIOracleNodeAddress,
+  getOrderAPIOracleNodePrivateKey: getOrderAPIOracleNodePrivateKey,
   getOrderAPIConsumerContractAddress: getOrderAPIConsumerContractAddress,
   getOrderAPIJobId: getOrderAPIJobId,
   getOrderAPIJobFee: getOrderAPIJobFee,
@@ -561,8 +576,8 @@ const utils = {
   getRarePizzasProxyAdminAddress: getRarePizzasProxyAdminAddress,
   getStorageProxyAddress: getStorageProxyAddress,
   getStorageProxyAdminAddress: getStorageProxyAdminAddress,
-  getStorageProxyAuthorizedRequestorAddress:getStorageProxyAuthorizedRequestorAddress,
-  getOrderApiConsumerAuthorizedRequestorAddress:getOrderApiConsumerAuthorizedRequestorAddress,
+  getStorageProxyAuthorizedRequestorAddress: getStorageProxyAuthorizedRequestorAddress,
+  getOrderApiConsumerAuthorizedRequestorAddress: getOrderApiConsumerAuthorizedRequestorAddress,
   parseBoxUris: parseBoxUris,
   publishBoxWeb3Abi: publishBoxWeb3Abi,
   publishBoxWeb3AdminAbi: publishBoxWeb3AdminAbi,
@@ -573,6 +588,6 @@ const utils = {
   publishDeploymentData: publishDeploymentData,
   publishRarePizzasAbi: publishRarePizzasAbi,
   publishRandomConsumerDeploymentData: publishRandomConsumerDeploymentData,
-  publishUpgradeData: publishUpgradeData
+  publishUpgradeData: publishUpgradeData,
 }
 export default utils

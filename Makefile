@@ -64,6 +64,9 @@ deploy-orderapi-rinkeby:
 deploy-orderapi-mainnet:
 	npx hardhat run --network mainnet scripts/orderAPIConsumer.deploy.ts
 
+verify-orderapi-rinkeby:
+	npx hardhat verify --contract contracts/chainlink/OrderAPIConsumer.sol:OrderAPIConsumer --network rinkeby 0x3afD8Cc13fD8bc2B1F60F1e591a56EB4d0E1A3BD
+
 configure-rarepizzas-rinkeby:
 	npx hardhat run --network rinkeby scripts/rarePizzas.configure.v1.ts
 
@@ -79,5 +82,17 @@ toggle-rarepizzas-saleisactive-mainnet:
 verify-rarepizzas-rinkeby:
 	npx hardhat verify --contract contracts/token/RarePizzas.sol:RarePizzas --network rinkeby 0xe5516529aec6feecd79ff3bf9225d78846f6768a
 
+verify-rarepizzas-mainnet:
+	npx hardhat verify --contract contracts/token/RarePizzas.sol:RarePizzas --network mainnet 0x2504C51C87265d2c9Ed6b0646e809b3729e1e023
+
 withdraw-box-rinkeby:
 	npx hardhat run --network rinkeby scripts/box.withdraw.ts
+
+assign-artwork-rarepizzas-rinkeby:
+	npx hardhat run --network rinkeby scripts/pizza.assignArtwork.ts
+
+assign-artwork-rarepizzas-mainnet:
+	npx hardhat run --network mainnet scripts/pizza.assignArtwork.ts
+
+find-missing-pizzas-mainnet:
+	npx hardhat run --network mainnet scripts/oracle.getEvents.ts

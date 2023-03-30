@@ -86,7 +86,7 @@ let recipes: Tuple[] = [
     {key: "New School", value: "2"},
     {key: "Veggie", value: "3"},
     {key: "Meat Lover's", value: "4"},
-    {key: "Seafood Delight", value: "5"},
+    {key: "Fresh Catch", value: "5"},
     {key: "Sweet", value: "6"},
     {key: "Horror", value: "7"},
     {key: "Moon", value: "8"}
@@ -385,7 +385,7 @@ const actions = {
             const price: BigNumber = await state.boxContract?.getPrice()
             state.app.ethPrice = price
 
-            const pctOver = 120 // 20%
+            const pctOver = 105 // 5%
             const amount = helpers.bigNumberAddPercent(price, pctOver)
 
             console.log(`purchase price: ${amount}`)
