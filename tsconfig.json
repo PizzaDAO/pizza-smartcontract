@@ -14,13 +14,13 @@
     "target": "ES2018"
   },
   "include": [
-    "./app", 
+    "./app",
     "scripts"
   ],
   "exclude": [
-    "node_modules", 
-    "test", 
-    "config", 
+    "node_modules",
+    "test",
+    "config",
     "**/*.spec.ts",
     "./hardhat.config.ts"
   ],
