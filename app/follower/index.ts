@@ -8,8 +8,9 @@ import {
   renderRequests,
   RenderRequestOptions,
   FetchOptions,
-  queryOrderStatus,
   checkStatus,
+  fulfullRequest,
+  FulfillRequestOptions,
 } from './commands'
 
 //interface Program extends Command, Options {}
@@ -45,9 +46,9 @@ program
     'single token id to be pushed to the API from the data directory rather than all tokens',
     parseInt,
   )
-  .action(async (options: RenderRequestOptions) => {
-    console.log('Pushing data to API...')
-    await renderRequests(options)
+  .action(async (options: FulfillRequestOptions) => {
+    console.log('Fulfilling request...')
+    await fulfullRequest(options)
   })
 
 program

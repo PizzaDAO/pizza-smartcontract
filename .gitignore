@@ -30,3 +30,9 @@ dist/dapp.js
 Production.md
 
 app/follower/data/pending/
+
+app/follower/data/rendered/
+
+app/follower/data/tasks/
+
+app/follower/data/todo/
