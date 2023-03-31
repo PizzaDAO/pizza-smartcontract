@@ -9,6 +9,7 @@ import {
   RenderRequestOptions,
   FetchOptions,
   queryOrderStatus,
+  checkStatus,
 } from './commands'
 
 //interface Program extends Command, Options {}
@@ -19,7 +20,7 @@ const commonOptions = {
   url: new Option(
     '-u, --base-url <baseUrl>',
     'the base URL of the api to post request data to',
-  ).default('http://localhost:8080'),
+  ).default('http://localhost:8000'),
   apiVersion: new Option(
     '-a, --apiVersion <apiVersion>',
     'API version, to use when contructing URI to post request data to',
@@ -30,15 +31,30 @@ program
   .version('0.0.1', '-v --version', 'output the current version')
   .description(
     'A blockchain event processor which fetchs events in batches and saves ' +
-      'relevant data to file, post saved data to an API, or run as a service ' +
-      'to process events as they are emitted and post them to an API live.',
+    'relevant data to file, post saved data to an API, or run as a service ' +
+    'to process events as they are emitted and post them to an API live.',
   )
+
+program
+  .command('fulfill')
+  .description(
+    'Fulfill a completed request',
+  )
+  .option(
+    '-t, --tokenId [tokenId]',
+    'single token id to be pushed to the API from the data directory rather than all tokens',
+    parseInt,
+  )
+  .action(async (options: RenderRequestOptions) => {
+    console.log('Pushing data to API...')
+    await renderRequests(options)
+  })
 
 program
   .command('listen', { isDefault: true })
   .description(
     'Listens for events from the blockchain, saves them to file,' +
-      ' and posts them to the API',
+    ' and posts them to the API',
   )
   .addOption(commonOptions.url)
   .addOption(commonOptions.apiVersion)
@@ -51,7 +67,7 @@ program
   .command('render')
   .description(
     'Pushes data in the data directory to the API.' +
-      ' Can push all data or a specific file.',
+    ' Can push all data or a specific file.',
   )
   .addOption(commonOptions.url)
   .addOption(commonOptions.apiVersion)
@@ -77,15 +93,15 @@ program
   )
   .action(async (options: RenderRequestOptions) => {
     console.log('Checking order status...')
-    await queryOrderStatus(options)
+    await checkStatus(options)
   })
 
 program
   .command('fetch')
   .description(
     'Fetches data from the API and saves it to the data directory. ' +
-      'Can fetch from a specified block number or a high-water mark block ' +
-      'specified in the fromBlock.json file.',
+    'Can fetch from a specified block number or a high-water mark block ' +
+    'specified in the fromBlock.json file.',
   )
   .option(
     '-f, --file [file]',
