@@ -22,30 +22,38 @@ type TestContext = {
 const MAX_NUMBER_OF_BOXES = 10 * 1000
 let testContext: TestContext
 
+export const deploy_box = async () => {
+    const RandomConsumer = await ethers.getContractFactory('FakeRandomConsumer')
+    const Box = await ethers.getContractFactory('RarePizzasBoxV2')
+    const box = await Box.deploy()
+
+    // use rinkeby contract info for out tests so its clear whats happening
+    // and add our V2 callback contract
+    const random = await RandomConsumer.deploy(
+        config.CHAINLINK_RINKEBY_VRF_COORD,
+        config.CHAINLINK_RINKEBY_TOKEN,
+        config.CHAINLINK_RINKEBY_VRF_KEY_HASH,
+        config.CHAINLINK_RINKEBY_VRF_FEE,
+        box.address)
+
+    // Initialize to set owner, since not deployed via proxy
+    await box.initialize(utils.getAddress('0x0000000000000000000000000000000000000000'))
+
+    // Pick a date like jan 1, 2021 so the sale is open
+    await box.setSaleStartTimestamp(1609459200)
+
+    // set up the consumer to the mock contract
+    await box.setVRFConsumer(random.address)
+    return {
+        box: box,
+        random: random
+    }
+}
+
 describe('Box V2 Purchase Tests', function () {
     beforeEach(async () => {
         const [wallet, userWallet] = new MockProvider().getWallets()
-        const RandomConsumer = await ethers.getContractFactory('FakeRandomConsumer')
-        const Box = await ethers.getContractFactory('RarePizzasBoxV2')
-        const box = await Box.deploy()
-
-        // use rinkeby contract info for out tests so its clear whats happening
-        // and add our V2 callback contract
-        const random = await RandomConsumer.deploy(
-            config.CHAINLINK_RINKEBY_VRF_COORD,
-            config.CHAINLINK_RINKEBY_TOKEN,
-            config.CHAINLINK_RINKEBY_VRF_KEY_HASH,
-            config.CHAINLINK_RINKEBY_VRF_FEE,
-            box.address)
-
-        // Initialize to set owner, since not deployed via proxy
-        await box.initialize(utils.getAddress('0x0000000000000000000000000000000000000000'))
-
-        // Pick a date like jan 1, 2021 so the sale is open
-        await box.setSaleStartTimestamp(1609459200)
-
-        // set up the consumer to the mock contract
-        await box.setVRFConsumer(random.address)
+        const {box, random} = await deploy_box()
 
         // just a hardcoded value
         const testHash = '0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4'

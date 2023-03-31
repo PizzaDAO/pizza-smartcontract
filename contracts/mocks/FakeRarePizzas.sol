@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 import '../token/RarePizzas.sol';
 
 /**
- * @dev a FakeRarePizzasBox is a wrapper contract used to demonstrate upgrades
+ * @dev a FakeRarePizzasBox is a wrapper contract used to mock function calls
  */
 contract FakeRarePizzas is RarePizzas {
     function base58EncodeAsString(bytes32 source) public pure returns (string memory) {

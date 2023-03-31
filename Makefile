@@ -5,10 +5,13 @@ environment:
 
 build:
 	npx hardhat compile
-	npx webpack
+#	npx webpack
 
 test:
 	npx hardhat test
+
+start-blockchain-listener:
+	npx ts-node app/blockchain-listener/blistener.ts
 
 box-transfer-ownable:
 	npx hardhat run --network rinkeby scripts/box.upgrade.v3.prepare.ts
@@ -34,6 +37,9 @@ deploy-random-mumbai:
 deploy-random-polygon:
 	npx hardhat run --network matic scripts/randomConsumer.polygon.deploy.ts
 
+set-orderapi-jobid:
+	npx hardhat run --network mainnet scripts/orderAPIConsumer.set.jobid.ts
+
 set-storage-random-mumbai:
 	npx hardhat run --network maticmum scripts/pizza.storage.setRandomConsumer.ts
 
@@ -58,6 +64,21 @@ deploy-orderapi-rinkeby:
 deploy-orderapi-mainnet:
 	npx hardhat run --network mainnet scripts/orderAPIConsumer.deploy.ts
 
+follower-fulfill:
+	npx ts-node app/follower fulfill -t 842
+
+follower-fetch:
+	npx ts-node app/follower fetch
+
+follower-render:
+	npx ts-node app/follower render
+
+follower-status:
+	npx ts-node app/follower status -t 842
+
+verify-orderapi-rinkeby:
+	npx hardhat verify --contract contracts/chainlink/OrderAPIConsumer.sol:OrderAPIConsumer --network rinkeby 0x3afD8Cc13fD8bc2B1F60F1e591a56EB4d0E1A3BD
+
 configure-rarepizzas-rinkeby:
 	npx hardhat run --network rinkeby scripts/rarePizzas.configure.v1.ts
 
@@ -73,5 +94,17 @@ toggle-rarepizzas-saleisactive-mainnet:
 verify-rarepizzas-rinkeby:
 	npx hardhat verify --contract contracts/token/RarePizzas.sol:RarePizzas --network rinkeby 0xe5516529aec6feecd79ff3bf9225d78846f6768a
 
+verify-rarepizzas-mainnet:
+	npx hardhat verify --contract contracts/token/RarePizzas.sol:RarePizzas --network mainnet 0x2504C51C87265d2c9Ed6b0646e809b3729e1e023
+
 withdraw-box-rinkeby:
 	npx hardhat run --network rinkeby scripts/box.withdraw.ts
+
+assign-artwork-rarepizzas-rinkeby:
+	npx hardhat run --network rinkeby scripts/pizza.assignArtwork.ts
+
+assign-artwork-rarepizzas-mainnet:
+	npx hardhat run --network mainnet scripts/pizza.assignArtwork.ts
+
+find-missing-pizzas-mainnet:
+	npx hardhat run --network mainnet scripts/oracle.getEvents.ts

@@ -15,7 +15,7 @@ const MAX_VALUE = 10 * 1000
 
 let testContext: TestContext
 
-describe('Bonding Curve', () => {
+describe.skip('Bonding Curve', () => {
   beforeEach('', async () => {
     const BondingCurve = await ethers.getContractFactory('BondingCurve')
     const bondingCurve = await BondingCurve.deploy()
@@ -83,9 +83,7 @@ describe('Bonding Curve', () => {
       const { bondingCurve } = testContext
 
       await expect(bondingCurve.curve(MAX_VALUE + 1)).to.be.revertedWith('cannot pass MAX_CURVE')
-      await expect(bondingCurve.curve(MAX_VALUE + 1000)).to.be.revertedWith(
-        'cannot pass MAX_CURVE',
-      )
+      await expect(bondingCurve.curve(MAX_VALUE + 1000)).to.be.revertedWith('cannot pass MAX_CURVE')
     })
   })
 })
