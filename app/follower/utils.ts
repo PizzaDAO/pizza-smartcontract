@@ -17,6 +17,12 @@ export const saveRequest = (request: IOracleRequestData): void => {
   fs.writeFileSync(fileName, JSON.stringify(request))
 }
 
+export const deleteRequest = (tokenId: number): void => {
+  // delete the request to file
+  const fileName = `${pendingDirectory}/${tokenId}.json`
+  fs.unlinkSync(fileName)
+}
+
 export const saveRenderTask = (task: IRenderTask): void => {
   if (!fs.existsSync(tasksDirectory)) {
     fs.mkdirSync(tasksDirectory)
@@ -36,12 +42,20 @@ export const getRenderTasks = (tokenId: number | undefined): IRenderTask[] => {
     tasks.push(request)
   } else {
     fs.readdirSync(`${pendingDirectory}`).map((file) => {
+      if (file.includes(".gitkeep"))
+        return;
       const data = fs.readFileSync(`${tasksDirectory}/${file}`, 'utf8')
       const request = JSON.parse(data)
       tasks.push(request)
     })
   }
   return tasks
+}
+
+export const deleteTask = (tokenId: number): void => {
+  // delete the request to file
+  const fileName = `${tasksDirectory}/${tokenId}.json`
+  fs.unlinkSync(fileName)
 }
 
 export const getPendingRequests = (
@@ -67,11 +81,11 @@ export const getPendingRequests = (
   return requests
 }
 
-export const getFromBlock = (file: string, block: number): number => {
+export const getFromBlock = (file?: string, block?: number): number => {
   console.log(`Fetching requests from block ${block} onwards...`)
   // Get the fromBlock value from the file or command line
   // Will default to 0 if neither are provided
-  let fromBlock: number
+  let fromBlock: number = block ?? 0
 
   // Tries to set the fromBlock value from the provided file option
   // If the file option is not provided, it will use the block option
@@ -89,11 +103,10 @@ export const getFromBlock = (file: string, block: number): number => {
       console.log(
         `Error reading fromBlock file: ${error} - using fromBlock value from command line or defaulting to 0 if not provided`,
       )
-      fromBlock = block + 1
+      fromBlock += 1
       console.log(`fromBlock value used: ${fromBlock}`)
     }
   } else {
-    fromBlock = block
     console.log(`fromBlock value used: ${fromBlock}`)
   }
   return fromBlock

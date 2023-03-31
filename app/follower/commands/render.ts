@@ -3,7 +3,7 @@ import { v4 as uuid } from 'uuid'
 import { IRenderTask } from '../types'
 import { OrderData } from '../types/OrderData'
 import { getPendingRequests, pendingDirectory } from '../utils'
-import { queryOrdersStatuses, queryOrderStatus } from './fetch'
+import { queryOrderStatus, queryOrderStatuses } from './fetch'
 
 export interface RenderRequestOptions {
   baseUrl: string
@@ -62,7 +62,7 @@ export const renderRequests = async ({
 
   const tasks: IRenderTask[] = []
 
-  const existing = await queryOrdersStatuses(
+  const existing = await queryOrderStatuses(
     baseUrl, apiVersion, requests.map((request) => request.token_id))
   if (existing.length > 0) {
     tasks.push(existing[0])
@@ -96,7 +96,7 @@ export const renderRequests = async ({
   }
 
   // check the renderer api again to see if there are any new jobs
-  await queryOrdersStatuses(
+  await queryOrderStatuses(
     baseUrl, apiVersion, requests.map((request) => request.token_id))
 }
 

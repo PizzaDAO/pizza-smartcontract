@@ -1,5 +1,6 @@
 import { getOracleRequest, orderApiOracle, signer } from '../contracts'
-import { getPendingRequests, getRenderTasks } from '../utils'
+import { deleteRequest, getPendingRequests, getRenderTasks } from '../utils'
+import fetchRequests, { queryOrderStatuses } from './fetch'
 
 export interface FulfillRequestOptions {
   // the chainlink request id
@@ -78,4 +79,33 @@ export const fulfillChainlinkRequest = async ({
   console.log('request fulfillment complete')
 }
 
-// TODO: fulfillListenerRequest
+export const cleanupCompletedEvents = async (): Promise<void> => {
+  console.log('cleanupCompletedEvents')
+
+  // get the pending events from the file system and delete them all
+  const pending = getPendingRequests(undefined)
+  for (const event of pending) {
+    deleteRequest(event.token_id)
+  }
+
+  // force a refresh which repopulates the filesystem
+  const _ = await fetchRequests({})
+}
+
+export const cleanupCompletedTasks = async (baseUrl: string,
+  apiVersion: string): Promise<void> => {
+  console.log('cleanupCompletedTasks')
+
+  // get the pending tasks from the file system and delete ethem all
+  const pending = getRenderTasks(undefined)
+  for (const task of pending) {
+    if (task.status === "complete") {
+      deleteRequest(task.request.data.token_id)
+    }
+  }
+
+  const requests = getPendingRequests(undefined)
+
+  const _ = await queryOrderStatuses(
+    baseUrl, apiVersion, requests.map((request) => request.token_id))
+}
