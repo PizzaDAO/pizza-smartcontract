@@ -6,6 +6,7 @@ import { IRenderTask } from '../types'
 import {
   dataDirectory,
   getFromBlock,
+  getPendingRequests,
   saveRenderTask,
   saveRequest,
 } from '../utils'
@@ -21,6 +22,42 @@ export interface QueryOrderStatusOptions {
   tokenId?: number
 }
 
+export const checkStatus = async ({
+  baseUrl,
+  apiVersion,
+  tokenId,
+}: QueryOrderStatusOptions): Promise<IRenderTask[]> => {
+  const tasks = []
+  // iterate over the tokenIds and query the order status
+
+  const pending = getPendingRequests(tokenId)
+
+  for (const tokenId of pending.map((r) => r.token_id)) {
+    const existing = await queryOrderStatus({ baseUrl, apiVersion, tokenId })
+    if (existing.length > 0) {
+      // TODO: deduplicate
+      tasks.push(existing[0])
+    }
+  }
+  return tasks
+}
+
+export const queryOrdersStatuses = async (
+  baseUrl: string,
+  apiVersion: string, tokenIds: number[]): Promise<IRenderTask[]> => {
+  const tasks = []
+  // iterate over the tokenIds and query the order status
+
+  for (const tokenId of tokenIds) {
+    const existing = await queryOrderStatus({ baseUrl, apiVersion, tokenId })
+    if (existing.length > 0) {
+      // TODO: deduplicate
+      tasks.push(existing[0])
+    }
+  }
+  return tasks
+}
+
 export const queryOrderStatus = async ({
   baseUrl,
   apiVersion,
@@ -33,9 +70,11 @@ export const queryOrderStatus = async ({
         'request.data.token_id': tokenId,
       },
     }
+    console.log(`queryOrderStatus`, filter)
     const response = await axios.post(endpoint, filter)
     const tasks = response.data as IRenderTask[]
     tasks.map(saveRenderTask)
+    console.log(tasks)
     return tasks
   } catch (error) {
     console.log(error)

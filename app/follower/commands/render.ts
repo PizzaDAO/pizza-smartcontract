@@ -1,8 +1,9 @@
 import axios, { AxiosResponse } from 'axios'
 import { v4 as uuid } from 'uuid'
+import { IRenderTask } from '../types'
 import { OrderData } from '../types/OrderData'
 import { getPendingRequests, pendingDirectory } from '../utils'
-import { queryOrderStatus } from './fetch'
+import { queryOrdersStatuses, queryOrderStatus } from './fetch'
 
 export interface RenderRequestOptions {
   baseUrl: string
@@ -59,8 +60,15 @@ export const renderRequests = async ({
     return
   }
 
+  const tasks: IRenderTask[] = []
+
+  const existing = await queryOrdersStatuses(
+    baseUrl, apiVersion, requests.map((request) => request.token_id))
+  if (existing.length > 0) {
+    tasks.push(existing[0])
+  }
   // check the renderer api if there is an existing job
-  const tasks = await queryOrderStatus({ baseUrl, apiVersion, tokenId })
+
 
   // if there is an existing job for the token_id, skip it
   const filteredRequests = requests.filter(
@@ -70,6 +78,7 @@ export const renderRequests = async ({
 
   // Post the requests to the OrderAPI
   for (const request of filteredRequests) {
+    console.log(`Posting request for token_id ${request.token_id}...`)
     const taskId = uuid()
 
     const orderData: OrderData = {
@@ -87,7 +96,8 @@ export const renderRequests = async ({
   }
 
   // check the renderer api again to see if there are any new jobs
-  await queryOrderStatus({ baseUrl, apiVersion, tokenId })
+  await queryOrdersStatuses(
+    baseUrl, apiVersion, requests.map((request) => request.token_id))
 }
 
 export default renderRequests

@@ -163,7 +163,8 @@ export const decodeOracleRequestData = (log: Event): IOracleRequestData => {
   for (let i = 0; i < decodedData.length; i += 2) {
     decodedObject[decodedData[i]] = decodedData[i + 1]
   }
-  console.log('decodeOracleRequestData', decodedObject)
+  decodedObject.requestId = args.requestId
+  decodedObject.blockNumber = log.blockNumber
   return decodedObject as IOracleRequestData
 }
 

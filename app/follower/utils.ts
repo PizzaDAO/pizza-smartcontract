@@ -13,7 +13,6 @@ export const saveRequest = (request: IOracleRequestData): void => {
     fs.mkdirSync(pendingDirectory)
   }
   // Save the request to file
-  console.log(`Saving request to file: ${request.token_id}.json`)
   const fileName = `${pendingDirectory}/${request.token_id}.json`
   fs.writeFileSync(fileName, JSON.stringify(request))
 }
@@ -22,8 +21,7 @@ export const saveRenderTask = (task: IRenderTask): void => {
   if (!fs.existsSync(tasksDirectory)) {
     fs.mkdirSync(tasksDirectory)
   }
-
-  console.log(`Saving request to file: ${task.request.data.token_id}.json`)
+  // Save the request to file
   const fileName = `${tasksDirectory}/${task.request.data.token_id}.json`
   fs.writeFileSync(fileName, JSON.stringify(task))
 }
@@ -49,6 +47,7 @@ export const getRenderTasks = (tokenId: number | undefined): IRenderTask[] => {
 export const getPendingRequests = (
   tokenId: number | undefined,
 ): IOracleRequestData[] => {
+  console.log(`getPendingRequests:`)
   const requests: IOracleRequestData[] = []
 
   // parse the file or files in the pending directory
@@ -58,6 +57,8 @@ export const getPendingRequests = (
     requests.push(request)
   } else {
     fs.readdirSync(`${pendingDirectory}`).map((file) => {
+      if (file.includes(".gitkeep"))
+        return;
       const data = fs.readFileSync(`${pendingDirectory}/${file}`, 'utf8')
       const request = JSON.parse(data)
       requests.push(request)
@@ -88,7 +89,7 @@ export const getFromBlock = (file: string, block: number): number => {
       console.log(
         `Error reading fromBlock file: ${error} - using fromBlock value from command line or defaulting to 0 if not provided`,
       )
-      fromBlock = block
+      fromBlock = block + 1
       console.log(`fromBlock value used: ${fromBlock}`)
     }
   } else {
