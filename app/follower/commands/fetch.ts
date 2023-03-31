@@ -2,7 +2,7 @@ import axios from 'axios'
 import fs from 'fs'
 
 import { getOracleRequests, getOrderApiConsumerRequests } from '../contracts'
-import { IRenderTask } from '../types'
+import { IOracleRequestData, IRenderTask } from '../types'
 import {
   dataDirectory,
   getFromBlock,
@@ -12,8 +12,8 @@ import {
 } from '../utils'
 
 export interface FetchOptions {
-  file: string
-  block: number
+  file?: string
+  block?: number
 }
 
 export interface QueryOrderStatusOptions {
@@ -42,7 +42,7 @@ export const checkStatus = async ({
   return tasks
 }
 
-export const queryOrdersStatuses = async (
+export const queryOrderStatuses = async (
   baseUrl: string,
   apiVersion: string, tokenIds: number[]): Promise<IRenderTask[]> => {
   const tasks = []
@@ -87,7 +87,7 @@ export const queryOrderStatus = async ({
 export const fetchRequests = async ({
   file,
   block,
-}: FetchOptions): Promise<void> => {
+}: FetchOptions): Promise<IOracleRequestData[]> => {
   const fromBlock = getFromBlock(file, block)
 
   // fetch the pending requests from the OrderAPI Consumer contract
@@ -116,6 +116,8 @@ export const fetchRequests = async ({
     `${dataDirectory}/fromBlock.json`,
     JSON.stringify({ fromBlock: blockHeight }),
   )
+
+  return getPendingRequests(undefined);
 }
 
 export default fetchRequests
