@@ -15,10 +15,10 @@ export interface IRenderTask {
   }
   status: string
   timestamp: string
-  random_number: string
-  metadata_hash: string
-  truncated_metadata: string
-  message: string
+  random_number?: string
+  metadata_hash?: string
+  truncated_metadata?: string
+  message?: string
 }
 
 export const exampleRenderTask: IRenderTask = {

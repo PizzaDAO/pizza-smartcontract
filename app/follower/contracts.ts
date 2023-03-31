@@ -159,6 +159,7 @@ export const decodeOracleRequestData = (log: Event): IOracleRequestData => {
   const event = orderApiOracle.interface.parseLog(log)
   const args = event.args as unknown as IOracleRequestEventArgs
   const decodedData = cbor.decodeAllSync(Buffer.from(args.data.slice(2), 'hex'))
+  console.log(`Decoded oracle request data`, event)
   const decodedObject: { [key: string]: any } = {}
   for (let i = 0; i < decodedData.length; i += 2) {
     decodedObject[decodedData[i]] = decodedData[i + 1]
