@@ -53,16 +53,16 @@ contract OrderAPIConsumerV2 is Ownable, ChainlinkClient, IOrderAPIConsumer, IOrd
     event CallbackUpdated(address previous, address current);
     event JobIdUpdated(bytes32 previous, bytes32 current);
     event FeeUpdated(uint256 previous, uint256 current);
-    event RequestCreated(uint256 tokenId, uint256 recipeId);
+    event RequestCreated(uint256 tokenId, uint256 recipeId, uint256 count);
     event ResponseFulfilled(bytes32 requestId, bytes32 result);
 
     constructor(address authorizedRequestor, address callback) public Ownable() {
         _authorizedRequestor = authorizedRequestor;
-        _callback = callback;
+        _callback = IOrderAPICallback(callback);
     }
 
     modifier isFullfiller(address a) {
-        require(fullfilller[a], 'sender does not havel fullfillment permissions');
+        require(fullfiller[a], 'sender does not havel fullfillment permissions');
         _;
     }
 
