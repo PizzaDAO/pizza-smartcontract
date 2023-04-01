@@ -5,7 +5,8 @@ import config, { NetworkConfig } from '../config'
 
 import boxContract from '../artifacts/contracts/token/RarePizzasBox.sol/RarePizzasBox.json'
 import boxContractV2 from '../artifacts/contracts/token/RarePizzasBoxV2.sol/RarePizzasBoxV2.json'
-import boxContractV3 from '../artifacts/contracts/token/RarePizzaBoxV3.sol/RarePizzasBoxV3.json'
+import boxContractV3 from '../artifacts/contracts/token/RarePizzasBoxV3.sol/RarePizzasBoxV3.json'
+
 import randomConsumer from '../artifacts/contracts/random/RandomConsumer.sol/RandomConsumer.json'
 import seedStorage from '../artifacts/contracts/data/RarePizzasSeedStorage.sol/RarePizzasSeedStorage.json'
 import rarePizzas from '../artifacts/contracts/token/RarePizzas.sol/RarePizzas.json'
@@ -18,7 +19,7 @@ const getAlchemyAPIKey = (config: NetworkConfig) => {
     case 'rinkeby':
       return config.ALCHEMY_RINKEBY_KEY
     case 'matic':
-        return config.ALCHEMY_MATIC_KEY
+      return config.ALCHEMY_MATIC_KEY
     case 'maticmum':
       return config.ALCHEMY_MUMBAI_KEY
   }
@@ -33,7 +34,7 @@ const getDeploymentKey = (config: NetworkConfig) => {
     case 'rinkeby':
       return config.RINKEBY_PRIVATE_KEY
     case 'matic':
-        return config.MATIC_PRIVATE_KEY
+      return config.MATIC_PRIVATE_KEY
     case 'maticmum':
       return config.MATIC_MUMBAI_PRIVATE_KEY
   }
@@ -65,7 +66,7 @@ const getChainlinkToken = (config: NetworkConfig) => {
     case 'rinkeby':
       return config.CHAINLINK_RINKEBY_TOKEN
     case 'matic':
-        return config.CHAINLINK_MATIC_TOKEN
+      return config.CHAINLINK_MATIC_TOKEN
     case 'maticmum':
       return config.CHAINLINK_MATIC_MUMBAI_TOKEN
   }
@@ -83,7 +84,7 @@ const getChainlinkVRFCoordinator = (config: NetworkConfig) => {
     case 'rinkeby':
       return config.CHAINLINK_RINKEBY_VRF_COORD
     case 'matic':
-        return config.CHAINLINK_MATIC_VRF_COORD
+      return config.CHAINLINK_MATIC_VRF_COORD
     case 'maticmum':
       return config.CHAINLINK_MATIC_MUMBAI_VRF_COORD
   }
@@ -101,7 +102,7 @@ const getChainlinkVRFKeyHash = (config: NetworkConfig) => {
     case 'rinkeby':
       return config.CHAINLINK_RINKEBY_VRF_KEY_HASH
     case 'matic':
-        return config.CHAINLINK_MATIC_VRF_KEY_HASH
+      return config.CHAINLINK_MATIC_VRF_KEY_HASH
     case 'maticmum':
       return config.CHAINLINK_MATIC_MUMBAI_VRF_KEY_HASH
   }
@@ -119,7 +120,7 @@ const getChainlinkVRFFee = (config: NetworkConfig) => {
     case 'rinkeby':
       return config.CHAINLINK_RINKEBY_VRF_FEE
     case 'matic':
-        return config.CHAINLINK_MATIC_VRF_FEE
+      return config.CHAINLINK_MATIC_VRF_FEE
     case 'maticmum':
       return config.CHAINLINK_MATIC_MUMBAI_VRF_FEE
   }
@@ -237,7 +238,7 @@ const getRandomConsumerAddress = (config: NetworkConfig) => {
     case 'rinkeby':
       return config.RAREPIZZAS_BOX_RINKEBY_RANDOM_CONSUMER_ADDRESS
     case 'matic':
-        return config.RAREPIZZAS_MATIC_RANDOM_CONSUMER_ADDRESS
+      return config.RAREPIZZAS_MATIC_RANDOM_CONSUMER_ADDRESS
     case 'maticmum':
       return config.RAREPIZZAS_MUMBAI_RANDOM_CONSUMER_ADDRESS
   }
@@ -402,32 +403,11 @@ const publishBoxWeb3V2AdminAbi = () => {
   writeFileSync('./dist/boxWeb3AdminInterface-v2.json', json)
 }
 
-const publishBoxWeb3V3AdminAbi = () => {
-  const boxWeb3interface = {
-    contractName: boxContractV3.contractName,
-    sourceName: boxContractV3.sourceName,
-    abi: [
-      boxContractV3.abi.find((i) => i.name === 'mint'),
-      boxContractV3.abi.find((i) => i.name === 'purchaseTo'),
-      boxContractV3.abi.find((i) => i.name === 'setPresaleAllowed'),
-      boxContractV3.abi.find((i) => i.name === 'setSaleStartTimestamp'),
-      boxContractV3.abi.find((i) => i.name === 'updateBitcoinPriceInWei'),
-      boxContractV3.abi.find((i) => i.name === 'withdraw'),
-      boxContractV3.abi.find(i => i.name === 'setVRFConsumer'),
-      boxContractV3.abi.find(i => i.name === 'startBatchMint'),
-      boxContractV3.abi.find(i => i.name === 'finishBatchMint')
-    ],
-  }
-
-  const json = JSON.stringify(boxWeb3interface)
-  console.log(json)
-  writeFileSync('./dist/boxWeb3AdminInterface-v2.json', json)
-}
 
 /**
  * Publish a truncated version of the RarePizzasSeedStorage ABI
  */
- const publishRarePizzasSeedStorageAbi = (proxy: Contract) => {
+const publishRarePizzasSeedStorageAbi = (proxy: Contract) => {
   const contractInterface = {
     contractName: seedStorage.contractName,
     sourceName: seedStorage.sourceName,
@@ -448,7 +428,7 @@ const publishBoxWeb3V3AdminAbi = () => {
 /**
  * Publish a truncated version of the RarePizzas ABI
  */
- const publishRarePizzasAbi = (proxy: Contract) => {
+const publishRarePizzasAbi = (proxy: Contract) => {
   const contractInterface = {
     contractName: rarePizzas.contractName,
     sourceName: rarePizzas.sourceName,
@@ -561,13 +541,13 @@ const utils = {
   getRarePizzasProxyAdminAddress: getRarePizzasProxyAdminAddress,
   getStorageProxyAddress: getStorageProxyAddress,
   getStorageProxyAdminAddress: getStorageProxyAdminAddress,
-  getStorageProxyAuthorizedRequestorAddress:getStorageProxyAuthorizedRequestorAddress,
-  getOrderApiConsumerAuthorizedRequestorAddress:getOrderApiConsumerAuthorizedRequestorAddress,
+  getStorageProxyAuthorizedRequestorAddress: getStorageProxyAuthorizedRequestorAddress,
+  getOrderApiConsumerAuthorizedRequestorAddress: getOrderApiConsumerAuthorizedRequestorAddress,
   parseBoxUris: parseBoxUris,
   publishBoxWeb3Abi: publishBoxWeb3Abi,
   publishBoxWeb3AdminAbi: publishBoxWeb3AdminAbi,
   publishBoxWeb3V2AdminAbi: publishBoxWeb3V2AdminAbi,
-  publishBoxWeb3V3AdminAbi: publishBoxWeb3V3AdminAbi,
+  publishBoxWeb3V3AdminAbi: publishBoxWeb3AdminAbi,
   publishRarePizzasSeedStorageAbi: publishRarePizzasSeedStorageAbi,
   publishRandomConsumerWeb3AdminAbi: publishRandomConsumerWeb3AdminAbi,
   publishDeploymentData: publishDeploymentData,
