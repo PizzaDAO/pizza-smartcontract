@@ -1,4 +1,4 @@
-import { task, HardhatUserConfig } from 'hardhat/config'
+import { HardhatUserConfig } from 'hardhat/config'
 import { NetworksUserConfig } from 'hardhat/types'
 import '@nomiclabs/hardhat-etherscan'
 import '@nomiclabs/hardhat-waffle'
@@ -28,7 +28,7 @@ const networks: NetworksUserConfig = {
   },
 }
 
-const getNetworks = (config: NetworkConfig) => {
+export const getNetworks = (config: NetworkConfig) => {
   const networkName = config.NETWORK.toLowerCase()
   const network = networks[networkName]
 
