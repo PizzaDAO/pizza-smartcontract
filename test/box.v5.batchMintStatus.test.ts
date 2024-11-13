@@ -9,7 +9,8 @@ type TestContext = {
   box: Contract;
   boxV5: Contract;
   random: Contract;
-  accounts: SignerWithAddress[];
+  deployer: SignerWithAddress;
+  user: SignerWithAddress;
 }
 
 let testContext: TestContext
@@ -41,7 +42,7 @@ const accountList = [
 
 const setup = async () => {
   // Deploy the original contract
-  const accounts = await ethers.getSigners()
+  const [deployer, user]: SignerWithAddress[] = await ethers.getSigners()
   const Box = await ethers.getContractFactory('RarePizzasBox')
   const box = await upgrades.deployProxy(Box, ['0x0000000000000000000000000000000000000000'])
   console.log(upgrades)
@@ -72,20 +73,26 @@ const setup = async () => {
     box,
     boxV5,
     random,
-    accounts,
+    deployer,
+    user,
   }
 }
 
 describe('Box V5 tests', () => {
+  let deployer: SignerWithAddress;
+  let user: SignerWithAddress;
+  let boxV5: Contract;
+  let random: Contract;
   beforeEach(async () => {
-    testContext = await setup()
+    testContext = await setup();
+    deployer = testContext.deployer;
+    user = testContext.user;
+    boxV5 = testContext.boxV5;
+    random = testContext.random;
   });
 
   describe('Happy Path', () => {
     it('Should return the correct status for a batch mint', async () => {
-      const { boxV5, accounts, random } = testContext;
-      const [deployer, user] = accounts;
-
       let status = await boxV5.connect(deployer).getBatchMintStatus()
       expect(status).to.equal(0)
 
@@ -95,8 +102,6 @@ describe('Box V5 tests', () => {
     });
 
     it('Should allow the admin address to set the batchMintStatus', async () => {
-      const { boxV5, accounts } = testContext;
-      const [deployer] = accounts;
       let foo = await boxV5.connect(deployer).getBatchMintStatus()
       console.log('foo: ', foo)
 
@@ -108,13 +113,10 @@ describe('Box V5 tests', () => {
     });
 
     it('Should disallow a non-admin address from setting the batchMintStatus', async () => {
-      const { boxV5, accounts } = testContext
-      const [user] = accounts
-
       await expect(
         boxV5.connect(user).setBatchMintStatus(1)
       ).to.be.revertedWith('Ownable: caller is not the owner');
-      
+
       const status = await boxV5.connect(user).getBatchMintStatus();
       expect(status).to.equal(0);
     });

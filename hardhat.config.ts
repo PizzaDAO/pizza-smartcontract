@@ -10,7 +10,10 @@ import config, { NetworkConfig } from './config'
 const networks: NetworksUserConfig = {
   mainnet: {
     url: `https://eth-mainnet.alchemyapi.io/v2/${config.ALCHEMY_MAINNET_KEY}`,
-    accounts: [`0x${config.MAINNET_PRIVATE_KEY}`],
+    accounts: [
+      `0x${config.MAINNET_DEPLOYER_PRIVATE_KEY}`,
+      `0x${config.MAINNET_USER_PRIVATE_KEY}`,
+    ],
     gasPrice: 220000000000,
   },
   rinkeby: {
