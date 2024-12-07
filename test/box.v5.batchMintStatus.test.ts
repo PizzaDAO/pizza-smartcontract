@@ -91,34 +91,52 @@ describe('Box V5 tests', () => {
     random = testContext.random;
   });
 
-  describe('Happy Path', () => {
-    it('Should return the correct status for a batch mint', async () => {
-      let status = await boxV5.connect(deployer).getBatchMintStatus()
-      expect(status).to.equal(0)
+  describe('boxV5 tests', () => {
+    describe('setBatchMintStatus', () => {
+      it('Should return the correct status for a batch mint', async () => {
+        let status = await boxV5.connect(deployer).getBatchMintStatus()
+        expect(status).to.equal(0)
 
-      await boxV5.connect(deployer).setBatchMintStatus(1);
-      status = await boxV5.connect(deployer).getBatchMintStatus()
-      expect(status).to.equal(1)
+        await boxV5.connect(deployer).setBatchMintStatus(1);
+        status = await boxV5.connect(deployer).getBatchMintStatus()
+        expect(status).to.equal(1)
+      });
+
+      it('Should allow the admin address to set the batchMintStatus', async () => {
+        let foo = await boxV5.connect(deployer).getBatchMintStatus()
+        console.log('foo: ', foo)
+
+        await boxV5.connect(deployer).setBatchMintStatus(1)
+
+        const status = await boxV5.connect(deployer).getBatchMintStatus()
+        console.log('status: ', status)
+        expect(status).to.equal(1)
+      });
+
+      it('Should disallow a non-admin address from setting the batchMintStatus', async () => {
+        await expect(
+          boxV5.connect(user).setBatchMintStatus(1)
+        ).to.be.revertedWith('Ownable: caller is not the owner');
+
+        const status = await boxV5.connect(user).getBatchMintStatus();
+        expect(status).to.equal(0);
+      });
     });
 
-    it('Should allow the admin address to set the batchMintStatus', async () => {
-      let foo = await boxV5.connect(deployer).getBatchMintStatus()
-      console.log('foo: ', foo)
+    describe('manualAdminFulfillRandomWords', () => {
+      it(
+        'Should allow admin to manually resubmit fulfillRandomWords for the currently set batchMintRequest',
+        async () => {
 
-      await boxV5.connect(deployer).setBatchMintStatus(1)
+      });
 
-      const status = await boxV5.connect(deployer).getBatchMintStatus()
-      console.log('status: ', status)
-      expect(status).to.equal(1)
-    });
+      it('Should disallow method being called with mismatched batchMintRequest', async () => {
 
-    it('Should disallow a non-admin address from setting the batchMintStatus', async () => {
-      await expect(
-        boxV5.connect(user).setBatchMintStatus(1)
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      });
 
-      const status = await boxV5.connect(user).getBatchMintStatus();
-      expect(status).to.equal(0);
+      it('Should disallow method being used by non-owner address', async () => {
+
+      });
     });
   });
 });
