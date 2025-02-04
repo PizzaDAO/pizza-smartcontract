@@ -2,7 +2,7 @@ import { BigNumber, Contract, Signer, Wallet } from 'ethers';
 import { expect } from 'chai';
 import { ethers, upgrades } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-
+import { randomNumber } from '@ethersproject/testcases'
 import config, { NetworkConfig } from '../config';
 
 type TestContext = {
@@ -24,7 +24,7 @@ let getRinkebyRandomConsumer = async (box: Contract) => {
   )
 }
 const accountList = [
-  '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
+
   '0x70997970c51812dc3a010c7d01b50e0d17dc79c8',
   '0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc',
   '0x90f79bf6eb2c4f870365e785982e1f101e93b906',
@@ -127,15 +127,34 @@ describe('Box V5 tests', () => {
       it(
         'Should allow admin to manually resubmit fulfillRandomWords for the currently set batchMintRequest',
         async () => {
+          const { box, random } = testContext
 
-      });
+          // 20 users * 10 each basically fills the block
+          const quantity = 10
+          await boxV5.startBatchMint(accountList, quantity)
+          let rv = randomNumber('31', 256, 512)
+          console.log(rv)
+          await boxV5.manualAdminFulfillRandomWords(7777, [rv], '0xf72e3c66b80dbb40ff430da97aca347109574cd5657be6c9dbd997671bef5877')
+
+          await boxV5.finishBatchMint({ gasLimit: 30_000_000 })
+          for (let i = 0; i < accountList.length; i++) {
+            expect(await boxV5.balanceOf(accountList[i])).to.be.equal(quantity)
+          }
+
+        });
 
       it('Should disallow method being called with mismatched batchMintRequest', async () => {
-
+        const quantity = 10
+        await boxV5.startBatchMint(accountList, quantity)
+        let rv = randomNumber('31', 256, 512)
+        await expect(boxV5.manualAdminFulfillRandomWords(7727, [rv], '0xf72e3c66b80dbb40ff430da97aca347109574cd5657be6c9dbd997671bef5877')).to.be.revertedWith('Invalid Request ID')
       });
 
       it('Should disallow method being used by non-owner address', async () => {
-
+        const quantity = 10
+        await boxV5.startBatchMint(accountList, quantity)
+        let rv = randomNumber('31', 256, 512)
+        await expect(boxV5.connect(user).manualAdminFulfillRandomWords(7727, [rv], '0xf72e3c66b80dbb40ff430da97aca347109574cd5657be6c9dbd997671bef5877')).to.be.revertedWith('')
       });
     });
   });
