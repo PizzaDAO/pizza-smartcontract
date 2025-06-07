@@ -28,7 +28,7 @@ export const postOrder = async (
         Authorization: `Bearer ${callbackApiKey}`,
       },
     })
-    // TODO: deserialize response
+    // TODO: deserialize response?
     return response
   } catch (error) {
     console.log(error)
@@ -62,15 +62,15 @@ export const renderRequests = async ({
 
   const tasks: IRenderTask[] = []
 
+  // check the renderer api if there is an existing job
   const existing = await queryOrderStatuses(
     baseUrl, apiVersion, requests.map((request) => request.token_id))
   if (existing.length > 0) {
     tasks.push(existing[0])
   }
-  // check the renderer api if there is an existing job
-
 
   // if there is an existing job for the token_id, skip it
+  // since it might be errored, complete, or in progress
   const filteredRequests = requests.filter(
     (request) =>
       !tasks.find((task) => task.request.data.token_id === request.token_id),

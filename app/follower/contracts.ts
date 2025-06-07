@@ -16,6 +16,7 @@ export const provider = new providers.AlchemyProvider(
 
 export const signer = new Wallet(
   process.env.RAREPIZZAS_ORDER_API_MAINNET_ORACLE_NODE_PRIVATE_KEY!,
+  provider,
 )
 
 export const orderApiConsumer = new Contract(
@@ -29,6 +30,13 @@ export const orderApiOracle = new Contract(
   oracleAbi,
   provider,
 )
+
+export const orderApiOracleWriteEnabled = new Contract(
+  process.env.RAREPIZZAS_ORDER_API_MAINNET_ORACLE_CONTRACT_ADDRESS!,
+  oracleAbi,
+  signer,
+)
+
 
 export const contracts = {
   orderApiConsumer,

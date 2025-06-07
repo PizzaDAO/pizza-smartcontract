@@ -1,4 +1,4 @@
-import { getOracleRequest, orderApiOracle, signer } from '../contracts'
+import { getOracleRequest, orderApiOracle, orderApiOracleWriteEnabled, signer } from '../contracts'
 import { deleteRequest, getPendingRequests, getRenderTasks } from '../utils'
 import fetchRequests, { queryOrderStatuses } from './fetch'
 
@@ -16,6 +16,8 @@ export interface FulfillChainlinkRequestOptions {
   truncatedMetadataHash: string
 }
 
+// find the complete render task for the given token id
+// and fulfill the chainlink request with the truncated metadata hash
 export const fulfullRequest = async (
   { tokenId }: FulfillRequestOptions): Promise<void> => {
   const tasks = getRenderTasks(tokenId);
@@ -52,7 +54,7 @@ export const fulfillChainlinkRequest = async ({
   truncatedMetadataHash,
 }: FulfillChainlinkRequestOptions): Promise<void> => {
   console.log('Connecting to instance')
-  const oracle = orderApiOracle.Connect(signer)
+  const oracle = orderApiOracleWriteEnabled
 
   console.log('Querying events')
   const incompleteEvent = await getOracleRequest(requestId, inBlock)
@@ -63,22 +65,28 @@ export const fulfillChainlinkRequest = async ({
     )
   }
 
-  console.log('posting request fulfillment')
+  console.log('posting request fulfillment', incompleteEvent)
 
-  // simulate the fulfillment
+  // simulate the fulfillment by chainlink
+  // by calling the fulfill function on the oracle contract
   const tx = await oracle.fulfillOracleRequest(
-    requestId,
+    incompleteEvent.requestId,
     incompleteEvent.payment,
     incompleteEvent.callbackAddr,
     incompleteEvent.callbackFunctionId,
     incompleteEvent.cancelExpiration,
-    truncatedMetadataHash,
+    `0x${truncatedMetadataHash}`,
   )
 
   console.log(tx)
-  console.log('request fulfillment complete')
+  const result = await tx.wait()
+  console.log('request fulfillment complete', result)
 }
 
+// TODO: fulfillment wihtout chainlink
+
+// clean up the filesystem of completed events
+// by nuking the folder and repopulating it
 export const cleanupCompletedEvents = async (): Promise<void> => {
   console.log('cleanupCompletedEvents')
 
@@ -92,6 +100,8 @@ export const cleanupCompletedEvents = async (): Promise<void> => {
   const _ = await fetchRequests({})
 }
 
+// clean up the filesystem of completed tasks
+// by nuking the folder and repopulating it
 export const cleanupCompletedTasks = async (baseUrl: string,
   apiVersion: string): Promise<void> => {
   console.log('cleanupCompletedTasks')
@@ -104,8 +114,8 @@ export const cleanupCompletedTasks = async (baseUrl: string,
     }
   }
 
+  // force a refresh which repopulates the filesystem
   const requests = getPendingRequests(undefined)
-
   const _ = await queryOrderStatuses(
     baseUrl, apiVersion, requests.map((request) => request.token_id))
 }

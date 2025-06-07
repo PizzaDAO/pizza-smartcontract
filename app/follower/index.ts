@@ -11,6 +11,8 @@ import {
   checkStatus,
   fulfullRequest,
   FulfillRequestOptions,
+  cleanupCompletedEvents,
+  cleanupCompletedTasks,
 } from './commands'
 
 //interface Program extends Command, Options {}
@@ -35,6 +37,19 @@ program
     'relevant data to file, post saved data to an API, or run as a service ' +
     'to process events as they are emitted and post them to an API live.',
   )
+
+program
+  .command('cleanup', { isDefault: true })
+  .description(
+    'clean up the data directory',
+  )
+  .addOption(commonOptions.url)
+  .addOption(commonOptions.apiVersion)
+  .action(async (options: RenderRequestOptions) => {
+    console.log('Listening for events...')
+    await cleanupCompletedEvents()
+    await cleanupCompletedTasks(options.baseUrl, options.apiVersion)
+  })
 
 program
   .command('fulfill')
