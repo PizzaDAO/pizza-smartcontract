@@ -14,8 +14,8 @@ contract RarePizzasBoxV5 is RarePizzasBoxV4 {
 
     event adminManuallyFulfilledRandomWords(uint256 request, uint256[] random, bytes32 failedTxHash);
 
-    function getBatchMintStatus() external view returns (batchMintStatus) {
-        return status;
+    function getBatchMintRequest() external view returns (bytes32) {
+      return batchMintRequest;
     }
 
     function setBatchMintStatus(batchMintStatus _status) external onlyOwner {
