@@ -50,6 +50,8 @@ const getChainlinkOracle = (config: NetworkConfig) => {
       return config.CHAINLINK_MAINNET_PRICE_FEED
     case 'rinkeby':
       return config.CHAINLINK_RINKEBY_PRICE_FEED
+    case 'sepolia':
+      return config.CHAINLINK_SEPOLIA_PRICE_FEED
   }
   return 'VALUE NOT FOUND'
 }
@@ -64,6 +66,8 @@ const getChainlinkToken = (config: NetworkConfig) => {
       return config.CHAINLINK_MAINNET_TOKEN
     case 'rinkeby':
       return config.CHAINLINK_RINKEBY_TOKEN
+    case 'sepolia':
+      return config.CHAINLINK_SEPOLIA_TOKEN
     case 'matic':
         return config.CHAINLINK_MATIC_TOKEN
     case 'maticmum':
@@ -82,6 +86,8 @@ const getChainlinkVRFCoordinator = (config: NetworkConfig) => {
       return config.CHAINLINK_MAINNET_VRF_COORD
     case 'rinkeby':
       return config.CHAINLINK_RINKEBY_VRF_COORD
+    case 'sepolia':
+      return config.CHAINLINK_SEPOLIA_VRF_COORD
     case 'matic':
         return config.CHAINLINK_MATIC_VRF_COORD
     case 'maticmum':
@@ -100,6 +106,8 @@ const getChainlinkVRFKeyHash = (config: NetworkConfig) => {
       return config.CHAINLINK_MAINNET_VRF_KEY_HASH
     case 'rinkeby':
       return config.CHAINLINK_RINKEBY_VRF_KEY_HASH
+    case 'sepolia':
+      return config.CHAINLINK_SEPOLIA_VRF_KEY_HASH
     case 'matic':
         return config.CHAINLINK_MATIC_VRF_KEY_HASH
     case 'maticmum':
@@ -118,6 +126,8 @@ const getChainlinkVRFFee = (config: NetworkConfig) => {
       return config.CHAINLINK_MAINNET_VRF_FEE
     case 'rinkeby':
       return config.CHAINLINK_RINKEBY_VRF_FEE
+    case 'sepolia':
+      return config.CHAINLINK_SEPOLIA_VRF_FEE
     case 'matic':
         return config.CHAINLINK_MATIC_VRF_FEE
     case 'maticmum':
@@ -206,6 +216,8 @@ const getBoxProxyAddress = (config: NetworkConfig) => {
       return config.RAREPIZZAS_BOX_MAINNET_PROXY_ADDRESS
     case 'rinkeby':
       return config.RAREPIZZAS_BOX_RINKEBY_PROXY_ADDRESS
+    case 'sepolia':
+      return config.RAREPIZZAS_BOX_SEPOLIA_PROXY_ADDRESS
   }
   return 'VALUE NOT FOUND'
 }
@@ -220,6 +232,8 @@ const getBoxProxyAdminAddress = (config: NetworkConfig) => {
       return config.RAREPIZZAS_BOX_MAINNET_PROXY_ADMIN_ADDRESS
     case 'rinkeby':
       return config.RAREPIZZAS_BOX_RINKEBY_PROXY_ADMIN_ADDRESS
+    case 'sepolia':
+      return config.RAREPIZZAS_BOX_SEPOLIA_PROXY_ADMIN_ADDRESS
   }
   return 'VALUE NOT FOUND'
 }

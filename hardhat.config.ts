@@ -22,7 +22,7 @@ const networks: NetworksUserConfig = {
     gasPrice: 22000000000,
   },
   sepolia: {
-    url: `https://eth-sepolia.g.alchemy.com/v2/${config.ALCCHEMY_SEPOLIA_KEY}`,
+    url: `https://eth-sepolia.g.alchemy.com/v2/${config.ALCHEMY_SEPOLIA_KEY}`,
     accounts: [`0x${config.SEPOLIA_PRIVATE_KEY}`],
     gasPrice: 22000000000,
   },
