@@ -250,6 +250,8 @@ const getRandomConsumerAddress = (config: NetworkConfig) => {
       return config.RAREPIZZAS_BOX_MAINNET_RANDOM_CONSUMER_ADDRESS
     case 'rinkeby':
       return config.RAREPIZZAS_BOX_RINKEBY_RANDOM_CONSUMER_ADDRESS
+    case 'sepolia':
+      return config.RAREPIZZAS_BOX_SEPOLIA_RANDOM_CONSUMER_ADDRESS
     case 'matic':
         return config.RAREPIZZAS_MATIC_RANDOM_CONSUMER_ADDRESS
     case 'maticmum':
@@ -268,6 +270,8 @@ const getRarePizzasProxyAddress = (config: NetworkConfig) => {
       return config.RAREPIZZAS_MAINNET_PROXY_ADDRESS
     case 'rinkeby':
       return config.RAREPIZZAS_RINKEBY_PROXY_ADDRESS
+    case 'sepolia':
+      return config.RAREPIZZAS_SEPOLIA_PROXY_ADDRESS
   }
   return 'VALUE NOT FOUND'
 }
@@ -282,6 +286,8 @@ const getRarePizzasProxyAdminAddress = (config: NetworkConfig) => {
       return config.RAREPIZZAS_MAINNET_PROXY_ADMIN_ADDRESS
     case 'rinkeby':
       return config.RAREPIZZAS_RINKEBY_PROXY_ADMIN_ADDRESS
+    case 'sepolia':
+      return config.RAREPIZZAS_SEPOLIA_PROXY_ADMIN_ADDRESS
   }
   return 'VALUE NOT FOUND'
 }
