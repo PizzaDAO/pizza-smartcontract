@@ -10,24 +10,24 @@ async function main() {
     const proxy = utils.getBoxProxyAddress(config)
     const proxyOwner = utils.getBoxProxyAdminAddress(config)
 
-    console.log('Preparing RandomConsumer with the account:', deployer.address)
+    console.log('Preparing RandomConsumerV2 with the account:', deployer.address)
     console.log('Account balance:', (await deployer.getBalance()).toString())
     console.log('Proxy Address:', proxy)
     console.log('Owner Address:', proxyOwner)
 
     // we get the chgainlink VRF to deploy
-    const RandomConsumer = await ethers.getContractFactory('RandomConsumer')
-    const randomConsumer = await RandomConsumer.deploy(
-        utils.getChainlinkVRFCoordinator(config),
-        utils.getChainlinkToken(config),
-        utils.getChainlinkVRFKeyHash(config),
-        utils.getChainlinkVRFFee(config),
-        proxy)
+    const RandomConsumerV2 = await ethers.getContractFactory('RandomConsumerV2')
+    const randomConsumerV2 = await RandomConsumerV2.deploy(
+        utils.getChainlinkVRFCoordinatorV2(config),
+        utils.getChainlinkVRFKeyHashV2(config),
+        utils.getBoxProxyAddress(config),
+        utils.getChainlinkVRFCoordinatorV2SubscriptionId(config),
+      )
 
-    console.log('Random Consumer:', randomConsumer)
+    console.log('Random Consumer V2:', randomConsumerV2)
 
-    utils.publishRandomConsumerDeploymentData("RandomConsumer", proxy, randomConsumer)
-    utils.publishRandomConsumerWeb3AdminAbi()
+    utils.publishRandomConsumerV2DeploymentData("RandomConsumerV2", proxy, randomConsumerV2)
+    utils.publishRandomConsumerV2Web3AdminAbi()
 }
 
 main()

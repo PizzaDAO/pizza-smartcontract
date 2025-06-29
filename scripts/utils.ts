@@ -6,7 +6,10 @@ import config, { NetworkConfig } from '../config'
 import boxContract from '../artifacts/contracts/token/RarePizzasBox.sol/RarePizzasBox.json'
 import boxContractV2 from '../artifacts/contracts/token/RarePizzasBoxV2.sol/RarePizzasBoxV2.json'
 import boxContractV3 from '../artifacts/contracts/token/RarePizzasBoxV3.sol/RarePizzasBoxV3.json'
+import boxContractV4 from '../artifacts/contracts/token/V4/RarePizzaBoxV4.sol/RarePizzasBoxV4.json'
+import boxContractV5 from '../artifacts/contracts/token/V4/RarePizzaBoxV5.sol/RarePizzasBoxV5.json'
 import randomConsumer from '../artifacts/contracts/random/RandomConsumer.sol/RandomConsumer.json'
+import randomConsumerV2 from '../artifacts/contracts/random/RandomConsumerV2.sol/RandomConsumerV2.json'
 import seedStorage from '../artifacts/contracts/data/RarePizzasSeedStorage.sol/RarePizzasSeedStorage.json'
 import rarePizzas from '../artifacts/contracts/token/RarePizzas.sol/RarePizzas.json'
 
@@ -97,6 +100,26 @@ const getChainlinkVRFCoordinator = (config: NetworkConfig) => {
 }
 
 /**
+ * Get the Address of the Chainlink VRF coordinator V2 contract address
+ */
+const getChainlinkVRFCoordinatorV2 = (config: NetworkConfig) => {
+  const networkName = config.NETWORK.toLowerCase()
+  switch (networkName) {
+    case 'mainnet':
+      return config.CHAINLINK_MAINNET_VRF_COORD_V2
+    case 'rinkeby':
+      return config.CHAINLINK_RINKEBY_VRF_COORD_V2
+    case 'sepolia':
+      return config.CHAINLINK_SEPOLIA_VRF_COORD_V2
+    case 'matic':
+      return config.CHAINLINK_MATIC_VRF_COORD_V2
+    case 'maticmum':
+      return config.CHAINLINK_MATIC_MUMBAI_VRF_COORD_V2
+  }
+  return 'VALUE NOT FOUND'
+}
+
+/**
  * Get the key hash of the chainlink vrf coordinator
  */
 const getChainlinkVRFKeyHash = (config: NetworkConfig) => {
@@ -112,6 +135,46 @@ const getChainlinkVRFKeyHash = (config: NetworkConfig) => {
         return config.CHAINLINK_MATIC_VRF_KEY_HASH
     case 'maticmum':
       return config.CHAINLINK_MATIC_MUMBAI_VRF_KEY_HASH
+  }
+  return 'VALUE NOT FOUND'
+}
+
+/**
+ * Get the key hash of the chainlink vrf coordinator V2
+ */
+const getChainlinkVRFKeyHashV2 = (config: NetworkConfig) => {
+  const networkName = config.NETWORK.toLowerCase()
+  switch (networkName) {
+    case 'mainnet':
+      return config.CHAINLINK_MAINNET_VRF_KEY_HASH_V2
+    case 'rinkeby':
+      return config.CHAINLINK_RINKEBY_VRF_KEY_HASH_V2
+    case 'sepolia':
+      return config.CHAINLINK_SEPOLIA_VRF_KEY_HASH_V2
+    case 'matic':
+      return config.CHAINLINK_MATIC_VRF_KEY_HASH_V2
+    case 'maticmum':
+      return config.CHAINLINK_MATIC_MUMBAI_VRF_KEY_HASH_V2
+  }
+  return 'VALUE NOT FOUND'
+}
+
+/**
+ * Get the subscription id created on the chainlink vrf coordinator V2
+ */
+const getChainlinkVRFCoordinatorV2SubscriptionId = (config: NetworkConfig) => {
+  const networkName = config.NETWORK.toLowerCase()
+  switch (networkName) {
+    case 'mainnet':
+      return parseInt(config.CHAINLINK_MAINNET_VRF_V2_SUBSCRIPTION_ID)
+    case 'rinkeby':
+      return parseInt(config.CHAINLINK_RINKEBY_VRF_V2_SUBSCRIPTION_ID)
+    case 'sepolia':
+      return parseInt(config.CHAINLINK_SEPOLIA_VRF_V2_SUBSCRIPTION_ID)
+    case 'matic':
+      return parseInt(config.CHAINLINK_MATIC_VRF_V2_SUBSCRIPTION_ID)
+    case 'maticmum':
+      return parseInt(config.CHAINLINK_MATIC_MUMBAI_VRF_V2_SUBSCRIPTION_ID)
   }
   return 'VALUE NOT FOUND'
 }
@@ -441,7 +504,63 @@ const publishBoxWeb3V3AdminAbi = () => {
 
   const json = JSON.stringify(boxWeb3interface)
   console.log(json)
-  writeFileSync('./dist/boxWeb3AdminInterface-v2.json', json)
+  writeFileSync('./dist/boxWeb3AdminInterface-v3.json', json)
+}
+
+const publishBoxWeb3V4AdminAbi = () => {
+  const boxWeb3interface = {
+    contractName: boxContractV4.contractName,
+    sourceName: boxContractV4.sourceName,
+    abi: [
+      boxContractV4.abi.find((i: { name: string }) => i.name === 'mint'),
+      boxContractV4.abi.find((i: { name: string }) => i.name === 'purchaseTo'),
+      boxContractV4.abi.find((i: { name: string }) => i.name === 'setPresaleAllowed'),
+      boxContractV4.abi.find((i: { name: string }) => i.name === 'setSaleStartTimestamp'),
+      boxContractV4.abi.find((i: { name: string }) => i.name === 'updateBitcoinPriceInWei'),
+      boxContractV4.abi.find((i: { name: string }) => i.name === 'withdraw'),
+      boxContractV4.abi.find((i: { name: string }) => i.name === 'setVRFConsumer'),
+      boxContractV4.abi.find((i: { name: string }) => i.name === 'startBatchMint'),
+      boxContractV4.abi.find((i: { name: string }) => i.name === 'finishBatchMint'),
+      boxContractV4.abi.find((i: { name: string }) => i.name === 'gift'),
+      boxContractV4.abi.find((i: { name: string }) => i.name === 'setmultiPurchaseLimit'),
+      boxContractV4.abi.find((i: { name: string }) => i.name === 'setSaleWhitelist'),
+      boxContractV4.abi.find((i: { name: string }) => i.name === 'setclaimWhiteList'),
+      boxContractV4.abi.find((i: { name: string }) => i.name === 'setMaxNewPurchases'),
+    ],
+  }
+
+  const json = JSON.stringify(boxWeb3interface)
+  console.log(json)
+  writeFileSync('./dist/boxWeb3AdminInterface-v4.json', json)
+}
+
+const publishBoxWeb3V5AdminAbi = () => {
+  const boxWeb3interface = {
+    contractName: boxContractV5.contractName,
+    sourceName: boxContractV5.sourceName,
+    abi: [
+      boxContractV5.abi.find((i: { name: string }) => i.name === 'mint'),
+      boxContractV5.abi.find((i: { name: string }) => i.name === 'purchaseTo'),
+      boxContractV5.abi.find((i: { name: string }) => i.name === 'setPresaleAllowed'),
+      boxContractV5.abi.find((i: { name: string }) => i.name === 'setSaleStartTimestamp'),
+      boxContractV5.abi.find((i: { name: string }) => i.name === 'updateBitcoinPriceInWei'),
+      boxContractV5.abi.find((i: { name: string }) => i.name === 'withdraw'),
+      boxContractV5.abi.find((i: { name: string }) => i.name === 'setVRFConsumer'),
+      boxContractV5.abi.find((i: { name: string }) => i.name === 'startBatchMint'),
+      boxContractV5.abi.find((i: { name: string }) => i.name === 'finishBatchMint'),
+      boxContractV5.abi.find((i: { name: string }) => i.name === 'gift'),
+      boxContractV5.abi.find((i: { name: string }) => i.name === 'setmultiPurchaseLimit'),
+      boxContractV5.abi.find((i: { name: string }) => i.name === 'setSaleWhitelist'),
+      boxContractV5.abi.find((i: { name: string }) => i.name === 'setclaimWhiteList'),
+      boxContractV5.abi.find((i: { name: string }) => i.name === 'setMaxNewPurchases'),
+      boxContractV5.abi.find((i: { name: string }) => i.name === 'setBatchMintStatus'),
+      boxContractV5.abi.find((i: { name: string }) => i.name === 'manualAdminFulfillRandomWords'),
+    ],
+  }
+
+  const json = JSON.stringify(boxWeb3interface)
+  console.log(json)
+  writeFileSync('./dist/boxWeb3AdminInterface-v5.json', json)
 }
 
 /**
@@ -512,6 +631,29 @@ const publishRandomConsumerWeb3AdminAbi = () => {
 }
 
 /**
+ * Publish a truncated version of the Random Conusmer V2 Web3 Admin ABI
+ */
+const publishRandomConsumerV2Web3AdminAbi = () => {
+  const contractInterface = {
+    contractName: randomConsumerV2.contractName,
+    sourceName: randomConsumerV2.sourceName,
+    abi: [
+      randomConsumerV2.abi.find((i) => i.name === 'setNumWords'),
+      randomConsumerV2.abi.find((i) => i.name === 'setRequestConfirmation'),
+      randomConsumerV2.abi.find((i) => i.name === 'setCallbackGasLimit'),
+      randomConsumerV2.abi.find((i) => i.name === 'setCallbackContract'),
+      randomConsumerV2.abi.find((i) => i.name === 'setSubscription'),
+      randomConsumerV2.abi.find((i) => i.name === 'setKeyHash'),
+      randomConsumerV2.abi.find((i) => i.name === 'withdraw'),
+    ],
+  }
+
+  const json = JSON.stringify(contractInterface)
+  console.log(json)
+  writeFileSync('./dist/randomConsumerV2Web3AdminInterface.json', json)
+}
+
+/**
  * Publish some deployment data.
  *
  * This function should be called for all contract deployments
@@ -535,6 +677,19 @@ const publishRandomConsumerDeploymentData = (name: string, proxy: string, random
     name: name,
     proxy: proxy,
     randomConsumer: randomConsumer
+  }
+  const json = JSON.stringify(deploymentData)
+  console.log(deploymentData)
+  writeFileSync(`./dist/deployment-${config.NETWORK}-${name}-latest.json`, json)
+  writeFileSync(`./dist/deployment-${config.NETWORK}-${name}-${Date.now()}.json`, json)
+}
+
+const publishRandomConsumerV2DeploymentData = (name: string, proxy: string, randomConsumerV2: Contract) => {
+  const deploymentData = {
+    network: config.NETWORK,
+    name: name,
+    proxy: proxy,
+    randomConsumerV2: randomConsumerV2
   }
   const json = JSON.stringify(deploymentData)
   console.log(deploymentData)
@@ -567,7 +722,10 @@ const utils = {
   getChainlinkOracle: getChainlinkOracle,
   getChainlinkToken: getChainlinkToken,
   getChainlinkVRFCoordinator: getChainlinkVRFCoordinator,
+  getChainlinkVRFCoordinatorV2: getChainlinkVRFCoordinatorV2,
   getChainlinkVRFKeyHash: getChainlinkVRFKeyHash,
+  getChainlinkVRFKeyHashV2: getChainlinkVRFKeyHashV2,
+  getChainlinkVRFCoordinatorV2SubscriptionId: getChainlinkVRFCoordinatorV2SubscriptionId,
   getChainlinkVRFFee: getChainlinkVRFFee,
   getOrderAPIOracleContractAddress: getOrderAPIOracleContractAddress,
   getOrderAPIOracleNodeAddress: getOrderAPIOracleNodeAddress,
@@ -588,11 +746,15 @@ const utils = {
   publishBoxWeb3AdminAbi: publishBoxWeb3AdminAbi,
   publishBoxWeb3V2AdminAbi: publishBoxWeb3V2AdminAbi,
   publishBoxWeb3V3AdminAbi: publishBoxWeb3V3AdminAbi,
+  publishBoxWeb3V4AdminAbi: publishBoxWeb3V4AdminAbi,
+  publishBoxWeb3V5AdminAbi: publishBoxWeb3V5AdminAbi,
   publishRarePizzasSeedStorageAbi: publishRarePizzasSeedStorageAbi,
   publishRandomConsumerWeb3AdminAbi: publishRandomConsumerWeb3AdminAbi,
+  publishRandomConsumerV2Web3AdminAbi: publishRandomConsumerV2Web3AdminAbi,
   publishDeploymentData: publishDeploymentData,
   publishRarePizzasAbi: publishRarePizzasAbi,
   publishRandomConsumerDeploymentData: publishRandomConsumerDeploymentData,
+  publishRandomConsumerV2DeploymentData: publishRandomConsumerV2DeploymentData,
   publishUpgradeData: publishUpgradeData
 }
 export default utils

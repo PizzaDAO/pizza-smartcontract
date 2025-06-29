@@ -1,9 +1,10 @@
 import utils from './utils'
-import { ethers, upgrades } from 'hardhat'
-import config from '../config'
 
-// This script prepares the V5 upgrade (deploys implementation contract)
-// Use this when you don't own the proxy admin
+import { ethers, upgrades } from 'hardhat'
+
+import config, { NetworkConfig } from '../config'
+
+// run the migration from the current signer account
 async function main() {
   const [deployer] = await ethers.getSigners()
   const proxy = utils.getBoxProxyAddress(config)
@@ -15,19 +16,18 @@ async function main() {
   console.log('Owner Address:', proxyOwner)
 
   // We get the upgrade contract to deploy
-  const UpgradeV5 = await ethers.getContractFactory('RarePizzasBoxV5')
-  const upgradeV5Address = await upgrades.prepareUpgrade(proxy, UpgradeV5)
+  const UpgradeV4 = await ethers.getContractFactory('RarePizzasBoxV4')
+  const upgradeV4Address = await upgrades.prepareUpgrade(proxy, UpgradeV4)
   console.log('Upgrade Successful.  You must now update the proxy contract.')
-  console.log('The V5 implementation is at:', upgradeV5Address)
+  console.log('The V4 implementation is at:', upgradeV4Address)
 
-  // Save deployment data
-  utils.publishUpgradeData('RarePizzasBoxV5', proxy, upgradeV5Address.toString())
-  utils.publishBoxWeb3V5AdminAbi()
+  utils.publishUpgradeData('RarePizzasBoxV4', proxy, upgradeV4Address)
+  utils.publishBoxWeb3V4AdminAbi()
 }
 
 main()
   .then(() => process.exit(0))
   .catch((error) => {
-    console.error('Error during deployment:', error)
+    console.error(error)
     process.exit(1)
   })
