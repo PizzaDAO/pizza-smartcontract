@@ -59,20 +59,22 @@ async function main() {
     console.log('Executing manual fulfillment...')
 
     // These values must come from the failed transaction
-    const FAILED_TX_HASH = process.env.FAILED_TX_HASH
-    const RANDOM_WORDS = process.env.RANDOM_WORDS
+    const FAILED_TX_HASH = utils.getStartBatchMintRecoveryFailedTxHash(config)
+    const RANDOM_WORDS = utils.getStartBatchMintRecoveryRandomWords(config)
+    const REQUEST_ID = utils.getStartBatchMintRecoveryRequestId(config)
 
-    if (!FAILED_TX_HASH || !RANDOM_WORDS) {
+
+    if (!FAILED_TX_HASH || !RANDOM_WORDS || !REQUEST_ID) {
       console.error('❌ Missing required environment variables:')
       console.error('FAILED_TX_HASH - The hash of the failed VRF fulfillment transaction')
       console.error('RANDOM_WORDS - The random words from the failed transaction (comma-separated)')
+      console.error('REQUEST_ID - The batchMintRequest which failed (should be the current value on the deployed contract')
       process.exit(1)
     }
 
     const randomWords = RANDOM_WORDS.split(',').map(w => ethers.BigNumber.from(w.trim()))
-    const requestId = ethers.BigNumber.from(batchMintRequest)
 
-    console.log('Request ID:', requestId.toString())
+    console.log('Request ID:', REQUEST_ID.toString())
     console.log('Failed TX Hash:', FAILED_TX_HASH)
     console.log('Random Words:', randomWords.map(w => w.toString()))
     console.log('')
@@ -83,7 +85,7 @@ async function main() {
 
     const tx = boxV5.interface.encodeFunctionData(
       'manualAdminFulfillRandomWords',
-      [requestId, randomWords, FAILED_TX_HASH]
+      [REQUEST_ID, randomWords, FAILED_TX_HASH]
     );
 
     console.log('===== manualAdminFulfillRandomWords TX Data =====');

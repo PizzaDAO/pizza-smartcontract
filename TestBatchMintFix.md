@@ -5,15 +5,15 @@
 ### V1
 **deploy the rare pizzas box implementation and proxy contracts:**
 
-`npx hardhat run --network sepolia scripts/box.deploy.ts`
+- `npx hardhat run --network sepolia scripts/box.deploy.ts`
 
 **verify the contract:**
-`npx hardhat verify --contract contracts/token/RarePizzasBox.sol:RarePizzasBox --network sepolia <CONTRACT_ADDRESS>`
+- `npx hardhat verify --contract contracts/token/RarePizzasBox.sol:RarePizzasBox --network sepolia <CONTRACT_ADDRESS>`
 
 ### V2
 **deploy the rare pizzas box V2 implementation contract:**
 
-`npx hardhat run --network sepolia scripts/box.upgrade.v2.prepare.ts`
+- `npx hardhat run --network sepolia scripts/box.upgrade.v2.prepare.ts`
 
 **upgrade the proxy to use the rare pizzas box V2 implementation:**
 From the proxy owner:
@@ -21,15 +21,15 @@ From the proxy owner:
 - [] call `upgradeTo(newImplementationAddress)` on the proxy with the new implementation instance address
 
 **verify the contract:**
-`npx hardhat verify --contract contracts/token/RarePizzasBoxV2.sol:RarePizzasBoxV2 --network sepolia <CONTRACT_ADDRESS>`
+- `npx hardhat verify --contract contracts/token/RarePizzasBoxV2.sol:RarePizzasBoxV2 --network sepolia <CONTRACT_ADDRESS>`
 
 ### V3
 **deploy the rare pizzas box V3 implementation contract:**
 
-`npx hardhat run --network sepolia scripts/box.upgrade.v3.prepare.ts`
+- `npx hardhat run --network sepolia scripts/box.upgrade.v3.prepare.ts`
 
 **verify the contract:**
-`npx hardhat verify --contract contracts/token/RarePizzasBoxV3.sol:RarePizzasBoxV3 --network sepolia <CONTRACT_ADDRESS>`
+- `npx hardhat verify --contract contracts/token/RarePizzasBoxV3.sol:RarePizzasBoxV3 --network sepolia <CONTRACT_ADDRESS>`
 
 **upgrade the proxy to use the rare pizzas box V3 implementation:**
 
@@ -38,26 +38,26 @@ From the proxy owner:
 ### V4
 **deploy the rare pizzas box V4 implementation contract:**
 
-`npx hardhat run --network sepolia scripts/box.upgrade.v4.prepare.ts`
+- `npx hardhat run --network sepolia scripts/box.upgrade.v4.prepare.ts`
 
 **upgrade the proxy to use the rare pizzas box V4 implementation:**
 
 - [] call `upgradeTo(newImplementationAddress)` on the proxy with the new implementation instance address
 
 **verify the contract:**
-`npx hardhat verify --contract contracts/token/V4/RarePizzaBoxV4.sol:RarePizzasBoxV4 --network sepolia <CONTRACT_ADDRESS>`
+- `npx hardhat verify --contract contracts/token/V4/RarePizzaBoxV4.sol:RarePizzasBoxV4 --network sepolia <CONTRACT_ADDRESS>`
 
 **create a subscription on the VRF Coordinator V2:**
-go to the VRF Coordinator V2 contract on etherscan and call the `createSubscription` method. Retrieve the ID of the
+- go to the VRF Coordinator V2 contract on etherscan and call the `createSubscription` method. Retrieve the ID of the
 subscription created from the logs of the resulting transaction, and add it in decimal form to your .env file for
 the relevant network.
 
 **deploy the random consumer:**
 
-`npx hardhat run --network sepolia scripts/randomConsumerV2.sepolia.deploy.ts`
+- `npx hardhat run --network sepolia scripts/randomConsumerV2.sepolia.deploy.ts`
 
 **verify the contract:**
-`npx hardhat verify --contract contracts/random/RandomConsumerV2.sol:RandomConsumerV2 --network sepolia <CONTRACT_ADDRESS>`
+- `npx hardhat verify --contract contracts/random/RandomConsumerV2.sol:RandomConsumerV2 --network sepolia <CONTRACT_ADDRESS>`
 
 **allowList the random consumer on the VRF Coordinator V2:**
 - Go to the VRF Coordinator V2 contract on etherscan and call the `addConsumer` method with the Subscription ID created
@@ -90,14 +90,14 @@ the relevant network.
 
 ## Deploy & Configure the Fix
 **identify the failed random consumer transaction which ran out of gas:**
-record the txHash, request Id and the random words, we'll use them in testing the fix
+- add the txHash, request Id and the random words to the .env, we'll use them in testing the fix
 
 **deploy the rare pizzas box V5 implementation contract:**
 
-`npx hardhat run --network sepolia scripts/box.upgrade.v5.prepare.ts`
+- `npx hardhat run --network sepolia scripts/box.upgrade.v5.prepare.ts`
 
 **verify the contract:**
-`npx hardhat verify --contract contracts/token/V4/RarePizzaBoxV5.sol:RarePizzasBoxV5 --network sepolia <CONTRACT_ADDRESS>`
+- `npx hardhat verify --contract contracts/token/V4/RarePizzaBoxV5.sol:RarePizzasBoxV5 --network sepolia <CONTRACT_ADDRESS>`
 
 **upgrade the proxy to use the rare pizzas box V5 implementation:**
 
@@ -111,10 +111,7 @@ record the txHash, request Id and the random words, we'll use them in testing th
   and give plenty to the subscription so we don't run out of gas again.
 
 **recover the initial failed startBatchMint attempt and the contract state**
-- Call the `manualAdminFulfillRandomWords` method from the owner address (deployer in this testing context as we never
-  changed it after deployment). Supply the ID of the `request`, the `random` (the list of random words), and the txHash
-  we recorded from the previous failed attempt to use `startBatchMint`. Confirm that this successfully completes the
-  failed mint.
+- `npx hardhat run --network sepolia scripts/box.v5.startBatchMint.recovery.ts`
 
 **call startBatchMint again, confirming the use of the function is no longer blocked**
 - Go to etherscan and use the function again, with a reasonably sized call to the function.

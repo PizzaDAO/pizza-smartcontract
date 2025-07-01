@@ -410,6 +410,22 @@ const getOrderApiConsumerAuthorizedRequestorAddress = (config: NetworkConfig) =>
   return 'VALUE NOT FOUND'
 }
 
+const getStartBatchMintRecoveryMode = (config: NetworkConfig) => {
+  return config.FAILED_FULFILL_RANDOM_WORDS_RECOVERY_MODE
+}
+
+const getStartBatchMintRecoveryFailedTxHash = (config: NetworkConfig) => {
+  return config.FAILED_FULFILL_RANDOM_WORDS_RECOVERY_FAILED_TX_HASH
+}
+
+const getStartBatchMintRecoveryRandomWords = (config: NetworkConfig) => {
+  return config.FAILED_FULFILL_RANDOM_WORDS_RECOVERY_RANDOM_WORDS
+}
+
+const getStartBatchMintRecoveryRequestId = (config: NetworkConfig) => {
+  return config.FAILED_FULFILL_RANDOM_WORDS_RECOVERY_REQUEST_ID
+}
+
 /**
  * Publish a truncated version of the Box Web3 ABI
  */
@@ -741,6 +757,10 @@ const utils = {
   getStorageProxyAdminAddress: getStorageProxyAdminAddress,
   getStorageProxyAuthorizedRequestorAddress:getStorageProxyAuthorizedRequestorAddress,
   getOrderApiConsumerAuthorizedRequestorAddress:getOrderApiConsumerAuthorizedRequestorAddress,
+  getStartBatchMintRecoveryMode: getStartBatchMintRecoveryMode,
+  getStartBatchMintRecoveryFailedTxHash: getStartBatchMintRecoveryFailedTxHash,
+  getStartBatchMintRecoveryRandomWords: getStartBatchMintRecoveryRandomWords,
+  getStartBatchMintRecoveryRequestId: getStartBatchMintRecoveryRequestId,
   parseBoxUris: parseBoxUris,
   publishBoxWeb3Abi: publishBoxWeb3Abi,
   publishBoxWeb3AdminAbi: publishBoxWeb3AdminAbi,
