@@ -15,13 +15,13 @@
 
 - `npx hardhat run --network sepolia scripts/box.upgrade.v2.prepare.ts`
 
+**verify the contract:**
+- `npx hardhat verify --contract contracts/token/RarePizzasBoxV2.sol:RarePizzasBoxV2 --network sepolia <CONTRACT_ADDRESS>`
+
 **upgrade the proxy to use the rare pizzas box V2 implementation:**
 From the proxy owner:
 
 - [] call `upgradeTo(newImplementationAddress)` on the proxy with the new implementation instance address
-
-**verify the contract:**
-- `npx hardhat verify --contract contracts/token/RarePizzasBoxV2.sol:RarePizzasBoxV2 --network sepolia <CONTRACT_ADDRESS>`
 
 ### V3
 **deploy the rare pizzas box V3 implementation contract:**
@@ -40,12 +40,12 @@ From the proxy owner:
 
 - `npx hardhat run --network sepolia scripts/box.upgrade.v4.prepare.ts`
 
+**verify the contract:**
+- `npx hardhat verify --contract contracts/token/V4/RarePizzaBoxV4.sol:RarePizzasBoxV4 --network sepolia <CONTRACT_ADDRESS>`
+
 **upgrade the proxy to use the rare pizzas box V4 implementation:**
 
 - [] call `upgradeTo(newImplementationAddress)` on the proxy with the new implementation instance address
-
-**verify the contract:**
-- `npx hardhat verify --contract contracts/token/V4/RarePizzaBoxV4.sol:RarePizzasBoxV4 --network sepolia <CONTRACT_ADDRESS>`
 
 **create a subscription on the VRF Coordinator V2:**
 - go to the VRF Coordinator V2 contract on etherscan and call the `createSubscription` method. Retrieve the ID of the
@@ -57,7 +57,7 @@ the relevant network.
 - `npx hardhat run --network sepolia scripts/randomConsumerV2.sepolia.deploy.ts`
 
 **verify the contract:**
-- `npx hardhat verify --contract contracts/random/RandomConsumerV2.sol:RandomConsumerV2 --network sepolia <CONTRACT_ADDRESS>`
+- `npx hardhat verify --contract contracts/random/RandomConsumerV2.sol:RandomConsumerV2 --network sepolia --constructor-args scripts/randomConsumerV2.sepolia.arguments.ts <CONTRACT_ADDRESS>`
 
 **allowList the random consumer on the VRF Coordinator V2:**
 - Go to the VRF Coordinator V2 contract on etherscan and call the `addConsumer` method with the Subscription ID created

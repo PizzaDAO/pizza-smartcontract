@@ -1,6 +1,1 @@
-{
-  "network": "sepolia",
-  "name": "RarePizzasBoxV5",
-  "proxy": "0x9AFe9558ebC9BD2f1Db3187e9736B57abF530bC5",
-  "implementation": "0xf9cc0fB41408C022c2e43d97d1851f6Ee79f27e5"
-}
+{"network":"sepolia","name":"RarePizzasBoxV4","proxy":"0xB34cfa1FcA6f37a2c8046c1aE97F10F2fA6FaD6B","implementation":"0x90aB65A6F93A64BC9B02D02eDdb9D5c626FAe249"}
