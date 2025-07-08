@@ -53,7 +53,7 @@ async function main() {
   // 2. The random words from that transaction
 
   // Example recovery (fill in actual values in environment variables):
-  const RECOVERY_MODE = process.env.RECOVERY_MODE || 'prompt'
+  const RECOVERY_MODE = utils.getStartBatchMintRecoveryMode(config) || 'prompt'
 
   if (RECOVERY_MODE === 'manual_fulfill') {
     console.log('Executing manual fulfillment...')

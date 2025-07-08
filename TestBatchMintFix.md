@@ -21,7 +21,7 @@
 **upgrade the proxy to use the rare pizzas box V2 implementation:**
 From the proxy owner:
 
-- [] call `upgradeTo(newImplementationAddress)` on the proxy with the new implementation instance address
+- [] call `upgrade(proxyAddress,newImplementationAddress)` on the proxy admin contract
 
 ### V3
 **deploy the rare pizzas box V3 implementation contract:**
@@ -33,7 +33,7 @@ From the proxy owner:
 
 **upgrade the proxy to use the rare pizzas box V3 implementation:**
 
-- [] call `upgradeTo(newImplementationAddress)` on the proxy with the new implementation instance address
+- [] call `upgrade(proxyAddress,newImplementationAddress)` on the proxy admin contract
 
 ### V4
 **deploy the rare pizzas box V4 implementation contract:**
@@ -45,7 +45,7 @@ From the proxy owner:
 
 **upgrade the proxy to use the rare pizzas box V4 implementation:**
 
-- [] call `upgradeTo(newImplementationAddress)` on the proxy with the new implementation instance address
+- [] call `upgrade(proxyAddress,newImplementationAddress)` on the proxy admin contract
 
 **create a subscription on the VRF Coordinator V2:**
 - go to the VRF Coordinator V2 contract on etherscan and call the `createSubscription` method. Retrieve the ID of the
@@ -101,7 +101,7 @@ the relevant network.
 
 **upgrade the proxy to use the rare pizzas box V5 implementation:**
 
-- [] call `upgradeTo(newImplementationAddress)` on the proxy with the new implementation instance address
+- [] call `upgrade(proxyAddress,newImplementationAddress)` on the proxy admin contract
 
 ## Execute the Fix & Recover the Contract to Working State
 
@@ -112,6 +112,8 @@ the relevant network.
 
 **recover the initial failed startBatchMint attempt and the contract state**
 - `npx hardhat run --network sepolia scripts/box.v5.startBatchMint.recovery.ts`
+- note, this will not broadcast the transaction, it will log out the data for the transactions which should
+be submitted to the proxy from the multisig
 
 **call startBatchMint again, confirming the use of the function is no longer blocked**
 - Go to etherscan and use the function again, with a reasonably sized call to the function.
