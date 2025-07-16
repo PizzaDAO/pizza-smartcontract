@@ -74,7 +74,7 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
         }
     }
 
-    function gift(address toPizzaiolo, uint256 count) public onlyOwner {
+    function gift(address toPizzaiolo, uint256 count) public virtual onlyOwner {
         require(toPizzaiolo != address(0), 'dont be silly');
         require(count > 0, 'need a number');
         require(totalSupply().add(count) <= maxSupply(), 'would exceed supply.');

@@ -47,7 +47,7 @@ contract RarePizzasBoxV5 is RarePizzasBoxV4 {
         _fulfillRandomWords(request, random);
     }
 
-    function _fulfillRandomWords(uint256 request, uint256[] memory random) internal {
+    function _fulfillRandomWords(uint256 request, uint256[] memory random) internal virtual {
         if (bytes32(request) == batchMintRequest) {
             for (uint256 i = 0; i < batchMintUsers.length; i++) {
                 // iterate over the count
