@@ -16,7 +16,7 @@ type TestContext = {
 let testContext: TestContext
 
 const getRinkebyRandomConsumer = async (box: Contract) => {
-  const RandomConsumer = await ethers.getContractFactory('FakeRandomV2')
+  const RandomConsumer = await ethers.getContractFactory('FakeRandomV2Sequential')
   return await RandomConsumer.deploy(
     config.CHAINLINK_RINKEBY_VRF_COORD,
     '0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4',
@@ -24,7 +24,7 @@ const getRinkebyRandomConsumer = async (box: Contract) => {
   )
 }
 
-const setupV4ContractWithBuggyState = async () => {
+const setupV5ContractWithBuggyState = async () => {
   const accounts = await ethers.getSigners()
 
   // Deploy original contract and upgrade to V4 (where bug was introduced)
@@ -33,87 +33,75 @@ const setupV4ContractWithBuggyState = async () => {
   await box.setSaleStartTimestamp(1609459200)
 
   const BoxV2 = await ethers.getContractFactory('RarePizzasBoxV2Fix')
-  const boxV2 = await upgrades.upgradeProxy(box.address, BoxV2)
+  await upgrades.upgradeProxy(box.address, BoxV2)
 
   const BoxV3 = await ethers.getContractFactory('RarePizzasBoxV3Fix')
-  const boxV3 = await upgrades.upgradeProxy(box.address, BoxV3)
+  await upgrades.upgradeProxy(box.address, BoxV3)
 
   const BoxV4 = await ethers.getContractFactory('RarePizzasBoxV4')
-  const boxV4 = await upgrades.upgradeProxy(box.address, BoxV4)
+  await upgrades.upgradeProxy(box.address, BoxV4)
+
+  const BoxV5 = await ethers.getContractFactory('RarePizzasBoxV5')
+  const boxV5 = await upgrades.upgradeProxy(box.address, BoxV5)
 
   // Configure V4
-  const random = await getRinkebyRandomConsumer(boxV4)
-  await boxV4.setVRFConsumer(random.address)
-  await boxV4.setmultiPurchaseLimit(15)
-  await boxV4.setMaxNewPurchases(1000)
+  const random = await getRinkebyRandomConsumer(boxV5)
+  await boxV5.setVRFConsumer(random.address)
+  await boxV5.setmultiPurchaseLimit(15)
+  await boxV5.setMaxNewPurchases(1000)
 
-  return { boxV4, random, accounts }
+  return { boxV5, random, accounts }
 }
 
 describe('RarePizzasBoxV6 Double Counting Bug Fix Tests', function () {
 
-  describe('V4/V5 Bug Reproduction and V6 Fix', () => {
-    it('Should demonstrate and fix the V4/V5 double counting bug', async () => {
-      const { boxV4, random, accounts } = await setupV4ContractWithBuggyState()
+  describe('V5 Bug Reproduction and V6 Fix', () => {
+    it('Should demonstrate and fix the V5 double counting bug', async () => {
+      const { boxV5, random, accounts } = await setupV5ContractWithBuggyState() // Use V5
 
-      // === PHASE 1: Reproduce the bug in V4 ===
-      console.log("=== Testing V4 Bug ===")
+      // === PHASE 1: Reproduce the bug in V5 ===
+      console.log("=== Testing V5 Bug ===")
 
-      // Make some purchases in V4 (this will create the bug)
-      const price = await boxV4.getPrice()
-      await boxV4.connect(accounts[1]).multiPurchase(2, { value: price.mul(2) })
-      await random.fulfillRandomWordsWrapper(7777, [12345]) // Use 7777, not 1
+      // Make some purchases in V5 (this will create the bug)
+      const price = await boxV5.getPrice()
+      await boxV5.connect(accounts[1]).multiPurchase(2, { value: price.mul(2) })
 
-      // Make a team allocation in V4
-      await boxV4.startBatchMint([accounts[2].address], 3)
-      const batchRequestId = await boxV4.batchMintRequest()
+      // Now we can get the actual request ID from the sequential mock
+      let currentRequestId = await random.nextRequestId() - 2 // -2 because we made 2 requests
+      await random.fulfillRandomWordsWrapper(currentRequestId, [12345])
+      await random.fulfillRandomWordsWrapper(currentRequestId + 1, [12346])
+
+      // Make a team allocation in V5
+      await boxV5.startBatchMint([accounts[2].address], 3)
+      const batchRequestId = await boxV5.getBatchMintRequest() // Now we can use this!
       await random.fulfillRandomWordsWrapper(batchRequestId, [67890])
 
-      // Check V4 state - this demonstrates the bug
-      const v4PurchasedCount = await boxV4._purchased_pizza_count()
-      const v4MintedCount = await boxV4._minted_pizza_count()
-      const v4TotalSupply = await boxV4.totalSupply()
-
-      console.log(`V4 - Purchased: ${v4PurchasedCount}, Minted: ${v4MintedCount}, Total: ${v4TotalSupply}`)
-
-      expect(v4PurchasedCount).to.equal(2) // ✓ Correct
-      expect(v4TotalSupply).to.equal(5) // ✓ Correct (2 purchases + 3 team)
-      expect(v4MintedCount).to.equal(5) // ❌ BUG: Should be 3, but it's 5 (includes purchases!)
-
-      // === PHASE 2: Upgrade to V5, bug persists ===
-      console.log("=== Testing V5 Bug Persistence ===")
-
-      const BoxV5 = await ethers.getContractFactory('RarePizzasBoxV5')
-      const boxV5 = await upgrades.upgradeProxy(boxV4.address, BoxV5)
-      await boxV5.setVRFConsumer(random.address)
-
-      // Make another purchase in V5 to confirm bug persists
-      await boxV5.connect(accounts[3]).multiPurchase(1, { value: price })
-      await random.fulfillRandomWordsWrapper(7777, [11111]) // Use 7777
-
+      // Check V5 state - this demonstrates the bug
       const v5PurchasedCount = await boxV5._purchased_pizza_count()
       const v5MintedCount = await boxV5._minted_pizza_count()
       const v5TotalSupply = await boxV5.totalSupply()
 
       console.log(`V5 - Purchased: ${v5PurchasedCount}, Minted: ${v5MintedCount}, Total: ${v5TotalSupply}`)
 
-      expect(v5PurchasedCount).to.equal(3) // ✓ Correct (2+1)
-      expect(v5TotalSupply).to.equal(6) // ✓ Correct (5+1)
-      expect(v5MintedCount).to.equal(6) // ❌ BUG: Should be 3, but it's 6 (still includes purchases!)
+      expect(v5PurchasedCount).to.equal(2) // ✓ Correct
+      expect(v5TotalSupply).to.equal(5) // ✓ Correct (2 purchases + 3 team)
+      expect(v5MintedCount).to.equal(5) // ❌ BUG: Should be 3, but it's 5 (includes purchases!)
+
+      // === PHASE 2: Make more activity ===
+      console.log("=== Testing V5 More Activity ===")
+
+      await boxV5.connect(accounts[3]).multiPurchase(1, { value: price })
+      currentRequestId = await random.nextRequestId() - 1 // Get the last request ID
+      await random.fulfillRandomWordsWrapper(currentRequestId, [11111])
 
       // === PHASE 3: Upgrade to V6 and verify initial broken state ===
       console.log("=== Testing V6 Initial State ===")
 
       const BoxV6 = await ethers.getContractFactory('RarePizzasBoxV6')
       const boxV6 = await upgrades.upgradeProxy(boxV5.address, BoxV6)
-      await boxV6.setVRFConsumer(random.address)
 
       // V6 should have _corrected_team_count = 0 initially
       expect(await boxV6._corrected_team_count()).to.equal(0)
-
-      // Operations should fail before initialization (this tests the "no fallback" requirement)
-      await expect(boxV6.startBatchMint([accounts[4].address], 1))
-        .to.be.revertedWith('exceeds team mint') // Should fail because _corrected_team_count is 0
 
       // === PHASE 4: Initialize V6 and verify correction ===
       console.log("=== Testing V6 Initialization and Fix ===")
@@ -165,31 +153,36 @@ describe('RarePizzasBoxV6 Double Counting Bug Fix Tests', function () {
     })
 
     it('Should test initialization behavior', async () => {
-      const { boxV4, accounts } = await setupV4ContractWithBuggyState()
+      const { boxV5, random, accounts } = await setupV5ContractWithBuggyState()
+
+      // Create some activity first so that initialization will set _corrected_team_count > 0
+      const price = await boxV5.getPrice()
+      await boxV5.connect(accounts[1]).multiPurchase(1, { value: price })
+      await random.fulfillRandomWordsWrapper(1, [12345])
+
+      await boxV5.startBatchMint([accounts[2].address], 2)
+      const batchRequestId = await boxV5.getBatchMintRequest()
+      await random.fulfillRandomWordsWrapper(batchRequestId, [67890])
 
       // Upgrade to V6
       const BoxV6 = await ethers.getContractFactory('RarePizzasBoxV6')
-      const boxV6 = await upgrades.upgradeProxy(boxV4.address, BoxV6)
+      const boxV6 = await upgrades.upgradeProxy(boxV5.address, BoxV6)
 
-      // First initialization should work
+      // First initialization should work and set _corrected_team_count > 0
       await boxV6.initializeCorrectedCount()
-      expect(await boxV6._corrected_team_count()).to.be.gte(0)
+      expect(await boxV6._corrected_team_count()).to.be.gt(0) // Should be > 0 now
 
-      // Test double initialization behavior (might not be implemented as expected)
-      try {
-        await boxV6.initializeCorrectedCount()
-        console.log("Warning: Double initialization was allowed")
-      } catch (error: any) {
-        expect(error.message).to.include('Already initialized')
-      }
+      // Test double initialization behavior - should now be prevented
+      await expect(boxV6.initializeCorrectedCount())
+        .to.be.revertedWith('Already initialized')
     })
 
     it('Should test V6 operations without initialization', async () => {
-      const { boxV4, accounts } = await setupV4ContractWithBuggyState()
+      const { boxV5, accounts } = await setupV5ContractWithBuggyState()
 
       // Upgrade to V6 but don't initialize
       const BoxV6 = await ethers.getContractFactory('RarePizzasBoxV6')
-      const boxV6 = await upgrades.upgradeProxy(boxV4.address, BoxV6)
+      const boxV6 = await upgrades.upgradeProxy(boxV5.address, BoxV6)
 
       // _corrected_team_count should be 0
       expect(await boxV6._corrected_team_count()).to.equal(0)
@@ -211,11 +204,11 @@ describe('RarePizzasBoxV6 Double Counting Bug Fix Tests', function () {
 
   describe('V6 Event Emissions', () => {
     it('Should emit TeamAllocationMinted event correctly', async () => {
-      const { boxV4, random, accounts } = await setupV4ContractWithBuggyState()
+      const { boxV5, random, accounts } = await setupV5ContractWithBuggyState()
 
       // Upgrade to V6 and initialize
       const BoxV6 = await ethers.getContractFactory('RarePizzasBoxV6')
-      const boxV6 = await upgrades.upgradeProxy(boxV4.address, BoxV6)
+      const boxV6 = await upgrades.upgradeProxy(boxV5.address, BoxV6)
       await boxV6.initializeCorrectedCount()
 
       // Test event emission
@@ -255,15 +248,19 @@ describe('RarePizzasBoxV6 Double Counting Bug Fix Tests', function () {
     })
 
     it('Should handle large batch allocations correctly', async () => {
-      const { boxV4, random, accounts } = await setupV4ContractWithBuggyState()
+      const { boxV5, random, accounts } = await setupV5ContractWithBuggyState()
 
       // Upgrade to V6 and initialize
       const BoxV6 = await ethers.getContractFactory('RarePizzasBoxV6')
-      const boxV6 = await upgrades.upgradeProxy(boxV4.address, BoxV6)
+      const boxV6 = await upgrades.upgradeProxy(boxV5.address, BoxV6)
       await boxV6.initializeCorrectedCount()
 
-      // Large batch mint
-      const batchUsers = accounts.slice(1, 6) // 5 users
+      // FIX: Ensure we have enough valid accounts and filter out any undefined ones
+      const validAccounts = accounts.slice(1, 11).filter(account => account && account.address)
+      expect(validAccounts.length).to.be.gte(5, "Need at least 5 valid accounts for this test")
+
+      // Large batch mint - use only first 5 valid accounts
+      const batchUsers = validAccounts.slice(0, 5).map(account => account.address)
       const countPerUser = 10
 
       await boxV6.startBatchMint(batchUsers, countPerUser)
@@ -274,8 +271,8 @@ describe('RarePizzasBoxV6 Double Counting Bug Fix Tests', function () {
       expect(await boxV6._corrected_team_count()).to.be.gte(expectedTeamCount)
 
       // Verify each user got correct amount
-      for (const user of batchUsers) {
-        expect(await boxV6.balanceOf(user)).to.equal(countPerUser)
+      for (const userAddress of batchUsers) {
+        expect(await boxV6.balanceOf(userAddress)).to.equal(countPerUser)
       }
     })
   })
