@@ -8,6 +8,7 @@ import boxContractV2 from '../artifacts/contracts/token/RarePizzasBoxV2.sol/Rare
 import boxContractV3 from '../artifacts/contracts/token/RarePizzasBoxV3.sol/RarePizzasBoxV3.json'
 import boxContractV4 from '../artifacts/contracts/token/V4/RarePizzaBoxV4.sol/RarePizzasBoxV4.json'
 import boxContractV5 from '../artifacts/contracts/token/V4/RarePizzaBoxV5.sol/RarePizzasBoxV5.json'
+import boxContractV6 from '../artifacts/contracts/token/V4/RarePizzasBoxV6.sol/RarePizzasBoxV6.json'
 import randomConsumer from '../artifacts/contracts/random/RandomConsumer.sol/RandomConsumer.json'
 import randomConsumerV2 from '../artifacts/contracts/random/RandomConsumerV2.sol/RandomConsumerV2.json'
 import seedStorage from '../artifacts/contracts/data/RarePizzasSeedStorage.sol/RarePizzasSeedStorage.json'
@@ -579,6 +580,37 @@ const publishBoxWeb3V5AdminAbi = () => {
   writeFileSync('./dist/boxWeb3AdminInterface-v5.json', json)
 }
 
+  const publishBoxWeb3V6AdminAbi = () => {
+    const boxWeb3interface = {
+      contractName: boxContractV6.contractName,
+      sourceName: boxContractV6.sourceName,
+      abi: [
+        boxContractV5.abi.find((i: { name: string }) => i.name === 'mint'),
+        boxContractV5.abi.find((i: { name: string }) => i.name === 'purchaseTo'),
+        boxContractV5.abi.find((i: { name: string }) => i.name === 'setPresaleAllowed'),
+        boxContractV5.abi.find((i: { name: string }) => i.name === 'setSaleStartTimestamp'),
+        boxContractV5.abi.find((i: { name: string }) => i.name === 'updateBitcoinPriceInWei'),
+        boxContractV5.abi.find((i: { name: string }) => i.name === 'withdraw'),
+        boxContractV5.abi.find((i: { name: string }) => i.name === 'setVRFConsumer'),
+        boxContractV5.abi.find((i: { name: string }) => i.name === 'startBatchMint'),
+        boxContractV5.abi.find((i: { name: string }) => i.name === 'finishBatchMint'),
+        boxContractV5.abi.find((i: { name: string }) => i.name === 'gift'),
+        boxContractV5.abi.find((i: { name: string }) => i.name === 'setmultiPurchaseLimit'),
+        boxContractV5.abi.find((i: { name: string }) => i.name === 'setSaleWhitelist'),
+        boxContractV5.abi.find((i: { name: string }) => i.name === 'setclaimWhiteList'),
+        boxContractV5.abi.find((i: { name: string }) => i.name === 'setMaxNewPurchases'),
+        boxContractV5.abi.find((i: { name: string }) => i.name === 'setBatchMintStatus'),
+        boxContractV5.abi.find((i: { name: string }) => i.name === 'manualAdminFulfillRandomWords'),
+        boxContractV6.abi.find((i: { name: string }) => i.name === 'initializeCorrectedCount'),
+        boxContractV6.abi.find((i: { name: string }) => i.name === '_corrected_team_count'), // public state variable getter
+      ],
+    }
+
+  const json = JSON.stringify(boxWeb3interface)
+  console.log(json)
+  writeFileSync('./dist/boxWeb3AdminInterface-v5.json', json)
+}
+
 /**
  * Publish a truncated version of the RarePizzasSeedStorage ABI
  */
@@ -768,6 +800,7 @@ const utils = {
   publishBoxWeb3V3AdminAbi: publishBoxWeb3V3AdminAbi,
   publishBoxWeb3V4AdminAbi: publishBoxWeb3V4AdminAbi,
   publishBoxWeb3V5AdminAbi: publishBoxWeb3V5AdminAbi,
+  publishBoxWeb3V6AdminAbi: publishBoxWeb3V6AdminAbi,
   publishRarePizzasSeedStorageAbi: publishRarePizzasSeedStorageAbi,
   publishRandomConsumerWeb3AdminAbi: publishRandomConsumerWeb3AdminAbi,
   publishRandomConsumerV2Web3AdminAbi: publishRandomConsumerV2Web3AdminAbi,
