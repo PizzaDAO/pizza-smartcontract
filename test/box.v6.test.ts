@@ -127,7 +127,8 @@ describe('RarePizzasBoxV6 Double Counting Bug Fix Tests', function () {
 
       // Test new purchase doesn't increment team counter
       await boxV6.connect(accounts[5]).multiPurchase(1, { value: price })
-      await random.fulfillRandomWordsWrapper(7777, [22222]) // Use 7777
+      currentRequestId = await random.nextRequestId() - 1 // Get the last request ID
+      await random.fulfillRandomWordsWrapper(currentRequestId, [22222])
 
       expect(await boxV6._purchased_pizza_count()).to.equal(4) // Should increment
       expect(await boxV6._corrected_team_count()).to.equal(3) // Should NOT increment
