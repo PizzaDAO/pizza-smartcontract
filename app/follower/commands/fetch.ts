@@ -98,7 +98,7 @@ export const fetchRequests = async ({
   // Save the decoded oracle requests data to file based on token_id
   if (requestIds.length !== 0) {
     console.log(`Found ${requestIds.length} pending requests`)
-    const oracleRequests = await getOracleRequests(requestIds, fromBlock)
+    const oracleRequests = await getOracleRequests(requestIds, fromBlock, blockHeight)
     oracleRequests.map(saveRequest)
   } else {
     console.log(

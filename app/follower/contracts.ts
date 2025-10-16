@@ -1,4 +1,4 @@
-import { Event, Contract, providers, Wallet } from 'ethers'
+import { Event, Contract, providers, Wallet, EventFilter } from 'ethers'
 import * as cbor from 'cbor'
 
 import { abi as oracleAbi } from '../../artifacts/contracts/chainlink/OrderAPIOracle.sol/OrderAPIOracle.json'
@@ -8,6 +8,8 @@ import {
   IOracleRequestData,
   IOracleRequestEventArgs,
 } from './types'
+
+const MAX_BLOCK_RANGE = 9
 
 export const provider = new providers.AlchemyProvider(
   'mainnet',
@@ -43,6 +45,24 @@ export const contracts = {
   orderApiOracle,
 }
 
+export const getBatchedLogs = async (
+  contract: Contract,
+  filter: EventFilter,
+  fromBlock: number,
+  toBlock: number,
+): Promise<Event[]> => {
+  const logs: Event[] = []
+  for (let start = fromBlock; start <= toBlock; start += MAX_BLOCK_RANGE + 1) {
+    const end = Math.min(start + MAX_BLOCK_RANGE, toBlock)
+    // Query the logs in batches to avoid hitting block range limits
+    const batch = await contract.queryFilter(filter, start, end)
+    logs.push(...batch)
+    await new Promise((resolve) => setTimeout(resolve, 200)) // Add a small delay to avoid rate limits
+    console.log(`Fetched logs from blocks ${start} to ${end}`)
+  }
+  return logs
+}
+
 // Get the pending requests from the OrderAPIConsumer contract
 export const getOrderApiConsumerRequests = async (
   fromBlock: number,
@@ -54,16 +74,19 @@ export const getOrderApiConsumerRequests = async (
 
   // Get the requested and fulfilled events
   const contract = contracts.orderApiConsumer
+  const latestBlock = await contract.provider.getBlockNumber()
+  console.log(`Latest block number: ${latestBlock}`)
+
   const requestedFilter = contract.filters.ChainlinkRequested()
   console.log(`Getting ChainlinkRequested events...`)
 
-  const requestedEvents = await contract.queryFilter(requestedFilter, fromBlock)
+  const requestedEvents = await getBatchedLogs(contract, requestedFilter, fromBlock, latestBlock)
   console.log(`Found ${requestedEvents.length} ChainlinkRequested events`)
 
   const fulfilledFilter = contract.filters.ChainlinkFulfilled()
   console.log(`Getting ChainlinkFulfilled events...`)
 
-  const fulfilledLogs = await contract.queryFilter(fulfilledFilter, fromBlock)
+  const fulfilledLogs = await getBatchedLogs(contract, fulfilledFilter, fromBlock, latestBlock)
   console.log(`Found ${fulfilledLogs.length} ChainlinkFulfilled events`)
 
   console.log(
@@ -72,6 +95,7 @@ export const getOrderApiConsumerRequests = async (
 
   const pendingRequests = []
   let blockHeight: number = fromBlock
+
   // Loop through the requested events and check if the requestId is in the fulfilled events
   for (let i = 0; i < requestedEvents.length; i++) {
     const requestedEvent = requestedEvents[i]
@@ -98,7 +122,6 @@ export const getOrderApiConsumerRequests = async (
   }
 
   const requestIds = pendingRequests.map((event) => event.topics[1])
-
   return { requestIds, blockHeight }
 }
 
@@ -108,7 +131,7 @@ export const getOracleRequest = async (
 ): Promise<IOracleRequestEventArgs | undefined> => {
   const contract = contracts.orderApiOracle
   const requestFilter = contract.filters.OracleRequest()
-  console.log(`Getting OracleRequest events...`)
+  console.log(`Getting OracleRequest events in block ${inBlock}...`)
   const oracleRequests = await contract.queryFilter(
     requestFilter,
     inBlock,
@@ -130,12 +153,19 @@ export const getOracleRequest = async (
 export const getOracleRequests = async (
   requestIds: string[],
   fromBlock: number,
+  toBlock: number = 0, // If toBlock is not provided, it will fetch up to the latest block
 ): Promise<IOracleRequestData[]> => {
+
   // Get the oracle events data
   const contract = contracts.orderApiOracle
+
+  if (toBlock === 0) {
+    const latestBlock = await contract.provider.getBlockNumber()
+    toBlock = latestBlock
+  }
   const requestFilter = contract.filters.OracleRequest()
   console.log(`Getting OracleRequest events...`)
-  const oracleRequests = await contract.queryFilter(requestFilter, fromBlock)
+  const oracleRequests = await getBatchedLogs(contract, requestFilter, fromBlock, toBlock)
 
   const matchedOracleRequests = []
 
