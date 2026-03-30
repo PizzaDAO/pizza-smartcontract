@@ -1,4 +1,4 @@
-import { task, HardhatUserConfig } from 'hardhat/config'
+import { HardhatUserConfig } from 'hardhat/config'
 import { NetworksUserConfig } from 'hardhat/types'
 import '@nomiclabs/hardhat-etherscan'
 import '@nomiclabs/hardhat-waffle'
@@ -10,12 +10,20 @@ import config, { NetworkConfig } from './config'
 const networks: NetworksUserConfig = {
   mainnet: {
     url: `https://eth-mainnet.alchemyapi.io/v2/${config.ALCHEMY_MAINNET_KEY}`,
-    accounts: [`0x${config.MAINNET_PRIVATE_KEY}`],
+    accounts: [
+      `0x${config.MAINNET_DEPLOYER_PRIVATE_KEY}`,
+      `0x${config.MAINNET_USER_PRIVATE_KEY}`,
+    ],
     gasPrice: 220000000000,
   },
   rinkeby: {
     url: `https://eth-rinkeby.alchemyapi.io/v2/${config.ALCHEMY_RINKEBY_KEY}`,
     accounts: [`0x${config.RINKEBY_PRIVATE_KEY}`],
+    gasPrice: 22000000000,
+  },
+  sepolia: {
+    url: `https://eth-sepolia.g.alchemy.com/v2/${config.ALCHEMY_SEPOLIA_KEY}`,
+    accounts: [`0x${config.SEPOLIA_PRIVATE_KEY}`],
     gasPrice: 22000000000,
   },
   matic: {
@@ -28,7 +36,7 @@ const networks: NetworksUserConfig = {
   },
 }
 
-const getNetworks = (config: NetworkConfig) => {
+export const getNetworks = (config: NetworkConfig) => {
   const networkName = config.NETWORK.toLowerCase()
   const network = networks[networkName]
 
@@ -43,6 +51,16 @@ const hardhatConfig: HardhatUserConfig = {
   networks: networks,
   etherscan: {
     apiKey: config.ETHERSCAN_API_KEY,
+    customChains: [
+      {
+        network: "sepolia",
+        chainId: 11155111,
+        urls: {
+          apiURL: "https://api-sepolia.etherscan.io/api",
+          browserURL: "https://sepolia.etherscan.io"
+        }
+      }
+    ],
   },
   solidity: {
     compilers: [

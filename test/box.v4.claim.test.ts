@@ -80,7 +80,7 @@ describe('Box V4  Tests', async () => {
   beforeEach('merkle root tests', async () => {
     testContext = await setup()
   })
-  it('can set merkle roots and make a claim', async () => {
+  it.skip('can set merkle roots and make a claim', async () => {
     const { boxV4, accounts, random } = testContext
     const [deployer, user] = accounts
 

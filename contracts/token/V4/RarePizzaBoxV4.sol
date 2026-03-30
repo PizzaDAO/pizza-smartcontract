@@ -39,7 +39,7 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
     event Gift(address a, uint256 n);
 
     //fulfillRandomWords
-    function fulfillRandomWords(uint256 request, uint256[] memory random) external {
+    function fulfillRandomWords(uint256 request, uint256[] memory random) external virtual {
         require(msg.sender == _chainlinkVRFConsumer, 'caller not VRF');
         if (bytes32(request) == batchMintRequest) {
             for (uint256 i = 0; i < batchMintUsers.length; i++) {
@@ -74,7 +74,7 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
         }
     }
 
-    function gift(address toPizzaiolo, uint256 count) public onlyOwner {
+    function gift(address toPizzaiolo, uint256 count) public virtual onlyOwner {
         require(toPizzaiolo != address(0), 'dont be silly');
         require(count > 0, 'need a number');
         require(totalSupply().add(count) <= maxSupply(), 'would exceed supply.');
@@ -151,7 +151,7 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
     }
 
     function claim(bytes32[] memory proof, uint256 amount) public virtual {
-        
+
     }
 
     function validateUserAmount(
@@ -160,7 +160,7 @@ contract RarePizzasBoxV4 is RarePizzasBoxV3Fix {
         address a,
         uint256 amount
     ) internal {
-       
+
     }
 
     function validateUser(
